@@ -16,16 +16,26 @@ export interface VersionInfo {
   buildTime: string;
 }
 
-// Global window interface extensions for testing compatibility
+// Global window interface extensions for game state and testing compatibility
 declare global {
   interface Window {
     __APP_STORE_INITIALIZED?: boolean;
     __appStore?: {
       message: string;
       count: number;
+      gamePhase: string;
+      saveGame: () => void;
+      loadGame: () => boolean;
+      resetGame: () => void;
+      earnMoney: () => void;
+      foundCompany: () => boolean;
     };
     __appMethods?: {
-      dummyMethod: () => void;
+      loadGame: () => boolean;
+      saveGame: () => void;
+      resetGame: () => void;
+      earnMoney: () => void;
+      foundCompany: () => boolean;
     };
   }
 }

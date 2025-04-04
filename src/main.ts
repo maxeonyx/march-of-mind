@@ -18,11 +18,23 @@ if (typeof window !== 'undefined' && !window.__APP_STORE_INITIALIZED) {
   setTimeout(() => {
     const store = useAppStore();
     
+    // Prevent auto-loading in tests with fresh localStorage
+    const isInTest = window.location.href.includes('playwright');
+    
+    // Try to load saved game state if not in test
+    if (!isInTest) {
+      store.loadGame();
+    }
+    
     // Expose store for tests
     window.__appStore = store;
     window.__appMethods = {
       // Add basic methods for test compatibility
-      dummyMethod: () => console.log('Test method called')
+      loadGame: () => store.loadGame(),
+      saveGame: () => store.saveGame(),
+      resetGame: () => store.resetGame(),
+      earnMoney: () => store.earnMoney(),
+      foundCompany: () => store.foundCompany()
     };
   }, 0);
 }
