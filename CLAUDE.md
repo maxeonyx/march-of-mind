@@ -3,15 +3,8 @@
 ## Project Overview
 March of Mind - A cookie clicker style game where you run a company and balance R&D with products, hardware capital and talent. Built with Vue.js, TypeScript, Pinia, and includes Playwright testing and GitHub Actions CI/CD setup.
 
-## Current Features
-- Vue 3 with Composition API
-- TypeScript support
-- Pinia state management
-- Vite build system
-- ESLint code quality with modern flat config
-- Playwright end-to-end testing
-- GitHub Actions CI/CD
-- GitHub Pages deployment
+## Current Tech Stack
+- Earn Money Button (still kinda fun already lol)
 
 ## Development Philosophy
 
@@ -47,20 +40,21 @@ March of Mind - A cookie clicker style game where you run a company and balance 
      - Summarize the changes, and how the changes are covered by the tests.
      - Ask the user what's next
        - Continue development?
-       - Commit and (if the app is changed) push (ie. deploy. You don't have to ask here, just go ahead.)
+       - Commit and deploy (if the user requests this, proceed with committing, pushing, and deployment steps)
    - ONLY AFTER the user has confirmed, update the semver version in package.json AND update the version history in CLAUDE.md. The version is shown to users, so this is REQUIRED before committing.
 
    There are no commit message requirements.
 
 4. **Deployment Process**
-   The app is deployed via GitHub workflows to GitHub pages. When deploying,
-   always do ALL of the following:
-
-   - `git push`
-   - `gh run list --limit 5`
-   - `gh run watch <run-id>`
-   - Verify the new version is live by requesting app-base/version.json
-   - If successful, link the user to the working application.
+   The app is deployed via GitHub workflows to GitHub pages. When the user requests deployment or confirms changes:
+   
+   - YOU (Claude) should perform the deployment steps without asking additional permission
+   - The deployment steps are:
+     - `git push` to trigger the GitHub Actions workflow
+     - `gh run list --limit 5` to check deployment status
+     - `gh run watch <run-id>` to monitor the deployment process
+     - Verify the new version is live by checking https://maxeonyx.github.io/march-of-mind/version.json
+     - Report back to the user with a link to the working application: https://maxeonyx.github.io/march-of-mind/
    
 5. **Deployment Configuration**
    - `static.yml` - GitHub's standard Pages workflow (configured for our Vue.js app)

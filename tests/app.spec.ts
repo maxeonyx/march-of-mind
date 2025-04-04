@@ -16,7 +16,8 @@ test.beforeEach(async ({ page }) => {
 // short timeout. Longer timeouts hide performance issues.
 // DO NOT CHANGE THESE TIMEOUT VALUES - they are intentionally short to catch reactivity issues.
 // The app should respond within these timeframes - if tests fail due to timeouts, fix the app, not the timeouts.
-const NORMAL_TIMEOUT = 100; // ms - for normal UI operations
+const FRAME_TIMEOUT = 16; // ms - for animations or rapidly updating components.
+const NORMAL_TIMEOUT = 100; // ms - for normal UI operations.
 
 // Wait for the store to be initialized before test begins
 async function waitForStoreInitialization(page) {
