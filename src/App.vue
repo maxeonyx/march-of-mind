@@ -1,11 +1,19 @@
 <template>
   <div id="app">
     <header>
-      <img alt="Vue logo" src="./assets/logo.png" class="logo">
-      <h1>Claude Vue Template</h1>
+      <img alt="March of Mind logo" src="./assets/logo.png" class="logo">
+      <h1>March of Mind</h1>
     </header>
     <main>
-      <p>A Vue.js starter template with TypeScript, Pinia, and GitHub Actions</p>
+      <h2>Company Dashboard</h2>
+      <div class="game-container">
+        <div class="resource-display">
+          <h3>Money: ${{ money }}</h3>
+        </div>
+        <div class="actions">
+          <button @click="earnMoney" class="action-button">Unrealistically Earn Money</button>
+        </div>
+      </div>
     </main>
     <footer>
       <p>Version {{ version }}</p>
@@ -19,9 +27,16 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useVersion } from './composables/useVersion';
+import { useAppStore } from './stores/app';
 
 const { version: versionInfo } = useVersion();
 const version = computed(() => versionInfo.value?.version || '0.0.0');
+const store = useAppStore();
+const money = computed(() => store.count);
+
+function earnMoney() {
+  store.increment();
+}
 </script>
 
 <style>
@@ -67,6 +82,45 @@ h1 {
 
 main {
   margin-bottom: 50px;
+}
+
+.game-container {
+  background-color: var(--bg-color);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.resource-display {
+  margin-bottom: 20px;
+}
+
+.resource-display h3 {
+  font-size: 24px;
+  color: var(--text-color);
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.action-button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.action-button:hover {
+  background-color: var(--primary-hover);
 }
 
 footer {

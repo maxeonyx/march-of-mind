@@ -6,7 +6,7 @@ import { defineStore } from 'pinia';
 export const useAppStore = defineStore('app', {
   state: () => {
     return {
-      message: 'Hello World from Pinia Store!',
+      message: 'Welcome to March of Mind!',
       count: 0
     };
   },

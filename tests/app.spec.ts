@@ -31,15 +31,26 @@ test('homepage has title and basic components', async ({ page }) => {
   await waitForStoreInitialization(page);
   
   // Assert that the page title contains the project name
-  await expect(page).toHaveTitle(/Claude Vue Template/);
+  await expect(page).toHaveTitle(/March of Mind/);
   
   // Assert that the main title is visible
   const mainTitle = page.locator('h1');
   await expect(mainTitle).toBeVisible({ timeout: NORMAL_TIMEOUT });
-  await expect(mainTitle).toContainText('Claude Vue Template');
+  await expect(mainTitle).toContainText('March of Mind');
   
   // Verify that footer exists and contains version
   const footer = page.locator('footer');
   await expect(footer).toBeVisible({ timeout: NORMAL_TIMEOUT });
   await expect(footer).toContainText('Version');
+  
+  // Test the money counter and earn money button
+  const moneyDisplay = page.locator('.resource-display h3');
+  await expect(moneyDisplay).toBeVisible({ timeout: NORMAL_TIMEOUT });
+  await expect(moneyDisplay).toContainText('Money: $0');
+  
+  // Click the earn money button and check if counter increases
+  const earnButton = page.locator('.action-button');
+  await expect(earnButton).toBeVisible({ timeout: NORMAL_TIMEOUT });
+  await earnButton.click();
+  await expect(moneyDisplay).toContainText('Money: $1', { timeout: NORMAL_TIMEOUT });
 });
