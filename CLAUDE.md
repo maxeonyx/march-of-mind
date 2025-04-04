@@ -53,7 +53,7 @@ March of Mind - A cookie clicker style game where you run a company and balance 
      - `git push` to trigger the GitHub Actions workflow
      - `gh run list --limit 5` to check deployment status
      - `gh run watch <run-id>` to monitor the deployment process
-     - Verify the new version is live by checking https://maxeonyx.github.io/march-of-mind/version.json
+     - Verify the new version is live by using WebFetchTool to check https://maxeonyx.github.io/march-of-mind/version.json
      - Report back to the user with a link to the working application: https://maxeonyx.github.io/march-of-mind/
    
 5. **Deployment Configuration**
