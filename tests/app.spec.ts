@@ -137,7 +137,7 @@ test('talent management and income system', async ({ page }) => {
   });
   
   // Check that talent panel is visible
-  await expect(page.locator('.management-panel')).toBeVisible({ timeout: NORMAL_TIMEOUT });
+  await expect(page.locator('.management-panel').first()).toBeVisible({ timeout: NORMAL_TIMEOUT });
   
   // Initial talent should be 0
   await expect(page.locator('.talent-count')).toContainText('Current Talent:0', { timeout: NORMAL_TIMEOUT });
@@ -162,14 +162,14 @@ test('talent management and income system', async ({ page }) => {
   // Fire button should now be enabled
   await expect(fireButton).toBeEnabled({ timeout: NORMAL_TIMEOUT });
   
-  // Income stats should show correct values (assuming TALENT_INCOME=15, TALENT_SALARY=10)
+  // Income stats should show correct values (with TALENT_INCOME=5, TALENT_SALARY=15)
   const incomeStats = page.locator('.income-stats');
   const incomeStatsText = await incomeStats.textContent();
   
   // Check that income stats contain expected values
-  expect(incomeStatsText).toContain('Monthly Income:+$15');
-  expect(incomeStatsText).toContain('Monthly Expenses:-$10');
-  expect(incomeStatsText).toContain('Net Monthly:+$5');
+  expect(incomeStatsText).toContain('Monthly Income:+$5');
+  expect(incomeStatsText).toContain('Monthly Expenses:-$15');
+  expect(incomeStatsText).toContain('Net Monthly:$-10');
   
   // Fire talent
   await fireButton.click();

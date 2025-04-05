@@ -123,3 +123,4 @@ Always update both this file `CLAUDE.md` AND `package.json`.
 - 0.3.0 - Implemented Phase 1 features: "Work for the Man" button with progress bar, "Found a Company" button, game phase transitions, and save/load functionality
 - 0.4.0 - Implemented Phase 2 features: Time system (starting from 1950), Talent management with hire/fire functionality, Monthly income/expense system, Game tick mechanics for passive income
 - 0.4.1 - Refined Phase 2: Added "Work Hard" button to company phase, moved talent management to separate panel, fixed date advancement, balanced game to last 40 minutes total (~30 seconds per year)
+- 0.5.0 - Redesigned talent system to be a net resource drain while contributing to product development progress, simplified time system to use month counter, added product development progress tracking

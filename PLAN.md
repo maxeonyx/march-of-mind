@@ -20,6 +20,8 @@ The complete game experience is designed to take approximately 40 minutes from s
 - 2.5 seconds per game month
 - A total span from 1950 to 2035 (85 years)
 
+Note: The 2035 end date is a target for game pacing rather than a hard end date. It represents roughly when a player would develop superintelligent AI in the game narrative, but gameplay continues beyond this point.
+
 ### Phase 1: The Job Phase
 - **Core Mechanic**: Single "Work for the Man" button that earns money
 - **Satisfaction**: Watching money number increase

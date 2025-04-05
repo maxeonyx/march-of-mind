@@ -120,8 +120,45 @@
               </div>
               
               <div class="talent-info">
-                <p>Each talent costs ${{ TALENT_SALARY_VALUE }} per month but generates ${{ TALENT_INCOME_VALUE }} in revenue.</p>
-                <p>Net profit per talent: ${{ TALENT_INCOME_VALUE - TALENT_SALARY_VALUE }} per month.</p>
+                <p>Each talent costs ${{ TALENT_SALARY_VALUE }} per month and generates ${{ TALENT_INCOME_VALUE }} in revenue.</p>
+                <p>Net cost per talent: ${{ TALENT_SALARY_VALUE - TALENT_INCOME_VALUE }} per month.</p>
+                <p>Each talent generates {{ TALENT_DEVELOPMENT_POINTS_VALUE }} development points per month.</p>
+              </div>
+            </div>
+            
+            <!-- Product Development Panel -->
+            <div class="management-panel">
+              <div class="panel-header">
+                <h4>Product Development</h4>
+                <div class="development-count">
+                  <span class="development-label">Development Points:</span>
+                  <span class="development-value">{{ Math.floor(developmentPoints) }}</span>
+                </div>
+              </div>
+              
+              <div class="progress-container">
+                <div class="progress-label">Progress to first product: {{ Math.floor(productProgress * 100) }}%</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" :style="{ width: `${productProgress * 100}%` }"></div>
+                </div>
+                <div class="progress-info">
+                  <span>{{ Math.floor(developmentPoints) }} / {{ PRODUCT_DEVELOPMENT_COST_VALUE }}</span>
+                </div>
+              </div>
+              
+              <div class="product-actions">
+                <button 
+                  @click="launchProduct" 
+                  class="action-button product-button launch-button"
+                  :class="{ 'button-enabled': canLaunchProduct }"
+                  :disabled="!canLaunchProduct"
+                >
+                  Launch Product
+                </button>
+              </div>
+              
+              <div class="product-info" v-if="hasProduct">
+                <p>Your product is live! More features coming soon.</p>
               </div>
             </div>
           </div>
@@ -146,7 +183,9 @@ import {
   GamePhase,
   HIRE_TALENT_COST,
   TALENT_SALARY,
-  TALENT_INCOME
+  TALENT_INCOME,
+  TALENT_DEVELOPMENT_POINTS,
+  PRODUCT_DEVELOPMENT_COST
 } from './stores/app';
 
 // Version info
@@ -171,10 +210,18 @@ const monthlyNetIncome = computed(() => store.monthlyNetIncome);
 const canHireTalent = computed(() => store.canHireTalent);
 const canFireTalent = computed(() => store.canFireTalent);
 
+// Product development system
+const developmentPoints = computed(() => store.developmentPoints);
+const productProgress = computed(() => store.productDevelopmentProgress);
+const canLaunchProduct = computed(() => store.canLaunchProduct);
+const hasProduct = computed(() => store.hasProduct);
+
 // Expose constants to the template
 const HIRE_TALENT_COST_VALUE = HIRE_TALENT_COST;
 const TALENT_SALARY_VALUE = TALENT_SALARY;
 const TALENT_INCOME_VALUE = TALENT_INCOME;
+const TALENT_DEVELOPMENT_POINTS_VALUE = TALENT_DEVELOPMENT_POINTS;
+const PRODUCT_DEVELOPMENT_COST_VALUE = PRODUCT_DEVELOPMENT_COST;
 
 // Button click animation state
 const workButtonClicked = ref(false);
@@ -225,6 +272,12 @@ function hireTalent() {
 function fireTalent() {
   if (canFireTalent.value) {
     store.fireTalent();
+  }
+}
+
+function launchProduct() {
+  if (canLaunchProduct.value) {
+    store.launchProduct();
   }
 }
 
@@ -606,8 +659,49 @@ main {
   text-align: center;
 }
 
-.talent-info p {
+.talent-info p,
+.product-info p {
   margin: 5px 0;
+}
+
+.development-count {
+  background-color: var(--secondary-color);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 14px;
+}
+
+.development-value {
+  font-weight: bold;
+  margin-left: 5px;
+}
+
+.product-actions {
+  display: flex;
+  justify-content: center;
+  margin: 15px 0;
+}
+
+.product-button {
+  min-width: 150px;
+}
+
+.launch-button {
+  background-color: var(--primary-color);
+}
+
+.launch-button:hover,
+.launch-button.button-enabled:hover {
+  background-color: var(--primary-hover);
+}
+
+.product-info {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 4px;
+  text-align: center;
 }
 
 footer {

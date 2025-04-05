@@ -3,12 +3,16 @@ import { defineStore } from 'pinia';
 // Game constants
 export const COMPANY_FOUNDING_COST = 100;
 export const HIRE_TALENT_COST = 50;
-export const TALENT_SALARY = 10;
-export const TALENT_INCOME = 15;
+export const TALENT_SALARY = 15;
+export const TALENT_INCOME = 5;
+export const TALENT_DEVELOPMENT_POINTS = 2; // Development points generated per talent per month
+export const PRODUCT_DEVELOPMENT_COST = 100; // Development points needed for first product
 export const GAME_TICK_MS = 1000;  // How often to update the game state (1 second)
 export const GAME_MONTH_MS = 2500; // How long a month lasts in real time (2.5 seconds, ~30 seconds per year)
-export const START_DATE = new Date(1950, 0, 1); // January 1, 1950
-export const END_DATE = new Date(2035, 11, 31); // December 31, 2035
+export const START_YEAR = 1950;
+export const START_MONTH = 0; // January
+export const END_YEAR = 2035;
+export const MONTHS_PER_YEAR = 12;
 
 /**
  * Game phases
@@ -32,13 +36,16 @@ export const useAppStore = defineStore('app', {
       lastSavedAt: 0,
       
       // Time system
-      currentDate: new Date(START_DATE),
+      totalMonths: 0, // Months since game start (January 1950)
       lastTickTime: 0,
       timerId: null as number | null,
       
       // Talent system
       talent: 0,
-      lastSalaryPaymentDate: new Date(START_DATE)
+      
+      // Product development system
+      developmentPoints: 0,
+      hasProduct: false
     };
   },
   
@@ -105,10 +112,46 @@ export const useAppStore = defineStore('app', {
     },
     
     /**
+     * Calculate monthly development points generated
+     */
+    monthlyDevelopmentPoints: (state) => {
+      return state.talent * TALENT_DEVELOPMENT_POINTS;
+    },
+    
+    /**
+     * Calculate progress toward first product (0-1)
+     */
+    productDevelopmentProgress: (state) => {
+      return Math.min(state.developmentPoints / PRODUCT_DEVELOPMENT_COST, 1);
+    },
+    
+    /**
+     * Check if player can launch first product
+     */
+    canLaunchProduct: (state) => {
+      return !state.hasProduct && state.developmentPoints >= PRODUCT_DEVELOPMENT_COST;
+    },
+    
+    /**
+     * Calculate current year based on months elapsed
+     */
+    currentYear() {
+      return START_YEAR + Math.floor(this.totalMonths / MONTHS_PER_YEAR);
+    },
+
+    /**
+     * Calculate current month (0-11) based on months elapsed
+     */
+    currentMonth() {
+      return (START_MONTH + this.totalMonths) % MONTHS_PER_YEAR;
+    },
+
+    /**
      * Format the current date as a string
      */
-    formattedDate: (state) => {
-      return state.currentDate.toLocaleDateString('en-US', { 
+    formattedDate() {
+      const date = new Date(this.currentYear, this.currentMonth, 1);
+      return date.toLocaleDateString('en-US', { 
         month: 'long', 
         year: 'numeric' 
       });
@@ -164,6 +207,19 @@ export const useAppStore = defineStore('app', {
     },
     
     /**
+     * Launch the first product when enough development points are available
+     */
+    launchProduct() {
+      if (this.canLaunchProduct) {
+        this.developmentPoints -= PRODUCT_DEVELOPMENT_COST;
+        this.hasProduct = true;
+        this.saveGame();
+        return true;
+      }
+      return false;
+    },
+    
+    /**
      * Start the game ticker that advances time and processes events
      */
     startGameTicker() {
@@ -192,15 +248,10 @@ export const useAppStore = defineStore('app', {
     },
     
     /**
-     * Process one game tick
+     * Process one game tick - determines elapsed time and calls processOneMonth() as needed
      */
     processTick() {
-      // Only process if in company phase
-      if (this.gamePhase === GamePhase.JOB) {
-        return;
-      }
-      
-      // Calculate how much time has passed since the last tick
+      // Calculate real time elapsed
       const now = Date.now();
       const elapsed = now - this.lastTickTime;
       this.lastTickTime = now;
@@ -209,43 +260,40 @@ export const useAppStore = defineStore('app', {
       const monthsPassed = elapsed / GAME_MONTH_MS;
       
       if (monthsPassed > 0) {
-        // Advance the game date
-        const newDate = new Date(this.currentDate);
-        newDate.setMonth(newDate.getMonth() + Math.floor(monthsPassed));
-        this.currentDate = new Date(newDate);
+        // Track previous month count
+        const previousMonths = Math.floor(this.totalMonths);
         
-        // Process monthly events (only if we've entered a new month)
-        if (this.currentDate > this.lastSalaryPaymentDate) {
-          this.processMonthlyEvents();
+        // Advance the total months
+        this.totalMonths += monthsPassed;
+        
+        // Get the whole number of months that passed
+        const currentMonths = Math.floor(this.totalMonths);
+        const wholeMonthsPassed = currentMonths - previousMonths;
+        
+        // Process each full month that passed
+        for (let i = 0; i < wholeMonthsPassed; i++) {
+          this.processOneMonth();
         }
         
-        // Add passive income (proportional to time passed)
-        this.count += this.monthlyNetIncome * monthsPassed;
-        
-        // Save the game if changes were made
+        // Save the game
         this.saveGame();
       }
     },
     
     /**
-     * Process monthly events (salaries, etc.)
+     * Process a single month of game time
      */
-    processMonthlyEvents() {
-      // Update the last salary payment date
-      this.lastSalaryPaymentDate = new Date(this.currentDate);
-      
+    processOneMonth() {
       // No events to process if not in company phase
       if (this.gamePhase === GamePhase.JOB) {
         return;
       }
       
-      // Process income (handled in the partial month processing)
+      // Apply monthly income or expense
+      this.count += this.monthlyNetIncome;
       
-      // Check if player has reached the end date
-      if (this.currentDate >= END_DATE) {
-        // Game completed logic here
-        console.log('Game completed - reached 2035!');
-      }
+      // Add development points based on talent
+      this.developmentPoints += this.monthlyDevelopmentPoints;
     },
     
     /**
@@ -256,9 +304,10 @@ export const useAppStore = defineStore('app', {
         count: this.count,
         gamePhase: this.gamePhase,
         savedAt: Date.now(),
-        currentDate: this.currentDate.toISOString(),
+        totalMonths: this.totalMonths,
         talent: this.talent,
-        lastSalaryPaymentDate: this.lastSalaryPaymentDate.toISOString()
+        developmentPoints: this.developmentPoints,
+        hasProduct: this.hasProduct
       };
       localStorage.setItem('marchOfMindSave', JSON.stringify(saveData));
       this.lastSavedAt = saveData.savedAt;
@@ -277,15 +326,14 @@ export const useAppStore = defineStore('app', {
           this.lastSavedAt = data.savedAt || 0;
           
           // Load time system data
-          if (data.currentDate) {
-            this.currentDate = new Date(data.currentDate);
-          }
+          this.totalMonths = data.totalMonths || 0;
           
           // Load talent system data
           this.talent = data.talent || 0;
-          if (data.lastSalaryPaymentDate) {
-            this.lastSalaryPaymentDate = new Date(data.lastSalaryPaymentDate);
-          }
+          
+          // Load product development data
+          this.developmentPoints = data.developmentPoints || 0;
+          this.hasProduct = data.hasProduct || false;
           
           // If we're in company phase, start the game ticker
           if (this.gamePhase !== GamePhase.JOB) {
@@ -311,9 +359,10 @@ export const useAppStore = defineStore('app', {
       // Reset all state
       this.count = 0;
       this.gamePhase = GamePhase.JOB;
-      this.currentDate = new Date(START_DATE);
+      this.totalMonths = 0;
       this.talent = 0;
-      this.lastSalaryPaymentDate = new Date(START_DATE);
+      this.developmentPoints = 0;
+      this.hasProduct = false;
       
       // Clear local storage
       localStorage.removeItem('marchOfMindSave');
