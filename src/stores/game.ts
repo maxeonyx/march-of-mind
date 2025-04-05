@@ -139,7 +139,7 @@ export const useGameStore = defineStore('game', {
         totalMonths: timeStore.totalMonths,
         talent: talentStore.talent,
         hasHiredTalent: talentStore.hasHiredTalent,
-        developmentPoints: productStore.developmentPoints,
+        insights: productStore.insights,
         hasProduct: productStore.hasProduct,
         hasLaunchedFirstProduct: productStore.hasLaunchedFirstProduct
       };
@@ -177,7 +177,7 @@ export const useGameStore = defineStore('game', {
           talentStore.hasHiredTalent = data.hasHiredTalent || false;
           
           // Load product development data
-          productStore.developmentPoints = data.developmentPoints || 0;
+          productStore.insights = data.insights || data.developmentPoints || 0;
           productStore.hasProduct = data.hasProduct || false;
           productStore.hasLaunchedFirstProduct = data.hasLaunchedFirstProduct || false;
           

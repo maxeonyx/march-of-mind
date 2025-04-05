@@ -5,7 +5,7 @@ import { useResourcesStore } from './resources';
 export const HIRE_TALENT_COST = 50;
 export const TALENT_SALARY = 15;
 export const TALENT_INCOME = 5;
-export const TALENT_DEVELOPMENT_POINTS = 2; // Development points generated per talent per month
+export const TALENT_INSIGHTS = 0.02; // Insights generated per talent per month (50 talent-months per insight)
 
 /**
  * Store for managing talent
@@ -41,10 +41,10 @@ export const useTalentStore = defineStore('talent', {
     },
     
     /**
-     * Calculate monthly development points generated
+     * Calculate monthly insights generated
      */
-    monthlyDevelopmentPoints: (state) => {
-      return state.talent * TALENT_DEVELOPMENT_POINTS;
+    monthlyInsights: (state) => {
+      return state.talent * TALENT_INSIGHTS;
     },
     
     /**

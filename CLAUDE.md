@@ -126,3 +126,4 @@ Always update both this file `CLAUDE.md` AND `package.json`.
 - 0.5.0 - Redesigned talent system to be a net resource drain while contributing to product development progress, simplified time system to use month counter, added product development progress tracking
 - 0.5.1 - Made date visible in all game phases, including job phase, and time now passes consistently throughout the game
 - 0.6.0 - Major refactoring: Split app into modular components, restructured store into domain-specific modules, added ProgressButton component with color-based progress indicators
+- 0.6.1 - Renamed development points to insights and made them slower to accumulate, fixed product launch button by removing redundant progress bar

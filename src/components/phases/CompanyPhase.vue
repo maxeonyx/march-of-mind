@@ -56,7 +56,7 @@
         <div class="talent-info">
           <p>Each talent costs ${{ TALENT_SALARY }} per month and generates ${{ TALENT_INCOME }} in revenue.</p>
           <p>Net cost per talent: ${{ TALENT_SALARY - TALENT_INCOME }} per month.</p>
-          <p>Each talent generates {{ TALENT_DEVELOPMENT_POINTS }} development points per month.</p>
+          <p>Each talent generates {{ TALENT_INSIGHTS }} insights per month.</p>
         </div>
       </div>
       
@@ -65,20 +65,11 @@
         <div class="panel-header">
           <h4>Product Development</h4>
           <div class="development-count">
-            <span class="development-label">Development Points:</span>
-            <span class="development-value">{{ Math.floor(developmentPoints) }}</span>
+            <span class="development-label">Insights:</span>
+            <span class="development-value">{{ Math.floor(insights) }}</span>
           </div>
         </div>
         
-        <div v-if="!hasProduct" class="progress-container">
-          <div class="progress-label">Progress to first product: {{ Math.floor(productProgress * 100) }}%</div>
-          <div class="progress-bar">
-            <div class="progress-fill" :style="{ width: `${productProgress * 100}%` }"></div>
-          </div>
-          <div class="progress-info">
-            <span>{{ Math.floor(developmentPoints) }} / {{ PRODUCT_DEVELOPMENT_COST }}</span>
-          </div>
-        </div>
         
         <div class="product-actions">
           <ProgressButton
@@ -105,8 +96,8 @@
 import { computed } from 'vue';
 import ProgressButton from '../ProgressButton.vue';
 import { useGameStore } from '../../stores/game';
-import { useTalentStore, HIRE_TALENT_COST, TALENT_SALARY, TALENT_INCOME, TALENT_DEVELOPMENT_POINTS } from '../../stores/modules/talent';
-import { useProductStore, PRODUCT_DEVELOPMENT_COST } from '../../stores/modules/products';
+import { useTalentStore, HIRE_TALENT_COST, TALENT_SALARY, TALENT_INCOME, TALENT_INSIGHTS } from '../../stores/modules/talent';
+import { useProductStore } from '../../stores/modules/products';
 
 const gameStore = useGameStore();
 const talentStore = useTalentStore();
@@ -120,7 +111,7 @@ const hasHiredTalent = computed(() => talentStore.hasHiredTalent);
 const firstHireProgress = computed(() => talentStore.firstHireProgress);
 
 // Product development system
-const developmentPoints = computed(() => productStore.developmentPoints);
+const insights = computed(() => productStore.insights);
 const productProgress = computed(() => productStore.productDevelopmentProgress);
 const canLaunchProduct = computed(() => productStore.canLaunchProduct);
 const hasProduct = computed(() => productStore.hasProduct);

@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { useTalentStore } from './talent';
 
 // Product development constants
-export const PRODUCT_DEVELOPMENT_COST = 100; // Development points needed for first product
+export const PRODUCT_DEVELOPMENT_COST = 1; // Insights needed for first product
 
 /**
  * Store for managing product development
@@ -10,7 +10,7 @@ export const PRODUCT_DEVELOPMENT_COST = 100; // Development points needed for fi
 export const useProductStore = defineStore('products', {
   state: () => {
     return {
-      developmentPoints: 0,
+      insights: 0,
       hasProduct: false,
       hasLaunchedFirstProduct: false,
     };
@@ -21,40 +21,40 @@ export const useProductStore = defineStore('products', {
      * Calculate progress toward first product (0-1)
      */
     productDevelopmentProgress: (state) => {
-      return Math.min(state.developmentPoints / PRODUCT_DEVELOPMENT_COST, 1);
+      return Math.min(state.insights / PRODUCT_DEVELOPMENT_COST, 1);
     },
     
     /**
      * Check if player can launch first product
      */
     canLaunchProduct: (state) => {
-      return !state.hasProduct && state.developmentPoints >= PRODUCT_DEVELOPMENT_COST;
+      return !state.hasProduct && state.insights >= PRODUCT_DEVELOPMENT_COST;
     }
   },
   
   actions: {
     /**
-     * Add development points
+     * Add insights
      */
-    addDevelopmentPoints(amount: number) {
-      this.developmentPoints += amount;
+    addInsights(amount: number) {
+      this.insights += amount;
     },
     
     /**
-     * Process monthly development from talent
+     * Process monthly insights from talent
      */
     processMonthlyDevelopment() {
       const talentStore = useTalentStore();
-      this.addDevelopmentPoints(talentStore.monthlyDevelopmentPoints);
+      this.addInsights(talentStore.monthlyInsights);
     },
     
     /**
-     * Launch the first product when enough development points are available
-     * @returns true if successful, false if not enough development points
+     * Launch the first product when enough insights are available
+     * @returns true if successful, false if not enough insights
      */
     launchProduct() {
       if (this.canLaunchProduct) {
-        this.developmentPoints -= PRODUCT_DEVELOPMENT_COST;
+        this.insights -= PRODUCT_DEVELOPMENT_COST;
         this.hasProduct = true;
         this.hasLaunchedFirstProduct = true;
         return true;
@@ -66,7 +66,7 @@ export const useProductStore = defineStore('products', {
      * Reset product development
      */
     reset() {
-      this.developmentPoints = 0;
+      this.insights = 0;
       this.hasProduct = false;
       this.hasLaunchedFirstProduct = false;
     }
