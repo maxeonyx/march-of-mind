@@ -47,7 +47,6 @@ import { computed, onMounted } from 'vue';
 import { useVersion } from './composables/useVersion';
 import { useGameStore } from './stores/game';
 import { usePhaseStore } from './stores/modules/phase';
-import { initGame } from './game';
 
 // Components
 import DateDisplay from './components/DateDisplay.vue';
@@ -74,7 +73,7 @@ function resetGame() {
 
 // Initialize game on component mount
 onMounted(() => {
-  initGame();
+  gameStore.init();
 });
 </script>
 
