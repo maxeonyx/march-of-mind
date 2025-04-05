@@ -72,6 +72,23 @@
           <div class="company-info">
             <h3>Your Company is Founded!</h3>
             
+            <!-- Core Actions Panel -->
+            <div class="actions-panel">
+              <div class="panel-header">
+                <h4>Actions</h4>
+              </div>
+              
+              <div class="company-actions">
+                <button 
+                  @click="workForTheMad" 
+                  class="action-button work-button"
+                >
+                  Work Hard
+                  <span class="button-effect" v-if="workButtonClicked"></span>
+                </button>
+              </div>
+            </div>
+            
             <!-- Talent Management Panel -->
             <div class="management-panel">
               <div class="panel-header">
@@ -510,13 +527,21 @@ main {
   color: var(--negative-color);
 }
 
-/* Talent Management */
-.management-panel {
+/* Panel styles */
+.management-panel,
+.actions-panel {
   margin: 15px 0;
   padding: 15px;
   background-color: rgba(255, 255, 255, 0.8);
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* Company actions */
+.company-actions {
+  display: flex;
+  justify-content: center;
+  margin: 15px 0;
 }
 
 .panel-header {

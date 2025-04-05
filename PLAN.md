@@ -14,6 +14,12 @@
 
 ## Game Progression Flow
 
+### Game Duration
+The complete game experience is designed to take approximately 40 minutes from start to finish. This translates to:
+- Roughly 30 seconds per game year
+- 2.5 seconds per game month
+- A total span from 1950 to 2035 (85 years)
+
 ### Phase 1: The Job Phase
 - **Core Mechanic**: Single "Work for the Man" button that earns money
 - **Satisfaction**: Watching money number increase

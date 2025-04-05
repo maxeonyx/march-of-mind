@@ -6,7 +6,7 @@ export const HIRE_TALENT_COST = 50;
 export const TALENT_SALARY = 10;
 export const TALENT_INCOME = 15;
 export const GAME_TICK_MS = 1000;  // How often to update the game state (1 second)
-export const GAME_MONTH_MS = 5000; // How long a month lasts in real time (5 seconds)
+export const GAME_MONTH_MS = 2500; // How long a month lasts in real time (2.5 seconds, ~30 seconds per year)
 export const START_DATE = new Date(1950, 0, 1); // January 1, 1950
 export const END_DATE = new Date(2035, 11, 31); // December 31, 2035
 
@@ -195,6 +195,11 @@ export const useAppStore = defineStore('app', {
      * Process one game tick
      */
     processTick() {
+      // Only process if in company phase
+      if (this.gamePhase === GamePhase.JOB) {
+        return;
+      }
+      
       // Calculate how much time has passed since the last tick
       const now = Date.now();
       const elapsed = now - this.lastTickTime;
@@ -207,22 +212,17 @@ export const useAppStore = defineStore('app', {
         // Advance the game date
         const newDate = new Date(this.currentDate);
         newDate.setMonth(newDate.getMonth() + Math.floor(monthsPassed));
-        this.currentDate = newDate;
+        this.currentDate = new Date(newDate);
         
         // Process monthly events (only if we've entered a new month)
         if (this.currentDate > this.lastSalaryPaymentDate) {
           this.processMonthlyEvents();
         }
-      }
-      
-      // Also handle partial month passive income
-      if (this.gamePhase !== GamePhase.JOB && monthsPassed > 0) {
-        // Add fractional income for partial months
+        
+        // Add passive income (proportional to time passed)
         this.count += this.monthlyNetIncome * monthsPassed;
-      }
-      
-      // Save the game if changes were made
-      if (monthsPassed > 0) {
+        
+        // Save the game if changes were made
         this.saveGame();
       }
     },
