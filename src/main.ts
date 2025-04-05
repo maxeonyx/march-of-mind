@@ -4,12 +4,6 @@ import App from './App.vue';
 import { useGameStore } from './stores/game';
 import { initGame } from './game';
 
-// Make Pinia available for tests
-if (typeof window !== 'undefined' && window.Pinia) {
-  window.Pinia.createPinia = createPinia;
-  window.Pinia.useGameStore = useGameStore;
-}
-
 // Create Vue app instance
 const app = createApp(App);
 

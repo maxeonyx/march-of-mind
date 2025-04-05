@@ -84,11 +84,5 @@ declare global {
       addMoney: (amount: number) => void;
       setPhase: (phase: string) => void;
     };
-    Pinia?: {
-      createPinia: () => unknown;
-      useGameStore: () => unknown;
-      _useGameStore?: () => unknown;
-      instance?: unknown;
-    };
   }
 }

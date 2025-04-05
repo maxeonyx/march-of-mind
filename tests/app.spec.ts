@@ -3,10 +3,9 @@ import { test, expect } from '@playwright/test';
 // We need to ensure we initialize the store properly 
 // The page context in Playwright doesn't get the initialization from main.ts
 test.beforeEach(async ({ page }) => {
-  // Initialize the global store on each test page
+  // Clear localStorage to start fresh
   await page.addInitScript(() => {
     if (typeof window !== 'undefined') {
-      // Clear any localStorage data to ensure tests start fresh
       localStorage.removeItem('marchOfMindSave');
     }
   });
@@ -18,38 +17,16 @@ test.beforeEach(async ({ page }) => {
 // The app should respond within these timeframes - if tests fail due to timeouts, fix the app, not the timeouts.
 const NORMAL_TIMEOUT = 100; // ms - for normal UI operations.
 
-// Set up the app store directly for testing
-async function setupStore(page) {
-  // Add dummy store functions directly for testing
-  await page.evaluate(() => {
-    window.__APP_STORE_INITIALIZED = true;
-    window.__appStore = {
-      message: 'Welcome to March of Mind!',
-      count: 0,
-      gamePhase: 'job',
-      saveGame: () => {},
-      loadGame: () => true,
-      resetGame: () => {},
-      earnMoney: () => {},
-      foundCompany: () => true,
-      addMoney: (amount) => {},
-      setPhase: (phase) => {}
-    };
-    window.__appMethods = {
-      loadGame: () => true,
-      saveGame: () => {},
-      resetGame: () => {},
-      earnMoney: () => {},
-      foundCompany: () => true,
-      addMoney: (amount) => {},
-      setPhase: (phase) => {}
-    };
-  });
+// Initialize app directly for testing
+async function setupAppForTest(page) {
+  // Add a wait to let app initialize
+  await page.waitForSelector('h1', { timeout: NORMAL_TIMEOUT * 3 });
 }
 
-// Skip tests for now until we can fix them properly
-test.skip('homepage has title and basic components', async ({ page }) => {
+// Basic test to verify the page loads correctly
+test('homepage has title and basic components', async ({ page }) => {
   await page.goto('/');
+  await setupAppForTest(page);
   
   // Assert that the page title contains the project name
   await expect(page).toHaveTitle(/March of Mind/);
@@ -71,8 +48,9 @@ test.skip('homepage has title and basic components', async ({ page }) => {
 });
 
 // Test the initial job phase mechanics
-test.skip('job phase: earn money and progress toward founding company', async ({ page }) => {
+test('job phase: earn money and progress toward founding company', async ({ page }) => {
   await page.goto('/');
+  await setupAppForTest(page);
   
   // Verify we're in the job phase
   const pageTitle = page.locator('h2');
@@ -94,8 +72,9 @@ test.skip('job phase: earn money and progress toward founding company', async ({
 });
 
 // Test the company founding functionality
-test.skip('found a company when threshold is reached', async ({ page }) => {
+test('found a company when threshold is reached', async ({ page }) => {
   await page.goto('/');
+  await setupAppForTest(page);
   
   // Inject script to set money to threshold minus 1
   await page.evaluate(() => {
