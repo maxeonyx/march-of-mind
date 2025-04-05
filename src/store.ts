@@ -1,14 +1,18 @@
 import { defineStore } from 'pinia';
-import { reactive, computed, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { GamePhase } from './types';
 import { useResources } from './composables/useResources';
 import { useTime } from './composables/useTime';
 import { useTalent } from './composables/useTalent';
 import { useProducts } from './composables/useProducts';
 
+// Cost to found a company (moved from usePhase)
+export const COMPANY_FOUNDING_COST = 100;
+
 /**
  * Main game store that coordinates all modules
  */
+// Adding a type cast to fix circular reference issues
 export const useGameStore = defineStore('game', () => {
   // Create a message for the welcome screen
   const message = ref('Welcome to March of Mind!');
@@ -21,61 +25,54 @@ export const useGameStore = defineStore('game', () => {
   const talent = useTalent(resources);
   const products = useProducts(resources, talent, time);
   
-  // Game phase management (merged from usePhase)
-  const phaseBase = reactive({
-    gamePhase: GamePhase.JOB,
-    
-    enterPhase(newPhase: GamePhase) {
-      phaseBase.gamePhase = newPhase;
-    },
-
-    reset() {
-      phaseBase.gamePhase = GamePhase.JOB;
-    },
-
-    save() {
-      return {
-        gamePhase: phaseBase.gamePhase
-      };
-    },
-    
-    load(data: any) {
-      if (data) {
-        phaseBase.gamePhase = data.gamePhase || GamePhase.JOB;
-      }
+  // Game phase directly in the store
+  const phase = ref(GamePhase.JOB);
+  
+  // Phase-related computed properties
+  const hasFoundedCompany = computed(() => phase.value !== GamePhase.JOB);
+  
+  const phaseTitle = computed(() => {
+    switch (phase.value) {
+      case GamePhase.JOB:
+        return "Working for the Man";
+      case GamePhase.COMPANY:
+        return "Company Dashboard";
+      case GamePhase.MARKETING:
+        return "Marketing Department";
+      case GamePhase.RESEARCH:
+        return "Research & Development";
+      default:
+        return "March of Mind";
     }
   });
   
-  // Create the phase object with computed properties
-  const phase = reactive({
-    ...phaseBase,
-    
-    hasFoundedCompany: computed(() => {
-      return phaseBase.gamePhase !== GamePhase.JOB;
-    }),
-
-    phaseTitle: computed(() => {
-      switch (phaseBase.gamePhase) {
-        case GamePhase.JOB:
-          return "Working for the Man";
-        case GamePhase.COMPANY:
-          return "Company Dashboard";
-        case GamePhase.MARKETING:
-          return "Marketing Department";
-        case GamePhase.RESEARCH:
-          return "Research & Development";
-        default:
-          return "March of Mind";
-      }
-    }),
-  });
+  // Phase-related methods
+  function enterPhase(newPhase: GamePhase) {
+    phase.value = newPhase;
+  }
+  
+  function resetPhase() {
+    phase.value = GamePhase.JOB;
+  }
+  
+  function savePhase() {
+    return {
+      gamePhase: phase.value
+    };
+  }
+  
+  function loadPhase(data: any) {
+    if (data) {
+      phase.value = data.gamePhase || GamePhase.JOB;
+    }
+  }
 
   /**
    * Process one month of game time
    */
   function processOneMonth() {
     // Only process game mechanics if in company phase or beyond
-    if (phase.gamePhase !== GamePhase.JOB) {
+    if (phase.value !== GamePhase.JOB) {
       // Process talent income/expenses
       talent.processMonthlyFinances();
 
@@ -110,7 +107,7 @@ export const useGameStore = defineStore('game', () => {
       savedAt: Date.now(),
       
       // Each module's save data
-      phase: phase.save(),
+      phase: savePhase(),
       resources: resources.save(),
       time: time.save(),
       talent: talent.save(),
@@ -131,7 +128,7 @@ export const useGameStore = defineStore('game', () => {
         const saveData = JSON.parse(saveString);
         
         // Load each module's state
-        phase.load(saveData.phase);
+        loadPhase(saveData.phase);
         resources.load(saveData.resources);
         time.load(saveData.time);
         talent.load(saveData.talent);
@@ -161,7 +158,7 @@ export const useGameStore = defineStore('game', () => {
    */
   function resetGame() {
     // Reset all modules
-    phase.reset();
+    resetPhase();
     resources.reset();
     time.reset();
     talent.reset();
@@ -181,10 +178,15 @@ export const useGameStore = defineStore('game', () => {
     lastSavedAt,
     showWelcomeScreen,
     
+    // Phase state
+    phase,
+    phaseTitle,
+    hasFoundedCompany,
+    enterPhase,
+    
     // Module states (accessible as properties)
     resources,
     time,
-    phase,
     talent,
     products,
     

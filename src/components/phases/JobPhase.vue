@@ -57,7 +57,7 @@ function workHard() {
 
 function foundCompany() {
   if (canFoundCompany.value) {
-    gameStore.phase.enterPhase(GamePhase.COMPANY);
+    gameStore.enterPhase(GamePhase.COMPANY);
   }
 }
 </script>

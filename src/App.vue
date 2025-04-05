@@ -19,17 +19,17 @@
     </div>
   </header>
   <main>
-    <h2>{{ gameStore.phase.phaseTitle }}</h2>
+    <h2>{{ gameStore.phaseTitle }}</h2>
     
     <div class="game-container">
       <!-- Resource display -->
-      <ResourceDisplay :showIncomeStats="gameStore.phase.gamePhase === 'company'" />
+      <ResourceDisplay :showIncomeStats="gameStore.phase.value === 'company'" />
       
       <!-- Job Phase -->
-      <JobPhase v-if="gameStore.phase.gamePhase === 'job'" />
+      <JobPhase v-if="gameStore.phase.value === 'job'" />
       
       <!-- Company Phase -->
-      <CompanyPhase v-if="gameStore.phase.gamePhase === 'company'" />
+      <CompanyPhase v-if="gameStore.phase.value === 'company'" />
     </div>
   </main>
   <footer>
