@@ -19,16 +19,7 @@
             Work Hard
           </ProgressButton>
           
-          <ProgressButton
-            v-if="hasProduct"
-            :enabled="true"
-            :progress="1 - marketingEffectiveness"
-            @click="applyMarketing"
-            :style="{ backgroundColor: getMarketingButtonColor() }"
-            theme="marketing"
-          >
-            Marketing Campaign
-          </ProgressButton>
+          <!-- Marketing button removed since marketing feature was scrapped -->
         </div>
       </div>
       
@@ -153,12 +144,13 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue';
 import ProgressButton from '../ProgressButton.vue';
-import { useGameStore } from '../../stores/game';
+import { useGameStore } from '../../store';
 import { HIRE_TALENT_COST, TALENT_SALARY, TALENT_INCOME, TALENT_INSIGHTS } from '../../composables/useTalent';
 
 const gameStore = useGameStore();
 const talentStore = gameStore.talent;
 const productStore = gameStore.products;
+const resources = gameStore.resources;
 
 // Initialize product data
 onMounted(() => {
@@ -166,41 +158,49 @@ onMounted(() => {
 });
 
 // Talent system
-const talent = computed(() => talentStore.talent);
-const canHireTalent = computed(() => talentStore.canHireTalent);
-const canFireTalent = computed(() => talentStore.canFireTalent);
+const talent = computed(() => talentStore.count);
+const canHireTalent = computed(() => talentStore.canHireTalent.value);
+const canFireTalent = computed(() => talentStore.canFireTalent.value);
 const hasHiredTalent = computed(() => talentStore.hasHiredTalent);
-const firstHireProgress = computed(() => talentStore.firstHireProgress);
+const firstHireProgress = computed(() => talentStore.firstHireProgress.value);
 
 // Product development system
-const insights = computed(() => productStore.insights);
-const productProgress = computed(() => productStore.productDevelopmentProgress);
-const canLaunchProduct = computed(() => productStore.canLaunchProduct);
+const insights = computed(() => resources.insights);
+const productProgress = computed(() => productStore.productDevelopmentProgress.value);
+const canLaunchProduct = computed(() => productStore.canLaunchProduct.value);
+const currentProductInDevelopment = computed(() => productStore.currentProductInDevelopment.value);
+const hasProducts = computed(() => productStore.activeProducts.length > 0);
+const activeProducts = computed(() => productStore.activeProducts);
+const hasProduct = computed(() => productStore.hasProduct);
+const hasLaunchedFirstProduct = computed(() => productStore.hasLaunchedFirstProduct);
+const productIncome = computed(() => productStore.currentIncome);
+const marketingEffectiveness = computed(() => 1); // Since marketing is removed
 
 function workHard() {
-  gameStore.resources.addMoney(1);
+  resources.addMoney(1);
 }
 
 function hireTalent() {
   if (canHireTalent.value) {
-    gameStore.talent.hireTalent();
+    talentStore.hireTalent();
   }
 }
 
 function fireTalent() {
   if (canFireTalent.value) {
-    gameStore.talent.hireTalent();
+    talentStore.fireTalent(); // Fixed the bug where this was calling hireTalent
   }
 }
 
 function launchProduct() {
   if (canLaunchProduct.value) {
-    gameStore.products.launchProduct();
+    productStore.launchProduct();
   }
 }
 
 function applyMarketing() {
-  productStore.applyMarketing();
+  // This function is retained but now a no-op since marketing was removed
+  console.log("Marketing feature has been removed");
 }
 
 // Color utilities

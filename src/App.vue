@@ -19,23 +19,23 @@
     </div>
   </header>
   <main>
-    <h2>{{ phaseTitle }}</h2>
+    <h2>{{ gameStore.phase.phaseTitle }}</h2>
     
     <div class="game-container">
       <!-- Resource display -->
-      <ResourceDisplay :showIncomeStats="gamePhase === 'company'" />
+      <ResourceDisplay :showIncomeStats="gameStore.phase.gamePhase === 'company'" />
       
       <!-- Job Phase -->
-      <JobPhase v-if="gamePhase === 'job'" />
+      <JobPhase v-if="gameStore.phase.gamePhase === 'job'" />
       
       <!-- Company Phase -->
-      <CompanyPhase v-if="gamePhase === 'company'" />
+      <CompanyPhase v-if="gameStore.phase.gamePhase === 'company'" />
     </div>
   </main>
   <footer>
     <p>Version {{ version }}</p>
-    <p v-if="versionInfo?.buildTime" class="build-time">
-      Built: {{ new Date(versionInfo.buildTime).toLocaleString() }}
+    <p v-if="versionInfo.value?.buildTime" class="build-time">
+      Built: {{ new Date(versionInfo.value.buildTime).toLocaleString() }}
     </p>
   </footer>
 </template>
@@ -43,7 +43,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useVersion } from './composables/useVersion';
-import { useGameStore } from './stores/game';
+import { useGameStore } from './store';
 
 // Components
 import DateDisplay from './components/DateDisplay.vue';
@@ -52,15 +52,11 @@ import JobPhase from './components/phases/JobPhase.vue';
 import CompanyPhase from './components/phases/CompanyPhase.vue';
 
 // Version info
-const { version: versionInfo } = useVersion();
+const versionInfo = useVersion();
 const version = computed(() => versionInfo.value?.version || '0.0.0');
 
-// Game store and modules
+// Game store
 const gameStore = useGameStore();
-
-// Game state
-const gamePhase = computed(() => gameStore.phase.state.gamePhase); // TODO: Move phase straight into gameStore itself.
-const phaseTitle = computed(() => gameStore.phase.phaseTitle); // TODO these computed properties are redundant, especially after we refactor the composables.
 
 </script>
 

@@ -1,4 +1,4 @@
-import { reactive, computed } from 'vue';
+import { reactive, computed, type ComputedRef } from 'vue';
 import { type ResourcesStore } from './useResources';
 
 // Talent system constants
@@ -11,149 +11,90 @@ export const TALENT_INSIGHTS = 0.02; // Insights generated per talent per month 
  * Talent module for managing talent
  */
 export function useTalent(resources: ResourcesStore) {
-  const state = reactive({
-    talent: 0,
+  const talent = reactive({
+    count: 0,
     hasHiredTalent: false,
-  });
 
-  /**
-   * Calculate monthly income from talent
-   */
-  const monthlyIncome = computed(() => {
-    return state.talent * TALENT_INCOME;
-  });
-
-  /**
-   * Calculate monthly salary expenses
-   */
-  const monthlySalary = computed(() => {
-    return state.talent * TALENT_SALARY;
-  });
-
-  /**
-   * Calculate net monthly income (income - expenses)
-   */
-  const monthlyNetIncome = computed(() => {
-    return state.talent * (TALENT_INCOME - TALENT_SALARY);
-  });
-
-  /**
-   * Calculate monthly insights generated
-   */
-  const monthlyInsights = computed(() => {
-    return state.talent * TALENT_INSIGHTS;
-  });
-
-  /**
-   * Check if player can hire talent
-   */
-  const canHireTalent = computed(() => {
-    return resources.money >= HIRE_TALENT_COST;
-  });
-
-  /**
-   * Check if player can fire talent
-   */
-  const canFireTalent = computed(() => {
-    return state.talent > 0;
-  });
-
-  /**
-   * Get the progress toward first hire (0-1)
-   */
-  const firstHireProgress = computed(() => {
-    return Math.min(resources.money / HIRE_TALENT_COST, 1);
-  });
-
-  /**
-   * Hire a new talent
-   * @returns true if successful, false if not enough money
-   */
-  function hireTalent() {
-    if (canHireTalent.value) {
-      resources.spendMoney(HIRE_TALENT_COST);
-      state.talent++;
-      
-      // Mark that we've hired at least one talent
-      if (!state.hasHiredTalent) {
-        state.hasHiredTalent = true;
+    hireTalent() {
+      if (resources.money >= HIRE_TALENT_COST) {
+        resources.spendMoney(HIRE_TALENT_COST);
+        talent.count++;
+        
+        // Mark that we've hired at least one talent
+        if (!talent.hasHiredTalent) {
+          talent.hasHiredTalent = true;
+        }
+        
+        return true;
       }
-      
-      return true;
-    }
-    return false;
-  }
+      return false;
+    },
 
-  /**
-   * Fire an existing talent
-   * @returns true if successful, false if no talent to fire
-   */
-  function fireTalent() {
-    if (canFireTalent.value) {
-      state.talent--;
-      return true;
-    }
-    return false;
-  }
+    fireTalent() {
+      if (talent.count > 0) {
+        talent.count--;
+        return true;
+      }
+      return false;
+    },
 
-  /**
-   * Process monthly income/expenses for talent
-   */
-  function processMonthlyFinances() {
-    if (state.talent > 0) {
-      resources.addMoney(monthlyNetIncome.value);
-    }
-  }
+    processMonthlyFinances() {
+      if (talent.count > 0) {
+        // Calculate net income directly without using computed property
+        const netIncome = talent.count * (TALENT_INCOME - TALENT_SALARY);
+        resources.addMoney(netIncome);
+      }
+    },
 
-  /**
-   * Reset talent to 0
-   */
-  function reset() {
-    state.talent = 0;
-    state.hasHiredTalent = false;
-  }
+    reset() {
+      talent.count = 0;
+      talent.hasHiredTalent = false;
+    },
 
-  /**
-   * Save talent state to an object for persistence
-   */
-  function save() {
-    return {
-      talent: state.talent,
-      hasHiredTalent: state.hasHiredTalent
-    };
-  }
-  
-  /**
-   * Load talent state from saved data
-   */
-  function load(data: any) {
-    if (data) {
-      state.talent = data.talent || 0;
-      state.hasHiredTalent = data.hasHiredTalent || false;
-    }
-  }
-
-  return {
-    // State
-    state,
+    save() {
+      return {
+        talent: talent.count,
+        hasHiredTalent: talent.hasHiredTalent
+      };
+    },
     
-    // Computed
-    monthlyIncome,
-    monthlySalary,
-    monthlyNetIncome,
-    monthlyInsights,
-    canHireTalent,
-    canFireTalent,
-    firstHireProgress,
+    load(data: any) {
+      if (data) {
+        talent.count = data.talent || 0;
+        talent.hasHiredTalent = data.hasHiredTalent || false;
+      }
+    }
+  });
+
+  return reactive({
+    ...talent,
     
-    // Methods
-    hireTalent,
-    fireTalent,
-    processMonthlyFinances,
-    
-    // Persistence
-    reset,
-    save,
-    load
-  };
+    monthlyIncome: computed(() => {
+      return talent.count * TALENT_INCOME;
+    }),
+
+    monthlySalary: computed(() => {
+      return talent.count * TALENT_SALARY;
+    }),
+
+    monthlyNetIncome: computed(() => {
+      return talent.count * (TALENT_INCOME - TALENT_SALARY);
+    }),
+
+    monthlyInsights: computed(() => {
+      return talent.count * TALENT_INSIGHTS;
+    }),
+
+    canHireTalent: computed(() => {
+      return resources.money >= HIRE_TALENT_COST;
+    }),
+
+    canFireTalent: computed(() => {
+      return talent.count > 0;
+    }),
+
+    firstHireProgress: computed(() => {
+      return Math.min(resources.money / HIRE_TALENT_COST, 1);
+    }),
+  });
 }

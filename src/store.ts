@@ -1,33 +1,81 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
-import { GamePhase } from '../types';
-import { useResources } from '../composables/useResources';
-import { useTime } from '../composables/useTime';
-import { usePhase } from '../composables/usePhase';
-import { useTalent } from '../composables/useTalent';
-import { useProducts } from '../composables/useProducts';
+import { reactive, computed, ref } from 'vue';
+import { GamePhase } from './types';
+import { useResources } from './composables/useResources';
+import { useTime } from './composables/useTime';
+import { useTalent } from './composables/useTalent';
+import { useProducts } from './composables/useProducts';
 
 /**
  * Main game store that coordinates all modules
  */
 export const useGameStore = defineStore('game', () => {
   // Create a message for the welcome screen
-  const message = ref('Welcome to March of Mind!'); // TODO: Maybe make an opening screen / menu screen? with a "Play" button?
+  const message = ref('Welcome to March of Mind!');
   const lastSavedAt = ref(0);
+  const showWelcomeScreen = ref(false); // Will be used for future welcome screen
 
   // Initialize our module states
   const resources = useResources();
   const time = useTime();
-  const phase = usePhase();
   const talent = useTalent(resources);
   const products = useProducts(resources, talent, time);
+  
+  // Game phase management (merged from usePhase)
+  const phaseBase = reactive({
+    gamePhase: GamePhase.JOB,
+    
+    enterPhase(newPhase: GamePhase) {
+      phaseBase.gamePhase = newPhase;
+    },
+
+    reset() {
+      phaseBase.gamePhase = GamePhase.JOB;
+    },
+
+    save() {
+      return {
+        gamePhase: phaseBase.gamePhase
+      };
+    },
+    
+    load(data: any) {
+      if (data) {
+        phaseBase.gamePhase = data.gamePhase || GamePhase.JOB;
+      }
+    }
+  });
+  
+  // Create the phase object with computed properties
+  const phase = reactive({
+    ...phaseBase,
+    
+    hasFoundedCompany: computed(() => {
+      return phaseBase.gamePhase !== GamePhase.JOB;
+    }),
+
+    phaseTitle: computed(() => {
+      switch (phaseBase.gamePhase) {
+        case GamePhase.JOB:
+          return "Working for the Man";
+        case GamePhase.COMPANY:
+          return "Company Dashboard";
+        case GamePhase.MARKETING:
+          return "Marketing Department";
+        case GamePhase.RESEARCH:
+          return "Research & Development";
+        default:
+          return "March of Mind";
+      }
+    }),
+  });
 
   /**
    * Process one month of game time
    */
   function processOneMonth() {
     // Only process game mechanics if in company phase or beyond
-    if (phase.state.gamePhase !== GamePhase.JOB) {
+    if (phase.gamePhase !== GamePhase.JOB) {
       // Process talent income/expenses
       talent.processMonthlyFinances();
 
@@ -131,6 +179,7 @@ export const useGameStore = defineStore('game', () => {
     // State
     message,
     lastSavedAt,
+    showWelcomeScreen,
     
     // Module states (accessible as properties)
     resources,

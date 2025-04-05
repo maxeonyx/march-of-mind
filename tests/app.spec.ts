@@ -25,7 +25,7 @@ test.beforeEach(async ({ page }) => {
   });
   
   // Wait for the Vue app to mount by checking for the global store variable.
-  await page.waitForFunction(() => window.gameStore !== undefined, { timeout: 10000 });
+  await page.waitForFunction(() => window.getStore() !== undefined, { timeout: 10000 });
   
 });
 // We need to ensure we initialize the store properly 
@@ -71,15 +71,15 @@ test('job phase: earn money and progress toward founding company', async ({ page
   await workButton.click();
   
   expect(await page.evaluate(() => 
-    window.gameStore.resources.state.money
+    window.getStore().resources.state.money
   )).toBe(1)
 });
 
 // Test the company founding functionality
 test('found a company when threshold is reached', async ({ page }) => {  
   await page.evaluate(() => {
-      window.gameStore.addMoney(99);
-      window.gameStore.addMoney(1);
+      window.getStore().addMoney(99);
+      window.getStore().addMoney(1);
   });
   
   const foundButton = page.getByTestId('btn-found-company');
@@ -90,7 +90,7 @@ test('found a company when threshold is reached', async ({ page }) => {
   await page.waitForTimeout(LONG_TIMEOUT);
 
   expect(await page.evaluate(() => 
-    window.gameStore.phase.state.gamePhase
+    window.getStore().phase.state.gamePhase
   )).toBe(GamePhase.COMPANY);
 });
 
@@ -100,9 +100,9 @@ test.skip('talent management and income system', async ({ page }) => {
   
   // Set up company phase with enough money to hire talent
   await page.evaluate((phase) => {
-    if (window.gameStore) {
-      window.gameStore.addMoney(100);
-      window.gameStore.setPhase(phase);
+    if (window.getStore()) {
+      window.getStore().addMoney(100);
+      window.getStore().setPhase(phase);
     } else {
       throw new Error('gameStore not initialized');
     }
@@ -166,8 +166,8 @@ test.skip('company founding complete flow with multiple clicks', async ({ page }
   
   // Set up state close to founding threshold
   await page.evaluate(() => {
-    if (window.gameStore) {
-      window.gameStore.addMoney(95);
+    if (window.getStore()) {
+      window.getStore().addMoney(95);
     } else {
       throw new Error('gameStore not initialized');
     }
@@ -199,9 +199,9 @@ test.skip('dev reset button should reset game state', async ({ page }) => {
   
   // Directly set up company phase state without using localStorage
   await page.evaluate((phase) => {
-    if (window.gameStore) {
-      window.gameStore.addMoney(50);
-      window.gameStore.setPhase(phase);
+    if (window.getStore()) {
+      window.getStore().addMoney(50);
+      window.getStore().setPhase(phase);
     } else {
       throw new Error('gameStore not initialized');
     }
@@ -228,9 +228,9 @@ test.skip('company phase: can launch a product with enough insights', async ({ p
   
   // Set up company phase with money to hire talent
   await page.evaluate((phase) => {
-    if (window.gameStore) {
-      window.gameStore.addMoney(100);
-      window.gameStore.setPhase(phase);
+    if (window.getStore()) {
+      window.getStore().addMoney(100);
+      window.getStore().setPhase(phase);
     } else {
       throw new Error('gameStore not initialized');
     }
@@ -240,7 +240,7 @@ test.skip('company phase: can launch a product with enough insights', async ({ p
   await page.getByText('Hire Talent').click();
   
   await page.evaluate(() => {
-    window.gameStore;
+    window.getStore();
   });
   
   // Launch the product when available
@@ -260,9 +260,9 @@ test.skip('company phase: can apply marketing to products', async ({ page }) => 
   
   // Set up company phase with a launched product
   await page.evaluate((phase) => {
-    if (window.gameStore) {
-      window.gameStore.addMoney(100);
-      window.gameStore.setPhase(phase);
+    if (window.getStore()) {
+      window.getStore().addMoney(100);
+      window.getStore().setPhase(phase);
     } else {
       throw new Error('gameStore not initialized');
     }

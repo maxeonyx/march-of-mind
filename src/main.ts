@@ -1,7 +1,8 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
+// Import App component
 import App from './App.vue';
-import { useGameStore } from './stores/game';
+import { useGameStore } from './store';
 
 // Create Vue app instance
 const app = createApp(App);
@@ -20,4 +21,11 @@ if (typeof window !== 'undefined' && !window.gameStore) {
 
   // Expose store for tests & manual debugging. This also marks startup
   window.gameStore = game;
+  window.getStore = () => {
+      if (window.gameStore) {
+        return window.gameStore;
+      } else {
+        throw Error("Game store not created. This means the app has not initialized correctly")
+      }
+  };
 }

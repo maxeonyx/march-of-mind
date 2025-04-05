@@ -28,14 +28,14 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import ProgressButton from '@/components/ProgressButton.vue';
-import { useGameStore } from '@/stores/game';
+import { useGameStore } from '@/store';
 import { GamePhase } from '@/types'
 
 const gameStore = useGameStore();
 const resources = gameStore.resources;
 
 // Company founding cost
-export const COMPANY_FOUNDING_COST = 50;
+const COMPANY_FOUNDING_COST = 50;
 
 /**
  * Calculate progress toward founding a company (0-1)
