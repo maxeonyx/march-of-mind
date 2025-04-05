@@ -127,3 +127,4 @@ Always update both this file `CLAUDE.md` AND `package.json`.
 - 0.5.1 - Made date visible in all game phases, including job phase, and time now passes consistently throughout the game
 - 0.6.0 - Major refactoring: Split app into modular components, restructured store into domain-specific modules, added ProgressButton component with color-based progress indicators
 - 0.6.1 - Renamed development points to insights and made them slower to accumulate, fixed product launch button by removing redundant progress bar
+- 0.6.2 - Cleaned up unused conditional code for legacy button implementations, fixed comment in ProgressButton template

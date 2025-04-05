@@ -21,7 +21,8 @@
     ></div>
     <span class="button-content">
       <slot></slot>
-      <span class="button-effect" v-if="clicked"></span>
+      <!-- FIXME: Animation disabled due to click issues -->
+      <span class="button-effect" v-if="clicked"></span> 
     </span>
   </button>
 </template>
