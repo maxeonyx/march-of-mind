@@ -151,3 +151,4 @@ test('company founding complete flow with multiple clicks', async ({ page }) => 
   // Company info should be visible
   await expect(page.locator('.company-info')).toContainText('Your Company is Founded', { timeout: NORMAL_TIMEOUT });
 });
+

@@ -95,13 +95,17 @@ const gameTitle = computed(() => {
 
 // Game actions
 function workForTheMad() {
+  // Always increment the money counter regardless of animation state
   store.earnMoney();
   
-  // Button click animation
-  workButtonClicked.value = true;
-  setTimeout(() => {
-    workButtonClicked.value = false;
-  }, 300);
+  // Button click animation - decoupled from the money earning
+  // This ensures rapid clicks are all counted even during animation
+  if (!workButtonClicked.value) {
+    workButtonClicked.value = true;
+    setTimeout(() => {
+      workButtonClicked.value = false;
+    }, 300);
+  }
 }
 
 function foundCompany() {
