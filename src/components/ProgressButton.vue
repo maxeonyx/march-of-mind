@@ -6,7 +6,8 @@
         'button-enabled': enabled && !firstTimeOnly, 
         'button-disabled': !enabled,
         'first-time': firstTimeOnly && !unlocked,
-        'unlocked': unlocked
+        'unlocked': unlocked,
+        'clicked': clicked
       }
     ]"
     :disabled="!enabled"
@@ -21,8 +22,6 @@
     ></div>
     <span class="button-content">
       <slot></slot>
-      <!-- FIXME: Animation disabled due to click issues -->
-      <span class="button-effect" v-if="clicked"></span> 
     </span>
   </button>
 </template>
@@ -68,7 +67,7 @@ function handleClick() {
   
   emit('click');
   
-  // Button click animation
+  // Button click animation using CSS class
   if (!clicked.value) {
     clicked.value = true;
     setTimeout(() => {
@@ -125,6 +124,7 @@ function handleClick() {
   color: white;
   display: block;
   width: 100%;
+  user-select: none;
 }
 
 /* First-time button styles */
@@ -142,8 +142,9 @@ function handleClick() {
   width: 100%;
 }
 
-/* Button effect animation */
-.button-effect {
+/* Button click effect using pure CSS */
+.progress-button.clicked::after {
+  content: '';
   position: absolute;
   top: 50%;
   left: 50%;
@@ -151,17 +152,18 @@ function handleClick() {
   height: 5px;
   background: rgba(255, 255, 255, 0.5);
   border-radius: 50%;
-  transform: scale(1);
+  transform: translate(-50%, -50%);
   animation: ripple 0.3s linear;
+  pointer-events: none;
 }
 
 @keyframes ripple {
   0% {
-    transform: scale(1);
+    transform: translate(-50%, -50%) scale(1);
     opacity: 0.5;
   }
   100% {
-    transform: scale(40);
+    transform: translate(-50%, -50%) scale(40);
     opacity: 0;
   }
 }

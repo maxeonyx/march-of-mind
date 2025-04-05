@@ -1,17 +1,26 @@
 <template>
   <div id="app">
-    <header>
-      <img alt="March of Mind logo" src="./assets/logo.png" class="logo">
-      <h1>March of Mind</h1>
-      <div class="dev-controls">
+    <!-- 
+      UI Design Guidelines:
+      - All content should always fit within the viewport without scrolling
+      - Any scrolling should ONLY happen within individual components
+      - Layout uses a compact horizontal header to maximize vertical game space
+      - Footer remains minimal to preserve screen real estate
+    -->
+    <header class="app-header">
+      <div class="header-left">
+        <img alt="March of Mind logo" src="./assets/logo.png" class="logo">
+        <h1>March of Mind</h1>
+      </div>
+      <div class="header-center">
+        <DateDisplay />
+      </div>
+      <div class="header-right">
         <button @click="resetGame" class="dev-button">Reset Game (Dev)</button>
       </div>
     </header>
     <main>
       <h2>{{ phaseTitle }}</h2>
-      
-      <!-- Date display -->
-      <DateDisplay />
       
       <div class="game-container">
         <!-- Resource display -->
@@ -104,28 +113,45 @@ html, body {
   margin: 0 auto;
   padding: 0 20px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-header {
-  margin: 60px 0;
-  position: relative;
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.header-center {
+  flex-grow: 1;
+  padding: 0 20px;
+}
+
+.header-right {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .logo {
-  width: 80px;
-  height: 80px;
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
 }
 
 h1 {
-  font-size: 28px;
+  font-size: 24px;
   color: var(--primary-color);
-}
-
-.dev-controls {
-  position: absolute;
-  top: 0;
-  right: 0;
-  padding: 5px;
+  margin: 0;
 }
 
 .dev-button {
@@ -145,7 +171,8 @@ h1 {
 }
 
 main {
-  margin-bottom: 50px;
+  flex: 1;
+  margin-bottom: 20px;
 }
 
 .game-container {
@@ -159,8 +186,7 @@ main {
 
 footer {
   text-align: center;
-  margin: 30px 0;
-  padding-top: 20px;
+  padding: 10px 0;
   border-top: 1px solid var(--border-color);
   color: var(--muted-text);
   font-size: 14px;
@@ -182,16 +208,20 @@ footer .build-time {
   }
   
   h1 {
-    font-size: 24px;
-  }
-  
-  h2 {
     font-size: 20px;
   }
   
+  h2 {
+    font-size: 18px;
+  }
+  
   .logo {
-    width: 60px;
-    height: 60px;
+    width: 30px;
+    height: 30px;
+  }
+  
+  .app-header {
+    padding: 5px 0;
   }
 }
 </style>

@@ -108,11 +108,32 @@ March of Mind - A cookie clicker style game where you run a company and balance 
 - `playwright.config.ts` - End-to-end testing configuration
 - `env.d.ts` - TypeScript declarations for Vite environment
 
+### Components
+- `src/components/DateDisplay.vue` - Game date display component
+- `src/components/ProgressButton.vue` - Reusable button with progress indicator
+- `src/components/ResourceDisplay.vue` - Shows player resources (money, insights)
+- `src/components/phases/` - Phase-specific components:
+  - `JobPhase.vue` - Initial game phase UI
+  - `CompanyPhase.vue` - Company management phase UI
+
 ### State Management
-- `src/stores/app.ts` - Pinia store for application state
+- `src/stores/game.ts` - Main game state store
+- `src/stores/app.ts` - Application state store
+- `src/stores/modules/` - Domain-specific store modules:
+  - `phase.ts` - Game phase transitions
+  - `products.ts` - Product development
+  - `resources.ts` - Player resources
+  - `talent.ts` - Talent management
+  - `time.ts` - Game time progression
 
 ### Composables
 - `src/composables/useVersion.ts` - Reactive version information
+
+### Assets
+- `src/assets/` - Images and media assets
+
+### Testing
+- `tests/app.spec.ts` - Main application tests
 
 ## Version History
 
@@ -128,3 +149,4 @@ Always update both this file `CLAUDE.md` AND `package.json`.
 - 0.6.0 - Major refactoring: Split app into modular components, restructured store into domain-specific modules, added ProgressButton component with color-based progress indicators
 - 0.6.1 - Renamed development points to insights and made them slower to accumulate, fixed product launch button by removing redundant progress bar
 - 0.6.2 - Cleaned up unused conditional code for legacy button implementations, fixed comment in ProgressButton template
+- 0.6.3 - Improved UI layout with compact horizontal header, optimized vertical space, enhanced button click using pure CSS, made text non-selectable
