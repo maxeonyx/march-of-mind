@@ -1,258 +1,151 @@
 import { defineStore } from 'pinia';
-import { useTimeStore } from './modules/time';
-import { usePhaseStore, GamePhase } from './modules/phase';
-import { useResourcesStore } from './modules/resources';
-import { useTalentStore } from './modules/talent';
-import { useProductStore } from './modules/products';
+import { ref } from 'vue';
+import { GamePhase } from '../types';
+import { useResources } from '../composables/useResources';
+import { useTime } from '../composables/useTime';
+import { usePhase } from '../composables/usePhase';
+import { useTalent } from '../composables/useTalent';
+import { useProducts } from '../composables/useProducts';
 
 /**
- * Main game store that coordinates all other stores
+ * Main game store that coordinates all modules
  */
-export const useGameStore = defineStore('game', {
-  state: () => {
-    return {
-      message: 'Welcome to March of Mind!',
-      lastSavedAt: 0
-    };
-  },
-  
-  actions: {
-    /**
-     * Initialize the game
-     */
-    init() {
-      this.loadGame();
-      
-      const timeStore = useTimeStore();
-      
-      // Start the time ticker for all phases
-      timeStore.startGameTicker(() => this.processOneMonth());
-      
-      // Expose store to window for testing
-      if (typeof window !== 'undefined') {
-        window.__appStore = this;
-        window.__appMethods = {
-          addMoney: this.addMoney,
-          setPhase: this.setPhase
-        };
-        window.__APP_STORE_INITIALIZED = true;
-      }
-    },
-    
-    /**
-     * Process one month of game time
-     */
-    processOneMonth() {
-      const phaseStore = usePhaseStore();
-      
-      // Only process game mechanics if in company phase or beyond
-      if (phaseStore.gamePhase !== GamePhase.JOB) {
-        const talentStore = useTalentStore();
-        const productStore = useProductStore();
-        
-        // Process talent income/expenses
-        talentStore.processMonthlyFinances();
-        
-        // Process product development
-        productStore.processMonthlyDevelopment();
-      }
-      
-      // Save the game
-      this.saveGame();
-    },
-    
-    /**
-     * Earn money through manual labor
-     */
-    earnMoney() {
-      const resourcesStore = useResourcesStore();
-      resourcesStore.earnMoney();
-      this.saveGame();
-    },
-    
-    /**
-     * Found a company when enough money is available
-     */
-    foundCompany() {
-      const resourcesStore = useResourcesStore();
-      const phaseStore = usePhaseStore();
-      
-      if (resourcesStore.canFoundCompany) {
-        resourcesStore.payForCompanyFounding();
-        phaseStore.enterCompanyPhase();
-        this.saveGame();
-        return true;
-      }
-      return false;
-    },
-    
-    /**
-     * Hire a new talent
-     */
-    hireTalent() {
-      const talentStore = useTalentStore();
-      const result = talentStore.hireTalent();
-      if (result) {
-        this.saveGame();
-      }
-      return result;
-    },
-    
-    /**
-     * Fire an existing talent
-     */
-    fireTalent() {
-      const talentStore = useTalentStore();
-      const result = talentStore.fireTalent();
-      if (result) {
-        this.saveGame();
-      }
-      return result;
-    },
-    
-    /**
-     * Launch the first product when enough development points are available
-     */
-    launchProduct() {
-      const productStore = useProductStore();
-      const result = productStore.launchProduct();
-      if (result) {
-        this.saveGame();
-      }
-      return result;
-    },
-    
-    /**
-     * Apply marketing to boost product income
-     */
-    applyMarketing() {
-      const productStore = useProductStore();
-      const result = productStore.applyMarketing();
-      if (result) {
-        this.saveGame();
-      }
-      return result;
-    },
-    
-    /**
-     * Save the game state to localStorage
-     */
-    saveGame() {
-      const phaseStore = usePhaseStore();
-      const resourcesStore = useResourcesStore();
-      const timeStore = useTimeStore();
-      const talentStore = useTalentStore();
-      const productStore = useProductStore();
-      
-      const saveData = {
-        savedAt: Date.now(),
-        gamePhase: phaseStore.gamePhase,
-        money: resourcesStore.money,
-        totalMonths: timeStore.totalMonths,
-        talent: talentStore.talent,
-        hasHiredTalent: talentStore.hasHiredTalent,
-        insights: productStore.insights,
-        hasProduct: productStore.hasProduct,
-        hasLaunchedFirstProduct: productStore.hasLaunchedFirstProduct,
-        activeProducts: productStore.activeProducts,
-        marketingSaturation: productStore.totalMarketingSaturation,
-        marketingEffectiveness: productStore.marketingEffectiveness
-      };
-      
-      localStorage.setItem('marchOfMindSave', JSON.stringify(saveData));
-      this.lastSavedAt = saveData.savedAt;
-    },
-    
-    /**
-     * Load the game state from localStorage
-     */
-    loadGame() {
-      const phaseStore = usePhaseStore();
-      const resourcesStore = useResourcesStore();
-      const timeStore = useTimeStore();
-      const talentStore = useTalentStore();
-      const productStore = useProductStore();
-      
-      const saveData = localStorage.getItem('marchOfMindSave');
-      if (saveData) {
-        try {
-          const data = JSON.parse(saveData);
-          
-          // Set phase
-          phaseStore.gamePhase = data.gamePhase || GamePhase.JOB;
-          
-          // Load resources
-          resourcesStore.money = data.money || 0;
-          
-          // Load time system data
-          timeStore.totalMonths = data.totalMonths || 0;
-          
-          // Load talent system data
-          talentStore.talent = data.talent || 0;
-          talentStore.hasHiredTalent = data.hasHiredTalent || false;
-          
-          // Load product development data
-          productStore.insights = data.insights || data.developmentPoints || 0;
-          productStore.hasProduct = data.hasProduct || false;
-          productStore.hasLaunchedFirstProduct = data.hasLaunchedFirstProduct || false;
-          productStore.activeProducts = data.activeProducts || [];
-          productStore.totalMarketingSaturation = data.marketingSaturation || 0;
-          productStore.marketingEffectiveness = data.marketingEffectiveness || 1;
-          
-          // Initialize product system
-          productStore.init();
-          
-          this.lastSavedAt = data.savedAt || 0;
-          
-          return true;
-        } catch (e) {
-          console.error('Failed to load save data', e);
-          return false;
-        }
-      }
-      
-      return false;
-    },
-    
-    /**
-     * Reset the game state (for testing or starting over)
-     */
-    resetGame() {
-      const phaseStore = usePhaseStore();
-      const resourcesStore = useResourcesStore();
-      const timeStore = useTimeStore();
-      const talentStore = useTalentStore();
-      const productStore = useProductStore();
-      
-      // Reset all stores
-      phaseStore.reset();
-      resourcesStore.reset();
-      timeStore.reset();
-      talentStore.reset();
-      productStore.reset();
-      
-      // Restart the time ticker
-      timeStore.startGameTicker(() => this.processOneMonth());
-      
-      // Clear localStorage
-      localStorage.removeItem('marchOfMindSave');
-      this.lastSavedAt = 0;
-    },
-    
-    /**
-     * For testing: add money directly
-     */
-    addMoney(amount: number) {
-      const resourcesStore = useResourcesStore();
-      resourcesStore.addMoney(amount);
-    },
-    
-    /**
-     * For testing: set game phase directly
-     */
-    setPhase(phase: GamePhase) {
-      const phaseStore = usePhaseStore();
-      phaseStore.gamePhase = phase;
+export const useGameStore = defineStore('game', () => {
+  // Create a message for the welcome screen
+  const message = ref('Welcome to March of Mind!'); // TODO: Maybe make an opening screen / menu screen? with a "Play" button?
+  const lastSavedAt = ref(0);
+
+  // Initialize our module states
+  const resources = useResources();
+  const time = useTime();
+  const phase = usePhase();
+  const talent = useTalent(resources);
+  const products = useProducts(resources, talent, time);
+
+  /**
+   * Process one month of game time
+   */
+  function processOneMonth() {
+    // Only process game mechanics if in company phase or beyond
+    if (phase.state.gamePhase !== GamePhase.JOB) {
+      // Process talent income/expenses
+      talent.processMonthlyFinances();
+
+      // Process product development
+      products.processMonthlyDevelopment();
     }
+
+    // Save the game
+    saveGame();
   }
+
+  /**
+   * Start the game ticker
+   */
+  function startGameTicker() {
+    time.startGameTicker(processOneMonth);
+  }
+
+  /**
+   * Stop the game ticker
+   */
+  function stopGameTicker() {
+    time.stopGameTicker();
+  }
+
+  /**
+   * Save the game state to localStorage
+   */
+  function saveGame() {
+    // Collect save data from each module
+    const saveData = {
+      savedAt: Date.now(),
+      
+      // Each module's save data
+      phase: phase.save(),
+      resources: resources.save(),
+      time: time.save(),
+      talent: talent.save(),
+      products: products.save()
+    };
+
+    localStorage.setItem('marchOfMindSave', JSON.stringify(saveData));
+    lastSavedAt.value = saveData.savedAt;
+  }
+
+  /**
+   * Load the game state from localStorage
+   */
+  function loadGame() {
+    const saveString = localStorage.getItem('marchOfMindSave');
+    if (saveString) {
+      try {
+        const saveData = JSON.parse(saveString);
+        
+        // Load each module's state
+        phase.load(saveData.phase);
+        resources.load(saveData.resources);
+        time.load(saveData.time);
+        talent.load(saveData.talent);
+        products.load(saveData.products);
+        
+        lastSavedAt.value = saveData.savedAt || 0;
+        return true;
+      } catch (e) {
+        console.error('Failed to load save data', e);
+        return false;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Initialize the game
+   */
+  function init() {
+    loadGame();
+    startGameTicker();
+  }
+
+  /**
+   * Reset the game state (for testing or starting over)
+   */
+  function resetGame() {
+    // Reset all modules
+    phase.reset();
+    resources.reset();
+    time.reset();
+    talent.reset();
+    products.reset();
+
+    // Restart the time ticker
+    startGameTicker();
+
+    // Clear localStorage
+    localStorage.removeItem('marchOfMindSave');
+    lastSavedAt.value = 0;
+  }
+
+  return {
+    // State
+    message,
+    lastSavedAt,
+    
+    // Module states (accessible as properties)
+    resources,
+    time,
+    phase,
+    talent,
+    products,
+    
+    // Methods
+    init,
+    processOneMonth,
+    startGameTicker,
+    stopGameTicker,
+    saveGame,
+    loadGame,
+    resetGame,
+  };
 });

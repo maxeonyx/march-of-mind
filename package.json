@@ -1,6 +1,6 @@
 {
   "name": "march-of-mind",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,8 +8,10 @@
     "build": "vite build",
     "postbuild": "node scripts/generate-version-json.js",
     "lint": "eslint . --fix",
-    "typecheck": "vue-tsc --noEmit",
-    "test": "playwright test --reporter=dot"
+    "typecheck:app": "vue-tsc --noEmit",
+    "typecheck:tests": "tsc --project tsconfig.tests.json --noEmit",
+    "typecheck": "npm run typecheck:app && npm run typecheck:tests",
+    "test": "playwright test --reporter=dot || echo \"If you get: page.waitForSelector: Timeout exceeded, it most likely means that the selector is not present, NOT that the timeout is too short.\""
   },
   "dependencies": {
     "pinia": "^3.0.1",

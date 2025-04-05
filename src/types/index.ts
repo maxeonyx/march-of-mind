@@ -2,23 +2,19 @@
  * Basic application interfaces
  */
 
-/**
- * Version information
- */
+export enum GamePhase {
+  JOB = 'job',
+  COMPANY = 'company',
+  MARKETING = 'marketing',
+  RESEARCH = 'research'
+}
+
 export interface VersionInfo {
-  /** Version number from package.json */
   version: string;
-  
-  /** Application name */
   name: string;
-  
-  /** Build timestamp */
   buildTime: string;
 }
 
-/**
- * Product data structure
- */
 export interface Product {
   /** Unique identifier */
   id: string;
@@ -26,7 +22,7 @@ export interface Product {
   /** Display name */
   name: string;
   
-  /** Year when product becomes available */
+  /** In-game year when product becomes available */
   year: number;
   
   /** Product description */
@@ -57,32 +53,4 @@ export interface ProductInstance extends Product {
   
   /** Development progress (0-1) */
   progress: number;
-}
-
-// Global window interface extensions for game state and testing compatibility
-declare global {
-  interface Window {
-    __APP_STORE_INITIALIZED?: boolean;
-    __appStore?: {
-      message: string;
-      count: number;
-      gamePhase: string;
-      saveGame: () => void;
-      loadGame: () => boolean;
-      resetGame: () => void;
-      earnMoney: () => void;
-      foundCompany: () => boolean;
-      addMoney: (amount: number) => void;
-      setPhase: (phase: string) => void;
-    };
-    __appMethods?: {
-      loadGame: () => boolean;
-      saveGame: () => void;
-      resetGame: () => void;
-      earnMoney: () => void;
-      foundCompany: () => boolean;
-      addMoney: (amount: number) => void;
-      setPhase: (phase: string) => void;
-    };
-  }
 }

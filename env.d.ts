@@ -6,3 +6,14 @@ declare module '*.vue' {
   const component: DefineComponent<{}, {}, any>
   export default component
 }
+
+/**
+ * Type declaration for the gameStore global variable
+ */
+declare global {
+  interface Window {
+    gameStore?: any; // Use any to avoid circular references in tests
+  }
+}
+
+export {};

@@ -24,8 +24,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useResourcesStore } from '../stores/modules/resources';
-import { useTalentStore } from '../stores/modules/talent';
+import { useGameStore } from '../stores/game';
 
 defineProps({
   showIncomeStats: {
@@ -34,13 +33,14 @@ defineProps({
   }
 });
 
-const resourcesStore = useResourcesStore();
-const talentStore = useTalentStore();
+const gameStore = useGameStore();
+const resourcesStore = gameStore.resources;
+const talentStore = gameStore.talent;
 
-const money = computed(() => resourcesStore.money);
-const monthlyIncome = computed(() => talentStore.monthlyIncome);
-const monthlySalary = computed(() => talentStore.monthlySalary);
-const monthlyNetIncome = computed(() => talentStore.monthlyNetIncome);
+const money = computed(() => resourcesStore.state.money);
+const monthlyIncome = computed(() => talentStore.monthlyIncome.value);
+const monthlySalary = computed(() => talentStore.monthlySalary.value);
+const monthlyNetIncome = computed(() => talentStore.monthlyNetIncome.value);
 </script>
 
 <style scoped>

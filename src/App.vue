@@ -1,52 +1,49 @@
 <template>
-  <div id="app">
-    <!-- 
-      UI Design Guidelines:
-      - All content should always fit within the viewport without scrolling
-      - Any scrolling should ONLY happen within individual components
-      - Layout uses a compact horizontal header to maximize vertical game space
-      - Footer remains minimal to preserve screen real estate
-    -->
-    <header class="app-header">
-      <div class="header-left">
-        <img alt="March of Mind logo" src="./assets/logo.png" class="logo">
-        <h1>March of Mind</h1>
-      </div>
-      <div class="header-center">
-        <DateDisplay />
-      </div>
-      <div class="header-right">
-        <button @click="resetGame" class="dev-button">Reset Game (Dev)</button>
-      </div>
-    </header>
-    <main>
-      <h2>{{ phaseTitle }}</h2>
+  <!-- 
+    UI Design Guidelines:
+    - All content should always fit within the viewport without scrolling
+    - Any scrolling should ONLY happen within individual components
+    - Layout uses a compact horizontal header to maximize vertical game space
+    - Footer remains minimal to preserve screen real estate
+  -->
+  <header class="app-header">
+    <div class="header-left">
+      <img alt="March of Mind logo" src="./assets/logo.png" class="logo">
+      <h1>March of Mind</h1>
+    </div>
+    <div class="header-center">
+      <DateDisplay />
+    </div>
+    <div class="header-right">
+      <button @click="gameStore.resetGame()" class="dev-button">Reset Game (Dev)</button>
+    </div>
+  </header>
+  <main>
+    <h2>{{ phaseTitle }}</h2>
+    
+    <div class="game-container">
+      <!-- Resource display -->
+      <ResourceDisplay :showIncomeStats="gamePhase === 'company'" />
       
-      <div class="game-container">
-        <!-- Resource display -->
-        <ResourceDisplay :showIncomeStats="gamePhase === 'company'" />
-        
-        <!-- Job Phase -->
-        <JobPhase v-if="gamePhase === 'job'" />
-        
-        <!-- Company Phase -->
-        <CompanyPhase v-if="gamePhase === 'company'" />
-      </div>
-    </main>
-    <footer>
-      <p>Version {{ version }}</p>
-      <p v-if="versionInfo?.buildTime" class="build-time">
-        Built: {{ new Date(versionInfo.buildTime).toLocaleString() }}
-      </p>
-    </footer>
-  </div>
+      <!-- Job Phase -->
+      <JobPhase v-if="gamePhase === 'job'" />
+      
+      <!-- Company Phase -->
+      <CompanyPhase v-if="gamePhase === 'company'" />
+    </div>
+  </main>
+  <footer>
+    <p>Version {{ version }}</p>
+    <p v-if="versionInfo?.buildTime" class="build-time">
+      Built: {{ new Date(versionInfo.buildTime).toLocaleString() }}
+    </p>
+  </footer>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue';
+import { computed } from 'vue';
 import { useVersion } from './composables/useVersion';
 import { useGameStore } from './stores/game';
-import { usePhaseStore } from './stores/modules/phase';
 
 // Components
 import DateDisplay from './components/DateDisplay.vue';
@@ -58,23 +55,13 @@ import CompanyPhase from './components/phases/CompanyPhase.vue';
 const { version: versionInfo } = useVersion();
 const version = computed(() => versionInfo.value?.version || '0.0.0');
 
-// Game stores
+// Game store and modules
 const gameStore = useGameStore();
-const phaseStore = usePhaseStore();
 
 // Game state
-const gamePhase = computed(() => phaseStore.gamePhase);
-const phaseTitle = computed(() => phaseStore.phaseTitle);
+const gamePhase = computed(() => gameStore.phase.state.gamePhase); // TODO: Move phase straight into gameStore itself.
+const phaseTitle = computed(() => gameStore.phase.phaseTitle); // TODO these computed properties are redundant, especially after we refactor the composables.
 
-// Game actions
-function resetGame() {
-  gameStore.resetGame();
-}
-
-// Initialize game on component mount
-onMounted(() => {
-  gameStore.init();
-});
 </script>
 
 <style>

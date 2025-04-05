@@ -6,10 +6,11 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useTimeStore } from '../stores/modules/time';
+import { useGameStore } from '../stores/game';
 
-const timeStore = useTimeStore();
-const formattedDate = computed(() => timeStore.formattedDate);
+const gameStore = useGameStore();
+const timeStore = gameStore.time;
+const formattedDate = computed(() => timeStore.formattedDate.value);
 </script>
 
 <style scoped>

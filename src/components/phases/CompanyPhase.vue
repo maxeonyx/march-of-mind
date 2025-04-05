@@ -154,12 +154,11 @@
 import { computed, onMounted } from 'vue';
 import ProgressButton from '../ProgressButton.vue';
 import { useGameStore } from '../../stores/game';
-import { useTalentStore, HIRE_TALENT_COST, TALENT_SALARY, TALENT_INCOME, TALENT_INSIGHTS } from '../../stores/modules/talent';
-import { useProductStore } from '../../stores/modules/products';
+import { HIRE_TALENT_COST, TALENT_SALARY, TALENT_INCOME, TALENT_INSIGHTS } from '../../composables/useTalent';
 
 const gameStore = useGameStore();
-const talentStore = useTalentStore();
-const productStore = useProductStore();
+const talentStore = gameStore.talent;
+const productStore = gameStore.products;
 
 // Initialize product data
 onMounted(() => {
@@ -177,33 +176,26 @@ const firstHireProgress = computed(() => talentStore.firstHireProgress);
 const insights = computed(() => productStore.insights);
 const productProgress = computed(() => productStore.productDevelopmentProgress);
 const canLaunchProduct = computed(() => productStore.canLaunchProduct);
-const hasProduct = computed(() => productStore.hasProduct);
-const hasProducts = computed(() => productStore.activeProducts.length > 0);
-const hasLaunchedFirstProduct = computed(() => productStore.hasLaunchedFirstProduct);
-const currentProductInDevelopment = computed(() => productStore.currentProductInDevelopment);
-const activeProducts = computed(() => productStore.activeProducts);
-const productIncome = computed(() => productStore.currentIncome);
-const marketingEffectiveness = computed(() => productStore.marketingEffectiveness);
 
 function workHard() {
-  gameStore.earnMoney();
+  gameStore.resources.addMoney(1);
 }
 
 function hireTalent() {
   if (canHireTalent.value) {
-    gameStore.hireTalent();
+    gameStore.talent.hireTalent();
   }
 }
 
 function fireTalent() {
   if (canFireTalent.value) {
-    gameStore.fireTalent();
+    gameStore.talent.hireTalent();
   }
 }
 
 function launchProduct() {
   if (canLaunchProduct.value) {
-    gameStore.launchProduct();
+    gameStore.products.launchProduct();
   }
 }
 

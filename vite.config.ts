@@ -10,7 +10,7 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
-  base: '/march-of-mind/',
+  base: process.env.BASE_PATH || '/march-of-mind/',
   build: {
     outDir: 'dist'
   }

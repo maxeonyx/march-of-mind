@@ -80,7 +80,7 @@ March of Mind - A cookie clicker style game where you run a company and balance 
 
 ### Project Commands
 - `npm run build` - Build production-ready assets
-- `npm run typecheck` - Check types are valid.
+- `npm run typecheck` - Check types for both app and tests
 - `npm run lint` - Run ESLint code quality checks
 - `npm run test` - Run Playwright end-to-end tests
 - Do NOT use `npm run dev` or `npm run preview` - you can't view the output. Use comprehensive tests instead.
@@ -117,16 +117,14 @@ March of Mind - A cookie clicker style game where you run a company and balance 
   - `CompanyPhase.vue` - Company management phase UI
 
 ### State Management
-- `src/stores/game.ts` - Main game state store
-- `src/stores/app.ts` - Application state store
-- `src/stores/modules/` - Domain-specific store modules:
-  - `phase.ts` - Game phase transitions
-  - `products.ts` - Product development
-  - `resources.ts` - Player resources
-  - `talent.ts` - Talent management
-  - `time.ts` - Game time progression
+- `src/stores/game.ts` - Main game state store (Pinia)
 
-### Composables
+### Composables and Modules
+- `src/composables/usePhase.ts` - Game phase management
+- `src/composables/useProducts.ts` - Product development and marketing
+- `src/composables/useResources.ts` - Player resources (money, etc.)
+- `src/composables/useTalent.ts` - Talent management system
+- `src/composables/useTime.ts` - Game time progression
 - `src/composables/useVersion.ts` - Reactive version information
 
 ### Assets
@@ -151,3 +149,4 @@ Always update both this file `CLAUDE.md` AND `package.json`.
 - 0.6.2 - Cleaned up unused conditional code for legacy button implementations, fixed comment in ProgressButton template
 - 0.6.3 - Improved UI layout with compact horizontal header, optimized vertical space, enhanced button click using pure CSS, made text non-selectable
 - 0.7.0 - Implemented Phase 3 features: Marketing system with diminishing returns, product catalog with historical AI products, market saturation mechanics
+- 0.7.1 - Major architecture refactoring: Converted module stores to Vue composables using reactive state, improved type safety in tests, maintained single Pinia store for coordination

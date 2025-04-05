@@ -6,16 +6,18 @@
         :progress="0"
         @click="workHard"
         theme="primary"
+        data-testid="btn-work"
       >
-        Work for the Man
+        Work Hard
       </ProgressButton>
       
       <ProgressButton
         :enabled="canFoundCompany"
-        :progress="foundingProgress"
+        :progress="companyFoundingProgress"
         @click="foundCompany"
         theme="secondary"
         firstTimeOnly
+        data-testid="btn-found-company"
       >
         Found a Company
       </ProgressButton>
@@ -25,23 +27,37 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import ProgressButton from '../ProgressButton.vue';
-import { useGameStore } from '../../stores/game';
-import { useResourcesStore } from '../../stores/modules/resources';
+import ProgressButton from '@/components/ProgressButton.vue';
+import { useGameStore } from '@/stores/game';
+import { GamePhase } from '@/types'
 
 const gameStore = useGameStore();
-const resourcesStore = useResourcesStore();
+const resources = gameStore.resources;
 
-const foundingProgress = computed(() => resourcesStore.companyFoundingProgress);
-const canFoundCompany = computed(() => resourcesStore.canFoundCompany);
+// Company founding cost
+export const COMPANY_FOUNDING_COST = 50;
+
+/**
+ * Calculate progress toward founding a company (0-1)
+ */
+const companyFoundingProgress = computed(() => {
+  return Math.min(resources.money / COMPANY_FOUNDING_COST, 1);
+});
+
+/**
+ * Check if player can found a company
+ */
+const canFoundCompany = computed(() => {
+  return resources.money >= COMPANY_FOUNDING_COST;
+});
 
 function workHard() {
-  gameStore.earnMoney();
+  resources.addMoney(1);
 }
 
 function foundCompany() {
   if (canFoundCompany.value) {
-    gameStore.foundCompany();
+    gameStore.phase.enterPhase(GamePhase.COMPANY);
   }
 }
 </script>
