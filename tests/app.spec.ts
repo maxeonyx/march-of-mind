@@ -13,14 +13,16 @@ test.beforeEach(async ({ page }) => {
 
 // IMPORTANT: App should respond very quickly, so all waitForSelector calls should have a 
 // short timeout. Longer timeouts hide performance issues.
+// For this reason, you MUST use either of these timeouts, and prefer the shorter one.
 // DO NOT CHANGE THESE TIMEOUT VALUES - they are intentionally short to catch reactivity issues.
 // The app should respond within these timeframes - if tests fail due to timeouts, fix the app, not the timeouts.
-const NORMAL_TIMEOUT = 100; // ms - for normal UI operations.
+const NORMAL_TIMEOUT = 16; // ms - one frame.
+const LONG_TIMEOUT = 100; // ms - expensive UI operations.
 
 // Initialize app directly for testing
 async function setupAppForTest(page) {
   // Add a wait to let app initialize
-  await page.waitForSelector('h1', { timeout: NORMAL_TIMEOUT * 3 });
+  await page.waitForSelector('h1', { timeout: LONG_TIMEOUT });
 }
 
 // Basic test to verify the page loads correctly
