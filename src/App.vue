@@ -10,8 +10,8 @@
     <main>
       <h2>{{ gameTitle }}</h2>
       
-      <!-- Date display (visible in company phase) -->
-      <div v-if="gamePhase !== 'job'" class="date-display">
+      <!-- Date display (visible in all phases) -->
+      <div class="date-display">
         <h3>{{ formattedDate }}</h3>
       </div>
       

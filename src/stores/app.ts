@@ -174,7 +174,6 @@ export const useAppStore = defineStore('app', {
       if (this.canFoundCompany) {
         this.count -= COMPANY_FOUNDING_COST;
         this.gamePhase = GamePhase.COMPANY;
-        this.startGameTicker();
         this.saveGame();
         return true;
       }
@@ -263,16 +262,18 @@ export const useAppStore = defineStore('app', {
         // Track previous month count
         const previousMonths = Math.floor(this.totalMonths);
         
-        // Advance the total months
+        // Advance the total months (always advance time, regardless of game phase)
         this.totalMonths += monthsPassed;
         
         // Get the whole number of months that passed
         const currentMonths = Math.floor(this.totalMonths);
         const wholeMonthsPassed = currentMonths - previousMonths;
         
-        // Process each full month that passed
-        for (let i = 0; i < wholeMonthsPassed; i++) {
-          this.processOneMonth();
+        // Process each full month that passed (only if in company phase)
+        if (this.gamePhase !== GamePhase.JOB) {
+          for (let i = 0; i < wholeMonthsPassed; i++) {
+            this.processOneMonth();
+          }
         }
         
         // Save the game
@@ -335,10 +336,8 @@ export const useAppStore = defineStore('app', {
           this.developmentPoints = data.developmentPoints || 0;
           this.hasProduct = data.hasProduct || false;
           
-          // If we're in company phase, start the game ticker
-          if (this.gamePhase !== GamePhase.JOB) {
-            this.startGameTicker();
-          }
+          // Always start the game ticker to advance time
+          this.startGameTicker();
           
           return true;
         } catch (e) {
@@ -346,6 +345,10 @@ export const useAppStore = defineStore('app', {
           return false;
         }
       }
+      
+      // Start the game ticker even for a new game
+      this.startGameTicker();
+      
       return false;
     },
     
