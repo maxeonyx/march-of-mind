@@ -50,10 +50,18 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-  // Button color theme (primary, secondary, danger, etc.)
+  /**
+   * The button's color theme
+   * primary (default): Green
+   * hire: Blue
+   * fire: Red
+   * product: Purple
+   * marketing: Orange
+   */
   theme: {
     type: String,
-    default: 'primary'
+    default: 'primary',
+    validator: (value: string) => ['primary', 'hire', 'fire', 'product', 'marketing'].includes(value)
   }
 });
 
@@ -90,6 +98,26 @@ function handleClick() {
   overflow: hidden;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   background-color: var(--secondary-color);
+}
+
+.progress-button[theme="primary"] {
+  background-color: var(--primary-color);
+}
+
+.progress-button[theme="hire"] {
+  background-color: var(--hire-color);
+}
+
+.progress-button[theme="fire"] {
+  background-color: var(--fire-color);
+}
+
+.progress-button[theme="product"] {
+  background-color: var(--secondary-color);
+}
+
+.progress-button[theme="marketing"] {
+  background-color: var(--marketing-color);
 }
 
 .progress-button:hover:not(:disabled) {

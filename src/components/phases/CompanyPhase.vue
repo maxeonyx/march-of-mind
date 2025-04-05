@@ -18,6 +18,17 @@
           >
             Work Hard
           </ProgressButton>
+          
+          <ProgressButton
+            v-if="hasProduct"
+            :enabled="true"
+            :progress="1 - marketingEffectiveness"
+            @click="applyMarketing"
+            :style="{ backgroundColor: getMarketingButtonColor() }"
+            theme="marketing"
+          >
+            Marketing Campaign
+          </ProgressButton>
         </div>
       </div>
       
@@ -60,23 +71,40 @@
         </div>
       </div>
       
-      <!-- Product Development Panel -->
+      <!-- Products Panel -->
       <div class="management-panel">
         <div class="panel-header">
-          <h4>Product Development</h4>
-          <div class="development-count">
+          <h4>Products</h4>
+          <div v-if="hasProducts" class="income-badge">
+            <span class="income-label">Monthly Income:</span>
+            <span class="income-value">${{ Math.floor(productIncome) }}</span>
+          </div>
+          <div v-else class="development-count">
             <span class="development-label">Insights:</span>
             <span class="development-value">{{ Math.floor(insights) }}</span>
           </div>
         </div>
         
-        
-        <div class="product-actions">
+        <!-- Product Development Section -->
+        <div v-if="currentProductInDevelopment" class="product-development">
+          <h5>In Development: {{ currentProductInDevelopment.name }}</h5>
+          <div class="progress-container">
+            <div class="progress-bar">
+              <div 
+                class="progress-fill" 
+                :style="{ width: `${productProgress * 100}%` }"
+              ></div>
+            </div>
+            <div class="progress-info">
+              {{ Math.floor(insights) }} / {{ currentProductInDevelopment.baseCost }} insights
+            </div>
+          </div>
+          
           <ProgressButton
             :enabled="canLaunchProduct"
             :progress="productProgress"
-            :firstTimeOnly="!hasLaunchedFirstProduct"
-            :unlocked="hasLaunchedFirstProduct"
+            :firstTimeOnly="!hasLaunchedFirstProduct && !canLaunchProduct"
+            :unlocked="hasLaunchedFirstProduct || canLaunchProduct"
             @click="launchProduct"
             theme="product"
           >
@@ -84,8 +112,38 @@
           </ProgressButton>
         </div>
         
-        <div class="product-info" v-if="hasProduct">
-          <p>Your product is live! More features coming soon.</p>
+        <!-- Active Products List -->
+        <div v-if="hasProducts" class="active-products">
+          <h5>Active Products</h5>
+          <div class="products-list">
+            <div 
+              v-for="product in activeProducts" 
+              :key="product.id"
+              class="product-item"
+            >
+              <div class="product-header">
+                <div class="product-name">{{ product.name }} ({{ product.year }})</div>
+                <div class="product-income">${{ Math.floor(product.currentIncome) }}/mo</div>
+              </div>
+              <div class="product-saturation">
+                <div class="saturation-label">Market Saturation:</div>
+                <div class="saturation-bar">
+                  <div 
+                    class="saturation-fill" 
+                    :style="{ 
+                      width: `${product.saturation}%`,
+                      backgroundColor: getSaturationColor(product.saturation)
+                    }"
+                  ></div>
+                </div>
+                <div class="saturation-value">{{ Math.floor(product.saturation) }}%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div v-if="!hasProducts && !currentProductInDevelopment" class="products-empty">
+          <p>No products available to develop yet. Keep hiring talent to generate insights!</p>
         </div>
       </div>
     </div>
@@ -93,7 +151,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import ProgressButton from '../ProgressButton.vue';
 import { useGameStore } from '../../stores/game';
 import { useTalentStore, HIRE_TALENT_COST, TALENT_SALARY, TALENT_INCOME, TALENT_INSIGHTS } from '../../stores/modules/talent';
@@ -102,6 +160,11 @@ import { useProductStore } from '../../stores/modules/products';
 const gameStore = useGameStore();
 const talentStore = useTalentStore();
 const productStore = useProductStore();
+
+// Initialize product data
+onMounted(() => {
+  productStore.init();
+});
 
 // Talent system
 const talent = computed(() => talentStore.talent);
@@ -115,7 +178,12 @@ const insights = computed(() => productStore.insights);
 const productProgress = computed(() => productStore.productDevelopmentProgress);
 const canLaunchProduct = computed(() => productStore.canLaunchProduct);
 const hasProduct = computed(() => productStore.hasProduct);
+const hasProducts = computed(() => productStore.activeProducts.length > 0);
 const hasLaunchedFirstProduct = computed(() => productStore.hasLaunchedFirstProduct);
+const currentProductInDevelopment = computed(() => productStore.currentProductInDevelopment);
+const activeProducts = computed(() => productStore.activeProducts);
+const productIncome = computed(() => productStore.currentIncome);
+const marketingEffectiveness = computed(() => productStore.marketingEffectiveness);
 
 function workHard() {
   gameStore.earnMoney();
@@ -137,6 +205,26 @@ function launchProduct() {
   if (canLaunchProduct.value) {
     gameStore.launchProduct();
   }
+}
+
+function applyMarketing() {
+  productStore.applyMarketing();
+}
+
+// Color utilities
+function getSaturationColor(saturation: number): string {
+  // Red (high saturation) to green (low saturation)
+  const green = Math.floor(255 * (1 - saturation / 100));
+  const red = Math.floor(180 * (saturation / 100) + 75);
+  return `rgb(${red}, ${green}, 60)`;
+}
+
+function getMarketingButtonColor(): string {
+  // Gradient from green (high effectiveness) to red (low effectiveness)
+  const effectiveness = marketingEffectiveness.value;
+  const red = Math.floor(200 * (1 - effectiveness) + 55);
+  const green = Math.floor(180 * effectiveness + 75); 
+  return `rgb(${red}, ${green}, 60)`;
 }
 </script>
 
@@ -167,6 +255,7 @@ function launchProduct() {
 .company-actions {
   display: flex;
   justify-content: center;
+  gap: 15px;
   margin: 15px 0;
 }
 
@@ -183,7 +272,13 @@ function launchProduct() {
   font-size: 18px;
 }
 
-.talent-count {
+.panel-header h5 {
+  margin: 10px 0;
+  color: var(--text-color);
+  font-size: 16px;
+}
+
+.talent-count, .income-badge {
   background-color: var(--primary-color);
   color: white;
   padding: 5px 10px;
@@ -191,7 +286,11 @@ function launchProduct() {
   font-size: 14px;
 }
 
-.talent-value {
+.income-badge {
+  background-color: var(--success-color);
+}
+
+.talent-value, .income-value {
   font-weight: bold;
   margin-left: 5px;
 }
@@ -216,7 +315,7 @@ function launchProduct() {
 
 /* Progress bar styles for product development */
 .progress-container {
-  margin: 20px 0;
+  margin: 15px 0;
 }
 
 .progress-label {
@@ -227,9 +326,9 @@ function launchProduct() {
 
 .progress-bar {
   width: 100%;
-  height: 20px;
+  height: 12px;
   background-color: var(--progress-bg);
-  border-radius: 10px;
+  border-radius: 6px;
   overflow: hidden;
 }
 
@@ -260,17 +359,80 @@ function launchProduct() {
   margin-left: 5px;
 }
 
-.product-actions {
-  display: flex;
-  justify-content: center;
-  margin: 15px 0;
+.product-development {
+  margin-bottom: 20px;
+  text-align: center;
 }
 
-.product-info {
-  margin-top: 15px;
+.active-products {
+  margin-top: 20px;
+}
+
+.products-list {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 10px;
+}
+
+.product-item {
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 6px;
   padding: 10px;
-  background-color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.product-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.product-name {
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+.product-income {
+  font-weight: bold;
+  color: var(--success-color);
+}
+
+.product-saturation {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  gap: 8px;
+}
+
+.saturation-label {
+  min-width: 115px;
+  color: var(--muted-text);
+}
+
+.saturation-bar {
+  flex-grow: 1;
+  height: 8px;
+  background-color: #f0f0f0;
   border-radius: 4px;
+  overflow: hidden;
+}
+
+.saturation-fill {
+  height: 100%;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.saturation-value {
+  min-width: 35px;
+  text-align: right;
+  font-weight: bold;
+}
+
+.products-empty {
   text-align: center;
+  color: var(--muted-text);
+  padding: 20px 0;
 }
 </style>

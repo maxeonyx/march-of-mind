@@ -150,3 +150,4 @@ Always update both this file `CLAUDE.md` AND `package.json`.
 - 0.6.1 - Renamed development points to insights and made them slower to accumulate, fixed product launch button by removing redundant progress bar
 - 0.6.2 - Cleaned up unused conditional code for legacy button implementations, fixed comment in ProgressButton template
 - 0.6.3 - Improved UI layout with compact horizontal header, optimized vertical space, enhanced button click using pure CSS, made text non-selectable
+- 0.7.0 - Implemented Phase 3 features: Marketing system with diminishing returns, product catalog with historical AI products, market saturation mechanics

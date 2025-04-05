@@ -123,6 +123,18 @@ export const useGameStore = defineStore('game', {
     },
     
     /**
+     * Apply marketing to boost product income
+     */
+    applyMarketing() {
+      const productStore = useProductStore();
+      const result = productStore.applyMarketing();
+      if (result) {
+        this.saveGame();
+      }
+      return result;
+    },
+    
+    /**
      * Save the game state to localStorage
      */
     saveGame() {
@@ -141,7 +153,10 @@ export const useGameStore = defineStore('game', {
         hasHiredTalent: talentStore.hasHiredTalent,
         insights: productStore.insights,
         hasProduct: productStore.hasProduct,
-        hasLaunchedFirstProduct: productStore.hasLaunchedFirstProduct
+        hasLaunchedFirstProduct: productStore.hasLaunchedFirstProduct,
+        activeProducts: productStore.activeProducts,
+        marketingSaturation: productStore.totalMarketingSaturation,
+        marketingEffectiveness: productStore.marketingEffectiveness
       };
       
       localStorage.setItem('marchOfMindSave', JSON.stringify(saveData));
@@ -180,6 +195,12 @@ export const useGameStore = defineStore('game', {
           productStore.insights = data.insights || data.developmentPoints || 0;
           productStore.hasProduct = data.hasProduct || false;
           productStore.hasLaunchedFirstProduct = data.hasLaunchedFirstProduct || false;
+          productStore.activeProducts = data.activeProducts || [];
+          productStore.totalMarketingSaturation = data.marketingSaturation || 0;
+          productStore.marketingEffectiveness = data.marketingEffectiveness || 1;
+          
+          // Initialize product system
+          productStore.init();
           
           this.lastSavedAt = data.savedAt || 0;
           

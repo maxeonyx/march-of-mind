@@ -2,6 +2,13 @@ import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import App from './App.vue';
 import { useGameStore } from './stores/game';
+import { initGame } from './game';
+
+// Make Pinia available for tests
+if (typeof window !== 'undefined' && window.Pinia) {
+  window.Pinia.createPinia = createPinia;
+  window.Pinia.useGameStore = useGameStore;
+}
 
 // Create Vue app instance
 const app = createApp(App);
@@ -23,7 +30,7 @@ if (typeof window !== 'undefined' && !window.__APP_STORE_INITIALIZED) {
     
     // Try to load saved game state if not in test
     if (!isInTest) {
-      store.init();
+      initGame();
     }
     
     // Expose store for tests

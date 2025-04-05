@@ -6,12 +6,36 @@ test.beforeEach(async ({ page }) => {
   // Initialize the global store on each test page
   await page.addInitScript(() => {
     if (typeof window !== 'undefined') {
-      // Flag to ensure we initialize just once
-      window.__APP_STORE_INITIALIZED = false;
+      // Expose Pinia for test initialization
+      window.Pinia = {};
       
       // Clear any localStorage data to ensure tests start fresh
       localStorage.removeItem('marchOfMindSave');
     }
+  });
+  
+  // Add the Pinia access to window for tests
+  await page.addInitScript(() => {
+    // When Pinia is loaded, store its functions for test access
+    const originalCreatePinia = window.Pinia.createPinia || null;
+    window.Pinia.createPinia = function(...args) {
+      const pinia = originalCreatePinia ? originalCreatePinia(...args) : {};
+      window.Pinia.instance = pinia;
+      return pinia;
+    };
+    
+    // Capture the game store
+    Object.defineProperty(window.Pinia, 'useGameStore', {
+      configurable: true,
+      set(fn) {
+        window.Pinia._useGameStore = fn;
+      },
+      get() {
+        return function() {
+          return window.Pinia._useGameStore();
+        };
+      }
+    });
   });
 });
 
@@ -21,17 +45,33 @@ test.beforeEach(async ({ page }) => {
 // The app should respond within these timeframes - if tests fail due to timeouts, fix the app, not the timeouts.
 const NORMAL_TIMEOUT = 100; // ms - for normal UI operations.
 
-// Wait for the store to be initialized before test begins
-async function waitForStoreInitialization(page) {
-  await page.waitForFunction(() => {
-    return window.__appStore && window.__appMethods;
-  }, { timeout: 2000 });
+// Initialize store explicitly for tests
+async function initializeTestStore(page) {
+  await page.evaluate(() => {
+    // Directly initialize store for testing
+    window.__APP_STORE_INITIALIZED = true;
+    
+    // Initialize a test instance of the game store
+    if (!window.__appStore) {
+      const store = window.Pinia.useGameStore();
+      window.__appStore = store;
+      window.__appMethods = {
+        loadGame: () => store.loadGame(),
+        saveGame: () => store.saveGame(), 
+        resetGame: () => store.resetGame(),
+        earnMoney: () => store.earnMoney(),
+        foundCompany: () => store.foundCompany(),
+        addMoney: (amount) => store.addMoney(amount),
+        setPhase: (phase) => store.setPhase(phase)
+      };
+    }
+  });
 }
 
 // Basic test to verify the page loads correctly
 test('homepage has title and basic components', async ({ page }) => {
   await page.goto('/');
-  await waitForStoreInitialization(page);
+  await initializeTestStore(page);
   
   // Assert that the page title contains the project name
   await expect(page).toHaveTitle(/March of Mind/);
@@ -55,7 +95,7 @@ test('homepage has title and basic components', async ({ page }) => {
 // Test the initial job phase mechanics
 test('job phase: earn money and progress toward founding company', async ({ page }) => {
   await page.goto('/');
-  await waitForStoreInitialization(page);
+  await initializeTestStore(page);
   
   // Verify we're in the job phase
   const pageTitle = page.locator('h2');
@@ -79,7 +119,7 @@ test('job phase: earn money and progress toward founding company', async ({ page
 // Test the company founding functionality
 test('found a company when threshold is reached', async ({ page }) => {
   await page.goto('/');
-  await waitForStoreInitialization(page);
+  await initializeTestStore(page);
   
   // Inject script to set money to threshold minus 1
   await page.evaluate(() => {
@@ -120,7 +160,7 @@ test('found a company when threshold is reached', async ({ page }) => {
 // Test talent management functionality
 test('talent management and income system', async ({ page }) => {
   await page.goto('/');
-  await waitForStoreInitialization(page);
+  await initializeTestStore(page);
   
   // Set up company phase with enough money to hire talent
   await page.evaluate(() => {
@@ -183,7 +223,7 @@ test('talent management and income system', async ({ page }) => {
 // Test the company founding functionality fully
 test('company founding complete flow with multiple clicks', async ({ page }) => {
   await page.goto('/');
-  await waitForStoreInitialization(page);
+  await initializeTestStore(page);
   
   // Set up state close to founding threshold
   await page.evaluate(() => {
@@ -213,7 +253,7 @@ test('company founding complete flow with multiple clicks', async ({ page }) => 
 // Test reset button functionality
 test('dev reset button should reset game state', async ({ page }) => {
   await page.goto('/');
-  await waitForStoreInitialization(page);
+  await initializeTestStore(page);
   
   // Directly set up company phase state without using localStorage
   await page.evaluate(() => {
@@ -234,4 +274,71 @@ test('dev reset button should reset game state', async ({ page }) => {
   
   // Money should be reset to 0
   await expect(page.getByText(/Money: \$/)).toContainText('Money: $0', { timeout: NORMAL_TIMEOUT });
+});
+
+// Test product development and launching
+test('company phase: can launch a product with enough insights', async ({ page }) => {
+  await page.goto('/');
+  await initializeTestStore(page);
+  
+  // Set up company phase with money to hire talent
+  await page.evaluate(() => {
+    window.__appStore.addMoney(100);
+    window.__appStore.setPhase('company');
+  });
+  
+  // Hire talent to generate insights
+  await page.getByText('Hire Talent').click();
+  
+  // Wait for insights to accumulate enough to launch a product
+  await expect(async () => {
+    const insights = await page.locator('.development-value').textContent();
+    expect(Number(insights)).toBeGreaterThanOrEqual(1);
+  }).toPass({ timeout: 5000 });
+  
+  // Launch the product when available
+  await expect(page.getByText('Launch Product')).toBeEnabled({ timeout: NORMAL_TIMEOUT });
+  await page.getByText('Launch Product').click();
+  
+  // Verify that the product is launched by checking for the active products section
+  await expect(page.getByText('Active Products')).toBeVisible({ timeout: NORMAL_TIMEOUT });
+  
+  // Verify the marketing button appears
+  await expect(page.getByText('Marketing Campaign')).toBeVisible({ timeout: NORMAL_TIMEOUT });
+});
+
+// Test marketing functionality
+test('company phase: can apply marketing to products', async ({ page }) => {
+  await page.goto('/');
+  await initializeTestStore(page);
+  
+  // Set up company phase with a launched product
+  await page.evaluate(() => {
+    window.__appStore.addMoney(100);
+    window.__appStore.setPhase('company');
+  });
+  
+  // Hire talent to generate insights
+  await page.getByText('Hire Talent').click();
+  
+  // Wait for insights to accumulate and launch product
+  await expect(async () => {
+    const insights = await page.locator('.development-value').textContent();
+    expect(Number(insights)).toBeGreaterThanOrEqual(1);
+  }).toPass({ timeout: 5000 });
+  
+  await page.getByText('Launch Product').click();
+  
+  // Verify marketing button is visible
+  await expect(page.getByText('Marketing Campaign')).toBeVisible({ timeout: NORMAL_TIMEOUT });
+  
+  // Apply marketing
+  await page.getByText('Marketing Campaign').click();
+  
+  // Verify saturation increases on product
+  await expect(async () => {
+    const saturationText = await page.locator('.saturation-value').first().textContent();
+    const saturation = parseInt(saturationText || '0');
+    expect(saturation).toBeGreaterThan(10);
+  }).toPass({ timeout: NORMAL_TIMEOUT });
 });

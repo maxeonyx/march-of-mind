@@ -158,8 +158,10 @@ Note: The 2035 end date is a target for game pacing rather than a hard end date.
 - [ ] First passive income implementation
 
 ### Phase 3 Implementation
-- [ ] Marketing button and mechanics
-- [ ] Enhanced product performance system
+- [ ] Marketing button and mechanics with diminishing returns
+- [ ] Product list with historical AI products
+- [ ] Market saturation system for each product
+- [ ] Products panel with launch and management interface
 - [ ] Progress tracking toward R&D Center
 
 ### Phase 4 Implementation
