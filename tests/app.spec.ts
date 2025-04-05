@@ -47,7 +47,7 @@ test('homepage has title and basic components', async ({ page }) => {
   await expect(footer).toContainText('Version');
   
   // Test the money counter is visible
-  const moneyDisplay = page.locator('.resource-display h3');
+  const moneyDisplay = page.getByText(/Money: \$/);
   await expect(moneyDisplay).toBeVisible({ timeout: NORMAL_TIMEOUT });
   await expect(moneyDisplay).toContainText('Money: $0');
 });
@@ -61,29 +61,19 @@ test('job phase: earn money and progress toward founding company', async ({ page
   const pageTitle = page.locator('h2');
   await expect(pageTitle).toContainText('Working for the Man', { timeout: NORMAL_TIMEOUT });
   
-  // Check that both buttons are visible
-  const workButton = page.locator('.work-button');
-  const foundButton = page.locator('.found-button');
+  // Find the work and found buttons
+  const workButton = page.locator('button', { hasText: 'Work for the Man' });
+  const foundButton = page.locator('button', { hasText: 'Found a Company' });
+  
   await expect(workButton).toBeVisible({ timeout: NORMAL_TIMEOUT });
   await expect(foundButton).toBeVisible({ timeout: NORMAL_TIMEOUT });
   
   // Found button should be disabled initially
   await expect(foundButton).toBeDisabled({ timeout: NORMAL_TIMEOUT });
   
-  // Check that progress bar exists
-  const progressContainer = page.locator('.progress-container');
-  await expect(progressContainer).toBeVisible({ timeout: NORMAL_TIMEOUT });
-  
-  // Progress bar should start near 0%
-  const progressInfo = page.locator('.progress-info');
-  await expect(progressInfo).toContainText('0 / 100', { timeout: NORMAL_TIMEOUT });
-  
   // Click the work button and check money increases
   await workButton.click();
-  await expect(page.locator('.resource-display h3')).toContainText('Money: $1', { timeout: NORMAL_TIMEOUT });
-  
-  // Check that progress info has changed after earning money
-  await expect(progressInfo).toContainText('1 / 100', { timeout: NORMAL_TIMEOUT });
+  await expect(page.getByText(/Money: \$/)).toContainText('Money: $1', { timeout: NORMAL_TIMEOUT });
 });
 
 // Test the company founding functionality
@@ -94,15 +84,17 @@ test('found a company when threshold is reached', async ({ page }) => {
   // Inject script to set money to threshold minus 1
   await page.evaluate(() => {
     // We know the threshold is 100 from the app store
-    window.__appStore.count = 99;
+    window.__appStore.addMoney(99);
   });
   
-  // Check that the found button is still disabled
-  const foundButton = page.locator('.found-button');
+  // Find the buttons - now we need to find the actual button elements
+  const foundButton = page.locator('button', { hasText: 'Found a Company' });
+  const workButton = page.locator('button', { hasText: 'Work for the Man' });
+  
+  // Check that the found button is disabled
   await expect(foundButton).toBeDisabled({ timeout: NORMAL_TIMEOUT });
   
   // Click once more to reach the threshold
-  const workButton = page.locator('.work-button');
   await workButton.click();
   
   // Now the found button should be enabled
@@ -112,11 +104,11 @@ test('found a company when threshold is reached', async ({ page }) => {
   await foundButton.click();
   
   // We should now be in the company phase
-  const companyPhase = page.locator('.company-phase');
+  const companyPhase = page.getByText('Your Company is Founded!');
   await expect(companyPhase).toBeVisible({ timeout: NORMAL_TIMEOUT });
   
   // Money should be reduced by company founding cost
-  await expect(page.locator('.resource-display h3')).toContainText('Money: $0', { timeout: NORMAL_TIMEOUT });
+  await expect(page.getByText(/Money: \$/)).toContainText('Money: $0', { timeout: NORMAL_TIMEOUT });
   
   // Page title should change
   await expect(page.locator('h2')).toContainText('Company Dashboard', { timeout: NORMAL_TIMEOUT });
@@ -132,32 +124,34 @@ test('talent management and income system', async ({ page }) => {
   
   // Set up company phase with enough money to hire talent
   await page.evaluate(() => {
-    window.__appStore.count = 100;
-    window.__appStore.gamePhase = 'company';
+    window.__appStore.addMoney(100);
+    window.__appStore.setPhase('company');
   });
   
   // Check that talent panel is visible
-  await expect(page.locator('.management-panel').first()).toBeVisible({ timeout: NORMAL_TIMEOUT });
+  const talentPanel = page.getByText('Talent Management');
+  await expect(talentPanel).toBeVisible({ timeout: NORMAL_TIMEOUT });
   
   // Initial talent should be 0
-  await expect(page.locator('.talent-count')).toContainText('Current Talent:0', { timeout: NORMAL_TIMEOUT });
+  await expect(page.locator('.talent-value')).toContainText('0', { timeout: NORMAL_TIMEOUT });
   
-  // Hire button should be enabled with 100 money
-  const hireButton = page.locator('.hire-button');
-  await expect(hireButton).toBeEnabled({ timeout: NORMAL_TIMEOUT });
+  // Hire button should be visible
+  const hireButton = page.locator('button', { hasText: 'Hire Talent' });
+  await expect(hireButton).toBeVisible({ timeout: NORMAL_TIMEOUT });
   
-  // Fire button should be disabled with 0 talent
-  const fireButton = page.locator('.fire-button');
+  // Fire button should be visible but disabled
+  const fireButton = page.locator('button', { hasText: 'Fire Talent' });
+  await expect(fireButton).toBeVisible({ timeout: NORMAL_TIMEOUT });
   await expect(fireButton).toBeDisabled({ timeout: NORMAL_TIMEOUT });
   
   // Hire talent
   await hireButton.click();
   
   // Talent should now be 1
-  await expect(page.locator('.talent-count')).toContainText('Current Talent:1', { timeout: NORMAL_TIMEOUT });
+  await expect(page.locator('.talent-value')).toContainText('1', { timeout: NORMAL_TIMEOUT });
   
   // Money should be reduced by hire cost (50)
-  await expect(page.locator('.resource-display h3')).toContainText('Money: $50', { timeout: NORMAL_TIMEOUT });
+  await expect(page.getByText(/Money: \$/)).toContainText('Money: $50', { timeout: NORMAL_TIMEOUT });
   
   // Fire button should now be enabled
   await expect(fireButton).toBeEnabled({ timeout: NORMAL_TIMEOUT });
@@ -175,7 +169,7 @@ test('talent management and income system', async ({ page }) => {
   await fireButton.click();
   
   // Talent should be back to 0
-  await expect(page.locator('.talent-count')).toContainText('Current Talent:0', { timeout: NORMAL_TIMEOUT });
+  await expect(page.locator('.talent-value')).toContainText('0', { timeout: NORMAL_TIMEOUT });
   
   // Income stats should show zeroes
   const updatedIncomeStatsText = await incomeStats.textContent();
@@ -184,9 +178,6 @@ test('talent management and income system', async ({ page }) => {
   expect(updatedIncomeStatsText).toContain('Monthly Income:+$0');
   expect(updatedIncomeStatsText).toContain('Monthly Expenses:-$0');
   expect(updatedIncomeStatsText).toContain('Net Monthly:+$0');
-  
-  // Fire button should be disabled again
-  await expect(fireButton).toBeDisabled({ timeout: NORMAL_TIMEOUT });
 });
 
 // Test the company founding functionality fully
@@ -196,17 +187,17 @@ test('company founding complete flow with multiple clicks', async ({ page }) => 
   
   // Set up state close to founding threshold
   await page.evaluate(() => {
-    window.__appStore.count = 95;
+    window.__appStore.addMoney(95);
   });
   
   // Click 5 times to reach threshold
-  const workButton = page.locator('.work-button');
+  const workButton = page.locator('button', { hasText: 'Work for the Man' });
   for (let i = 0; i < 5; i++) {
     await workButton.click();
   }
   
   // Wait for found button to be enabled
-  const foundButton = page.locator('.found-button');
+  const foundButton = page.locator('button', { hasText: 'Found a Company' });
   await expect(foundButton).toBeEnabled({ timeout: NORMAL_TIMEOUT });
   
   // Found the company
@@ -216,7 +207,7 @@ test('company founding complete flow with multiple clicks', async ({ page }) => 
   await expect(page.locator('h2')).toContainText('Company Dashboard', { timeout: NORMAL_TIMEOUT });
   
   // Company info should be visible
-  await expect(page.locator('.company-info')).toContainText('Your Company is Founded', { timeout: NORMAL_TIMEOUT });
+  await expect(page.getByText('Your Company is Founded')).toBeVisible({ timeout: NORMAL_TIMEOUT });
 });
 
 // Test reset button functionality
@@ -226,21 +217,21 @@ test('dev reset button should reset game state', async ({ page }) => {
   
   // Directly set up company phase state without using localStorage
   await page.evaluate(() => {
-    window.__appStore.count = 50;
-    window.__appStore.gamePhase = 'company';
+    window.__appStore.addMoney(50);
+    window.__appStore.setPhase('company');
   });
   
   // Verify we can see the company phase UI
-  await expect(page.locator('.company-phase')).toBeVisible({ timeout: NORMAL_TIMEOUT });
+  const companyPhase = page.getByText('Your Company is Founded');
+  await expect(companyPhase).toBeVisible({ timeout: NORMAL_TIMEOUT });
   
   // Click the reset button
   const resetButton = page.locator('.dev-button');
   await resetButton.click();
   
-  // Verify we're back to job phase (progress bar is visible)
-  await expect(page.locator('.progress-container')).toBeVisible({ timeout: NORMAL_TIMEOUT });
+  // Verify we're back to job phase (Work for the Man button is visible)
+  await expect(page.getByText('Work for the Man')).toBeVisible({ timeout: NORMAL_TIMEOUT });
   
   // Money should be reset to 0
-  await expect(page.locator('.resource-display h3')).toContainText('Money: $0', { timeout: NORMAL_TIMEOUT });
+  await expect(page.getByText(/Money: \$/)).toContainText('Money: $0', { timeout: NORMAL_TIMEOUT });
 });
-

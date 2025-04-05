@@ -125,3 +125,4 @@ Always update both this file `CLAUDE.md` AND `package.json`.
 - 0.4.1 - Refined Phase 2: Added "Work Hard" button to company phase, moved talent management to separate panel, fixed date advancement, balanced game to last 40 minutes total (~30 seconds per year)
 - 0.5.0 - Redesigned talent system to be a net resource drain while contributing to product development progress, simplified time system to use month counter, added product development progress tracking
 - 0.5.1 - Made date visible in all game phases, including job phase, and time now passes consistently throughout the game
+- 0.6.0 - Major refactoring: Split app into modular components, restructured store into domain-specific modules, added ProgressButton component with color-based progress indicators

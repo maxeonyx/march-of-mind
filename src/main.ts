@@ -1,7 +1,7 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import App from './App.vue';
-import { useAppStore } from './stores/app';
+import { useGameStore } from './stores/game';
 
 // Create Vue app instance
 const app = createApp(App);
@@ -16,14 +16,14 @@ if (typeof window !== 'undefined' && !window.__APP_STORE_INITIALIZED) {
   
   // Initial store setup
   setTimeout(() => {
-    const store = useAppStore();
+    const store = useGameStore();
     
     // Prevent auto-loading in tests with fresh localStorage
     const isInTest = window.location.href.includes('playwright');
     
     // Try to load saved game state if not in test
     if (!isInTest) {
-      store.loadGame();
+      store.init();
     }
     
     // Expose store for tests
