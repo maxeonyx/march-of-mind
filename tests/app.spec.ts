@@ -152,3 +152,28 @@ test('company founding complete flow with multiple clicks', async ({ page }) => 
   await expect(page.locator('.company-info')).toContainText('Your Company is Founded', { timeout: NORMAL_TIMEOUT });
 });
 
+// Test reset button functionality
+test('dev reset button should reset game state', async ({ page }) => {
+  await page.goto('/');
+  await waitForStoreInitialization(page);
+  
+  // Directly set up company phase state without using localStorage
+  await page.evaluate(() => {
+    window.__appStore.count = 50;
+    window.__appStore.gamePhase = 'company';
+  });
+  
+  // Verify we can see the company phase UI
+  await expect(page.locator('.company-phase')).toBeVisible({ timeout: NORMAL_TIMEOUT });
+  
+  // Click the reset button
+  const resetButton = page.locator('.dev-button');
+  await resetButton.click();
+  
+  // Verify we're back to job phase (progress bar is visible)
+  await expect(page.locator('.progress-container')).toBeVisible({ timeout: NORMAL_TIMEOUT });
+  
+  // Money should be reset to 0
+  await expect(page.locator('.resource-display h3')).toContainText('Money: $0', { timeout: NORMAL_TIMEOUT });
+});
+

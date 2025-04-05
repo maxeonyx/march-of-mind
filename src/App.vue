@@ -3,6 +3,9 @@
     <header>
       <img alt="March of Mind logo" src="./assets/logo.png" class="logo">
       <h1>March of Mind</h1>
+      <div class="dev-controls">
+        <button @click="resetGame" class="dev-button">Reset Game (Dev)</button>
+      </div>
     </header>
     <main>
       <h2>{{ gameTitle }}</h2>
@@ -114,6 +117,11 @@ function foundCompany() {
   }
 }
 
+// Reset game state for development purposes
+function resetGame() {
+  store.resetGame();
+}
+
 // Initialize game on component mount
 onMounted(() => {
   store.loadGame();
@@ -154,6 +162,7 @@ html, body {
 
 header {
   margin: 60px 0;
+  position: relative;
 }
 
 .logo {
@@ -164,6 +173,29 @@ header {
 h1 {
   font-size: 28px;
   color: var(--primary-color);
+}
+
+.dev-controls {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 5px;
+}
+
+.dev-button {
+  background-color: #ff9800;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.dev-button:hover {
+  opacity: 1;
 }
 
 main {
