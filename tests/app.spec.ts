@@ -120,6 +120,73 @@ test('found a company when threshold is reached', async ({ page }) => {
   
   // Page title should change
   await expect(page.locator('h2')).toContainText('Company Dashboard', { timeout: NORMAL_TIMEOUT });
+  
+  // Date display should be visible
+  await expect(page.locator('.date-display')).toBeVisible({ timeout: NORMAL_TIMEOUT });
+});
+
+// Test talent management functionality
+test('talent management and income system', async ({ page }) => {
+  await page.goto('/');
+  await waitForStoreInitialization(page);
+  
+  // Set up company phase with enough money to hire talent
+  await page.evaluate(() => {
+    window.__appStore.count = 100;
+    window.__appStore.gamePhase = 'company';
+  });
+  
+  // Check that talent panel is visible
+  await expect(page.locator('.management-panel')).toBeVisible({ timeout: NORMAL_TIMEOUT });
+  
+  // Initial talent should be 0
+  await expect(page.locator('.talent-count')).toContainText('Current Talent:0', { timeout: NORMAL_TIMEOUT });
+  
+  // Hire button should be enabled with 100 money
+  const hireButton = page.locator('.hire-button');
+  await expect(hireButton).toBeEnabled({ timeout: NORMAL_TIMEOUT });
+  
+  // Fire button should be disabled with 0 talent
+  const fireButton = page.locator('.fire-button');
+  await expect(fireButton).toBeDisabled({ timeout: NORMAL_TIMEOUT });
+  
+  // Hire talent
+  await hireButton.click();
+  
+  // Talent should now be 1
+  await expect(page.locator('.talent-count')).toContainText('Current Talent:1', { timeout: NORMAL_TIMEOUT });
+  
+  // Money should be reduced by hire cost (50)
+  await expect(page.locator('.resource-display h3')).toContainText('Money: $50', { timeout: NORMAL_TIMEOUT });
+  
+  // Fire button should now be enabled
+  await expect(fireButton).toBeEnabled({ timeout: NORMAL_TIMEOUT });
+  
+  // Income stats should show correct values (assuming TALENT_INCOME=15, TALENT_SALARY=10)
+  const incomeStats = page.locator('.income-stats');
+  const incomeStatsText = await incomeStats.textContent();
+  
+  // Check that income stats contain expected values
+  expect(incomeStatsText).toContain('Monthly Income:+$15');
+  expect(incomeStatsText).toContain('Monthly Expenses:-$10');
+  expect(incomeStatsText).toContain('Net Monthly:+$5');
+  
+  // Fire talent
+  await fireButton.click();
+  
+  // Talent should be back to 0
+  await expect(page.locator('.talent-count')).toContainText('Current Talent:0', { timeout: NORMAL_TIMEOUT });
+  
+  // Income stats should show zeroes
+  const updatedIncomeStatsText = await incomeStats.textContent();
+  
+  // Check that income stats contain expected values after firing
+  expect(updatedIncomeStatsText).toContain('Monthly Income:+$0');
+  expect(updatedIncomeStatsText).toContain('Monthly Expenses:-$0');
+  expect(updatedIncomeStatsText).toContain('Net Monthly:+$0');
+  
+  // Fire button should be disabled again
+  await expect(fireButton).toBeDisabled({ timeout: NORMAL_TIMEOUT });
 });
 
 // Test the company founding functionality fully

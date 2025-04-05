@@ -121,3 +121,4 @@ Always update both this file `CLAUDE.md` AND `package.json`.
 - 0.1.0 - Initial project setup with Vue 3, TypeScript, Pinia, and testing infrastructure
 - 0.2.0 - Renamed project to March of Mind, updated base path, added simple counter with "unrealistically earn money" button
 - 0.3.0 - Implemented Phase 1 features: "Work for the Man" button with progress bar, "Found a Company" button, game phase transitions, and save/load functionality
+- 0.4.0 - Implemented Phase 2 features: Time system (starting from 1950), Talent management with hire/fire functionality, Monthly income/expense system, Game tick mechanics for passive income

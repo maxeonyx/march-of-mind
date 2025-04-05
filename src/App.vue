@@ -9,9 +9,33 @@
     </header>
     <main>
       <h2>{{ gameTitle }}</h2>
+      
+      <!-- Date display (visible in company phase) -->
+      <div v-if="gamePhase !== 'job'" class="date-display">
+        <h3>{{ formattedDate }}</h3>
+      </div>
+      
       <div class="game-container">
         <div class="resource-display">
-          <h3>Money: ${{ money }}</h3>
+          <h3>Money: ${{ Math.floor(money) }}</h3>
+          
+          <!-- Income stats (visible in company phase) -->
+          <div v-if="gamePhase === 'company'" class="income-stats">
+            <div class="stat-row">
+              <span>Monthly Income:</span>
+              <span :class="{ 'positive': monthlyIncome > 0 }">+${{ monthlyIncome }}</span>
+            </div>
+            <div class="stat-row">
+              <span>Monthly Expenses:</span>
+              <span :class="{ 'negative': monthlySalary > 0 }">-${{ monthlySalary }}</span>
+            </div>
+            <div class="stat-row net-income">
+              <span>Net Monthly:</span>
+              <span :class="{ 'positive': monthlyNetIncome > 0, 'negative': monthlyNetIncome < 0 }">
+                {{ monthlyNetIncome >= 0 ? '+' : '' }}${{ monthlyNetIncome }}
+              </span>
+            </div>
+          </div>
         </div>
         
         <!-- Job Phase UI -->
@@ -43,11 +67,46 @@
           </div>
         </div>
         
-        <!-- Company Phase UI (will expand in future phases) -->
+        <!-- Company Phase UI -->
         <div v-if="gamePhase === 'company'" class="phase-container company-phase">
           <div class="company-info">
             <h3>Your Company is Founded!</h3>
-            <p>More features coming in the next development phase...</p>
+            
+            <!-- Talent Management Panel -->
+            <div class="management-panel">
+              <div class="panel-header">
+                <h4>Talent Management</h4>
+                <div class="talent-count">
+                  <span class="talent-label">Current Talent:</span>
+                  <span class="talent-value">{{ talent }}</span>
+                </div>
+              </div>
+              
+              <div class="talent-actions">
+                <button 
+                  @click="hireTalent" 
+                  class="action-button talent-button hire-button"
+                  :class="{ 'button-enabled': canHireTalent }"
+                  :disabled="!canHireTalent"
+                >
+                  Hire Talent (${{ HIRE_TALENT_COST_VALUE }})
+                </button>
+                
+                <button 
+                  @click="fireTalent" 
+                  class="action-button talent-button fire-button"
+                  :class="{ 'button-enabled': canFireTalent }"
+                  :disabled="!canFireTalent"
+                >
+                  Fire Talent
+                </button>
+              </div>
+              
+              <div class="talent-info">
+                <p>Each talent costs ${{ TALENT_SALARY_VALUE }} per month but generates ${{ TALENT_INCOME_VALUE }} in revenue.</p>
+                <p>Net profit per talent: ${{ TALENT_INCOME_VALUE - TALENT_SALARY_VALUE }} per month.</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -62,9 +121,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue';
+import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { useVersion } from './composables/useVersion';
-import { useAppStore, COMPANY_FOUNDING_COST, GamePhase } from './stores/app';
+import { 
+  useAppStore, 
+  COMPANY_FOUNDING_COST, 
+  GamePhase,
+  HIRE_TALENT_COST,
+  TALENT_SALARY,
+  TALENT_INCOME
+} from './stores/app';
 
 // Version info
 const { version: versionInfo } = useVersion();
@@ -76,6 +142,22 @@ const money = computed(() => store.money);
 const gamePhase = computed(() => store.gamePhase);
 const foundingProgress = computed(() => store.companyFoundingProgress);
 const canFoundCompany = computed(() => store.canFoundCompany);
+
+// Time system
+const formattedDate = computed(() => store.formattedDate);
+
+// Talent system
+const talent = computed(() => store.talent);
+const monthlyIncome = computed(() => store.monthlyIncome);
+const monthlySalary = computed(() => store.monthlySalary);
+const monthlyNetIncome = computed(() => store.monthlyNetIncome);
+const canHireTalent = computed(() => store.canHireTalent);
+const canFireTalent = computed(() => store.canFireTalent);
+
+// Expose constants to the template
+const HIRE_TALENT_COST_VALUE = HIRE_TALENT_COST;
+const TALENT_SALARY_VALUE = TALENT_SALARY;
+const TALENT_INCOME_VALUE = TALENT_INCOME;
 
 // Button click animation state
 const workButtonClicked = ref(false);
@@ -117,6 +199,18 @@ function foundCompany() {
   }
 }
 
+function hireTalent() {
+  if (canHireTalent.value) {
+    store.hireTalent();
+  }
+}
+
+function fireTalent() {
+  if (canFireTalent.value) {
+    store.fireTalent();
+  }
+}
+
 // Reset game state for development purposes
 function resetGame() {
   store.resetGame();
@@ -125,6 +219,11 @@ function resetGame() {
 // Initialize game on component mount
 onMounted(() => {
   store.loadGame();
+});
+
+// Clean up when component is unmounted
+onUnmounted(() => {
+  store.stopGameTicker();
 });
 </script>
 
@@ -142,6 +241,12 @@ onMounted(() => {
   --disabled-color: #b0b0b0;
   --progress-bg: #e0e0e0;
   --progress-fill: #42b983;
+  --positive-color: #4caf50;
+  --negative-color: #f44336;
+  --hire-color: #4a8af4;
+  --hire-hover: #3a7ae4;
+  --fire-color: #e53935;
+  --fire-hover: #d32f2f;
 }
 
 html, body {
@@ -356,7 +461,128 @@ main {
 
 .company-info h3 {
   color: var(--primary-color);
-  margin-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+/* Date display */
+.date-display {
+  text-align: center;
+  margin: 10px 0 20px;
+  padding: 5px;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+.date-display h3 {
+  margin: 0;
+  font-size: 18px;
+  color: var(--text-color);
+}
+
+/* Income statistics */
+.income-stats {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 4px;
+  text-align: left;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.net-income {
+  font-weight: bold;
+  margin-top: 10px;
+  padding-top: 5px;
+  border-top: 1px dashed var(--border-color);
+}
+
+.positive {
+  color: var(--positive-color);
+}
+
+.negative {
+  color: var(--negative-color);
+}
+
+/* Talent Management */
+.management-panel {
+  margin: 15px 0;
+  padding: 15px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.panel-header h4 {
+  margin: 0;
+  color: var(--text-color);
+  font-size: 18px;
+}
+
+.talent-count {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 14px;
+}
+
+.talent-value {
+  font-weight: bold;
+  margin-left: 5px;
+}
+
+.talent-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin: 15px 0;
+}
+
+.talent-button {
+  min-width: 120px;
+}
+
+.hire-button {
+  background-color: var(--hire-color);
+}
+
+.hire-button:hover,
+.hire-button.button-enabled:hover {
+  background-color: var(--hire-hover);
+}
+
+.fire-button {
+  background-color: var(--fire-color);
+}
+
+.fire-button:hover,
+.fire-button.button-enabled:hover {
+  background-color: var(--fire-hover);
+}
+
+.talent-info {
+  font-size: 14px;
+  color: var(--muted-text);
+  margin-top: 15px;
+  text-align: center;
+}
+
+.talent-info p {
+  margin: 5px 0;
 }
 
 footer {
