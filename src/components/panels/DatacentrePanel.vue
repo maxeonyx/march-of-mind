@@ -8,8 +8,8 @@
         :onUpgrade="onUpgradeHardware"
       />
 
-      <!-- Research Panel -->
-      <ResearchPanel
+      <!-- Research Button Panel -->
+      <ResearchButtonPanel
         @research="onResearch"
       />
     </div>
@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import HardwarePanel from '@/components/panels/HardwarePanel.vue';
-import ResearchPanel from '@/components/panels/ResearchPanel.vue';
+import ResearchButtonPanel from '@/components/panels/ResearchButtonPanel.vue';
 import InsightRateDisplay from '@/components/panels/InsightRateDisplay.vue';
 import ResourceAllocationSlider from '@/components/panels/ResourceAllocationSlider.vue';
 import type { HardwareStore } from '@/store/hardware';
