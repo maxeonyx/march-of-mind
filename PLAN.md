@@ -16,6 +16,8 @@
 
 7. **Exponential Compute**: Hardware improvements demonstrate the exponential growth of computing power throughout AI history.
 
+See wireframe.png and current-app-screenshot.jpeg.
+
 ## Game Progression Flow
 
 ### Game Duration
@@ -35,7 +37,7 @@ Note: The 2035 end date is a target for game pacing rather than a hard end date.
 - **Educational**: Answer multiple-choice question to unlock first discovery
 
 ### Phase 2: Lab Phase
-- **New Mechanics**: 
+- **New Mechanics**:
   - Hardware acquisition system (primary resource)
   - Insights generation based on hardware FLOP/s
   - Product development capability
@@ -48,7 +50,7 @@ Note: The 2035 end date is a target for game pacing rather than a hard end date.
 - **Educational**: Answer questions to unlock new hardware and products
 
 ### Phase 3: Discovery Phase
-- **New Mechanics**: 
+- **New Mechanics**:
   - Products generate income
   - "Marketing" button appears
   - Salary/savings allocation slider
