@@ -2,7 +2,7 @@
   <div class="phase-container lab-phase">
     <!-- Main game layout: two-column grid -->
     <div class="main-layout">
-      <!-- Left column for controls and work panels -->
+      <!-- Left column for Datacentre Panel -->
       <div class="left-column">
         <!-- Datacentre Panel (contains hardware, research, insight rate, and allocation) -->
         <DatacentrePanel
@@ -14,54 +14,36 @@
           @research="doResearch"
           @upgradeHardware="upgradeHardware"
         />
-
-        <!-- Work Panels -->
-        <div class="work-panels">
-          <!-- Product Development Panel -->
-          <ProductWorkPanel
-            :hasProductInProgress="productInProgress"
-            :productName="productInProgress ? aiProducts.selectedProduct.name : ''"
-            :productDescription="productInProgress ? aiProducts.selectedProduct.description : ''"
-            :progress="aiProducts.productProgress"
-            :allocationValue="insightsToProducts"
-          />
-
-          <!-- Research Development Panel -->
-          <ResearchWorkPanel
-            :hasResearchInProgress="researchInProgress"
-            researchTitle="Pure Research"
-            researchDescription="Advance your theoretical understanding by investing in pure research."
-            :progress="researchProgress"
-            :allocationValue="insightsToPureResearch"
-            :canStartResearch="canStartResearch"
-            @startResearch="startResearch"
-          />
-        </div>
       </div>
       
-      <!-- Right column for cards -->
+      <!-- Right column for Research Panel -->
       <div class="right-column">
-
-        <!-- Products Cards -->
-        <DiscoveryCardsGrid
-          title="Products"
-          :availableCards="availableProducts"
-          :unlockedCards="unlockedProducts"
-          :activeCards="developedProducts"
-          activeRegionLabel="Developed"
-          :showDescription="true"
-          @selectCard="selectAIProduct"
-          @showDetails="showProductDetails"
-        />
-
-        <!-- Discoveries Cards -->
-        <DiscoveryCardsGrid
-          title="Discoveries"
-          :availableCards="availableDiscoveries"
-          :unlockedCards="unlockedDiscoveries"
-          :activeCards="activeDiscoveries" 
-          activeRegionLabel="Active"
-          :showDescription="true"
+        <!-- Research Panel (contains work panels and discovery cards) -->
+        <ResearchPanel
+          :hasProductInProgress="productInProgress"
+          :productName="productInProgress ? aiProducts.selectedProduct.name : ''"
+          :productDescription="productInProgress ? aiProducts.selectedProduct.description : ''"
+          :productProgress="aiProducts.productProgress"
+          :insightsToProducts="insightsToProducts"
+          
+          :hasResearchInProgress="researchInProgress"
+          researchTitle="Pure Research"
+          researchDescription="Advance your theoretical understanding by investing in pure research."
+          :researchProgress="researchProgress"
+          :insightsToPureResearch="insightsToPureResearch"
+          :canStartResearch="canStartResearch"
+          
+          :availableProducts="availableProducts"
+          :unlockedProducts="unlockedProducts"
+          :developedProducts="developedProducts"
+          
+          :availableDiscoveries="availableDiscoveries"
+          :unlockedDiscoveries="unlockedDiscoveries"
+          :activeDiscoveries="activeDiscoveries"
+          
+          @selectProduct="selectAIProduct"
+          @showProductDetails="showProductDetails"
+          @startResearch="startResearch"
         />
       </div>
     </div>
@@ -103,11 +85,7 @@
 import { computed, ref } from 'vue';
 import EducationalModal from '@/components/EducationalModal.vue';
 import DatacentrePanel from '@/components/panels/DatacentrePanel.vue';
-import ProductWorkPanel from '@/components/panels/ProductWorkPanel.vue';
-import ResearchWorkPanel from '@/components/panels/ResearchWorkPanel.vue';
-// ProductCardsGrid is being replaced by DiscoveryCardsGrid
-// import ProductCardsGrid from '@/components/panels/ProductCardsGrid.vue';
-import DiscoveryCardsGrid from '@/components/panels/DiscoveryCardsGrid.vue';
+import ResearchPanel from '@/components/panels/ResearchPanel.vue';
 
 import { useGameStore } from '@/store';
 import type { EducationalQuestion } from '@/types';
@@ -380,27 +358,13 @@ function showProductDetails(productId: string) {
 /* Two-column layout */
 .main-layout {
   display: grid;
-  grid-template-columns: 1fr 350px;
+  grid-template-columns: 350px 1fr;
   gap: 15px;
 }
 
 .left-column, .right-column {
   display: flex;
   flex-direction: column;
-  gap: 15px;
-}
-
-/* Top row with hardware and research */
-.top-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-}
-
-/* Work panels */
-.work-panels {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: 15px;
 }
 
