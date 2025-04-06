@@ -170,8 +170,9 @@ main {
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  max-width: 600px;
+  max-width: 1100px; /* Increased max-width to accommodate two-column layout */
   margin: 0 auto;
+  width: 100%;
 }
 
 footer {
