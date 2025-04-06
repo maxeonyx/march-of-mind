@@ -213,8 +213,8 @@ const developedProducts = computed(() => {
 
 // Discovery data - this should come from the discoveries store
 // Placeholder implementation until discoveries store is fully implemented
-const availableDiscoveries = computed(() => discoveries.availableDiscoveries.value || []);
-const unlockedDiscoveries = computed(() => discoveries.unlockedDiscoveriesData.value || []);
+const availableDiscoveries = computed(() => gameStore.discoveries.availableDiscoveries || []);
+const unlockedDiscoveries = computed(() => gameStore.discoveries.unlockedDiscoveriesData || []);
 const activeDiscoveries = ref([{}]); // Placeholder - will eventually come from store
 
 // Main research function
