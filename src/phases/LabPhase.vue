@@ -1,186 +1,172 @@
 <template>
   <div class="phase-container lab-phase">
-    <div class="lab-content">
-      <!-- Researchers Section - conditionally shown when we can have at least 1 researcher -->
-      <div v-if="canAffordResearcher" class="section researchers-section">
-        <h3>Researchers</h3>
-        <div class="researcher-info">
-          <p>Researchers: <strong>{{ researchers.count }}</strong></p>
-          <p>Monthly Income: <span :class="{ positive: monthlyNetIncome > 0, negative: monthlyNetIncome < 0 }">
-            ${{ monthlyNetIncome }}
-          </span></p>
-          <p>Insights per click: <strong>{{ insightRate }}</strong></p>
-        </div>
-        
-        <!-- Researcher Count Slider - only shown when we can have at least 2 options -->
-        <div v-if="maxResearchers > 0 || researchers.count > 0" class="researcher-slider-control">
-          <p>Researcher Count:</p>
-          <input 
-            type="range" 
-            :min="0" 
-            :max="maxResearchers" 
-            step="1" 
-            v-model="researcherCount" 
-            :disabled="maxResearchers < 1 && researchers.count == 0"
-            class="researcher-slider"
-            data-testid="researcher-slider"
-          />
-          <div class="researcher-count-display">{{ researcherCount }}</div>
-        </div>
-        
-        <!-- Resource Allocation Slider -->
-        <div class="allocation-control">
-          <p>Resource Allocation:</p>
-          <div class="allocation-labels">
-            <span>Salaries ({{ Math.round(allocatedToSalaries * 100) }}%)</span>
-            <span>Hardware ({{ Math.round(allocatedToHardware * 100) }}%)</span>
-          </div>
-          <input 
-            type="range" 
-            min="0" 
-            max="1" 
-            step="0.1" 
-            v-model="allocation" 
-            class="allocation-slider"
-            data-testid="allocation-slider"
-          />
-        </div>
-      </div>
-      
-      <!-- Hardware Section -->
+    <!-- Top row with hardware and research panels -->
+    <div class="top-row">
+      <!-- Hardware Panel -->
       <div class="section hardware-section">
         <h3>Hardware</h3>
         <div class="hardware-info">
-          <p>Current: <strong>{{ currentHardware.name }}</strong></p>
-          <p>FLOP/s: <strong>{{ currentHardware.flops }}</strong></p>
-          <p>Research Multiplier: <strong class="hardware-multiplier">{{ hardwareMultiplier }}x</strong></p>
-          <p>Savings: <strong>${{ savings }}</strong></p>
+          <p>{{ currentHardware.name }}</p>
+          <p>{{ currentHardware.flops }} FLOP/s</p>
         </div>
         
-        <div v-if="nextHardware" class="next-hardware">
-          <h4>Next Upgrade:</h4>
-          <p>{{ nextHardware.name }} ({{ nextHardware.flops }} FLOP/s)</p>
-          <p>${{ savings }} / ${{ nextHardware.cost }}</p>
-          
-          <div class="progress-container">
-            <div class="progress-bar" :style="{ width: `${upgradeProgress * 100}%` }"></div>
-          </div>
-          
-          <button 
+        <div v-if="nextHardware" class="hardware-upgrade">
+          <ProgressButton 
             @click="upgradeHardware" 
-            class="upgrade-button"
-            :disabled="!canUpgrade"
+            :enabled="canUpgrade"
+            :progress="upgradeProgress"
+            theme="secondary"
             data-testid="btn-upgrade-hardware"
           >
-            Upgrade Hardware
-          </button>
-        </div>
-        <div v-else class="max-hardware">
-          <p>Maximum hardware tier reached!</p>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Research Panel -->
-    <div class="section research-section">
-      <h3>Research</h3>
-      <div class="research-description">
-        <p>Generate insights by clicking the Research button.</p>
-        <p v-if="researchers.count > 0">Your researchers will help increase insight generation.</p>
-      </div>
-      <ProgressButton
-        :enabled="true"
-        :progress="0"
-        @click="doResearch"
-        theme="primary"
-        data-testid="btn-research"
-      >
-        Research
-      </ProgressButton>
-    </div>
-    
-    <!-- Product Development Panel -->
-    <div class="section product-section">
-      <h3>Product Development</h3>
-      
-      <!-- Current Product Development (if any) -->
-      <div v-if="selectedAIProduct" class="current-product">
-        <h4>Currently Developing:</h4>
-        <div class="product-card selected-product">
-          <div class="product-header">
-            <span class="product-name">{{ selectedAIProduct.name }}</span>
-            <span class="product-revenue">${{ selectedAIProduct.revenue }}/mo</span>
-          </div>
-          <p class="product-description">{{ selectedAIProduct.description }}</p>
-          <div class="product-requirements">
-            <span class="flops-req">{{ formatFlops(selectedAIProduct.flopsRequired) }} FLOP/s required</span>
-          </div>
-          
-          <ProgressButton
-            :enabled="canDevelopSelectedAIProduct"
-            :progress="aiProductDevelopmentProgress"
-            @click="developAIProduct"
-            theme="secondary"
-            data-testid="btn-develop-product"
-          >
-            Develop ({{ selectedAIProduct.insightCost }} insights)
+            Upgrade
           </ProgressButton>
         </div>
+        <div v-else class="max-hardware">
+          <p>Maximum hardware reached</p>
+        </div>
       </div>
       
-      <!-- Available Products List -->
-      <div class="product-grid">
-        <div 
-          v-for="product in displayableAIProducts" 
-          :key="product.id"
-          class="product-card"
-          :class="{ 
-            'product-unlocked': isAIProductUnlocked(product.id),
-            'product-locked': !isAIProductUnlocked(product.id),
-            'product-developed': isAIProductDeveloped(product.id),
-            'product-available': isAIProductAvailable(product.id) && !isAIProductDeveloped(product.id),
-            'product-selected': selectedAIProductId === product.id
-          }"
-          @click="selectAIProduct(product.id)"
+      <!-- Research Panel -->
+      <div class="section research-section">
+        <h3>Research</h3>
+        <ProgressButton
+          :enabled="true"
+          :progress="0"
+          @click="doResearch"
+          theme="primary"
+          data-testid="btn-research"
         >
-          <div class="product-header">
-            <span class="product-name">{{ product.name }}</span>
-            <span class="product-revenue">${{ product.revenue }}/mo</span>
-          </div>
-          <p class="product-description">{{ product.description }}</p>
-          <div class="product-requirements">
-            <span class="flops-req" :class="{ 'requirement-met': hasEnoughFlops(product.id) }">
-              {{ formatFlops(product.flopsRequired) }} FLOP/s required
-            </span>
-            <span v-if="product.prerequisites && product.prerequisites.length > 0" 
-                  class="prereq" 
-                  :class="{ 'requirement-met': meetsPrerequisites(product.id) }">
-              Prerequisites: {{ formatPrerequisites(product) }}
-            </span>
+          Research
+        </ProgressButton>
+      </div>
+    </div>
+    
+    <!-- Insight Rate Indicator -->
+    <div class="insight-rate">
+      <div class="insight-multiplier">{{ insightRate }}x</div>
+      <div class="insight-label">insight</div>
+    </div>
+    
+    <!-- Resource Allocation Slider -->
+    <div class="resource-allocation">
+      <div class="allocation-label left">Product Development</div>
+      <input 
+        type="range" 
+        min="0" 
+        max="1" 
+        step="0.1" 
+        v-model="allocation" 
+        class="allocation-slider"
+        data-testid="resource-allocation-slider"
+      />
+      <div class="allocation-label right">Pure Research</div>
+    </div>
+    
+    
+    <!-- Work Panels -->
+    <div class="work-panels">
+      <!-- Product Development Panel -->
+      <div class="section product-panel">
+        <div v-if="productInProgress" class="in-progress-product">
+          <div class="card-label">In progress product card</div>
+        </div>
+        <div v-else class="no-product">
+          <p>No product in development</p>
+        </div>
+      </div>
+      
+      <!-- Research Development Panel -->
+      <div class="section research-panel">
+        <div v-if="researchInProgress" class="in-progress-research">
+          <div class="card-label">In-progress research card</div>
+        </div>
+        <div v-else class="no-research">
+          <p>No research in progress</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Products and Discoveries -->
+    <div class="cards-row">
+      <!-- Products Panel -->
+      <div class="section products-section">
+        <h3>Products</h3>
+        <div class="cards-grid products-grid">
+          <!-- Available but not started products -->
+          <div v-for="product in availableProducts" :key="product.id" class="card product-card available">
+            <div v-if="!isAIProductUnlocked(product.id)" class="card-status">
+              <span class="status-text">quiz not done yet</span>
+            </div>
+            <div class="card-title">{{ product.name }}</div>
+            <div class="card-action">
+              <button @click="selectAIProduct(product.id)" class="action-button">Select</button>
+            </div>
           </div>
           
-          <div class="product-status">
-            <span v-if="isAIProductDeveloped(product.id)" class="status-developed">Developed</span>
-            <span v-else-if="isAIProductUnlocked(product.id)" class="status-unlocked">Unlocked</span>
-            <span v-else-if="isAIProductAvailable(product.id)" class="status-available">Available</span>
-            <span v-else class="status-locked">Locked</span>
+          <!-- Unlocked products -->
+          <div v-for="product in unlockedProducts" :key="product.id" class="card product-card unlocked">
+            <div class="card-title">{{ product.name }}</div>
+            <div class="card-action">
+              <button @click="selectAIProduct(product.id)" class="action-button">
+                select to put in-progress
+              </button>
+            </div>
+          </div>
+          
+          <!-- Developed products -->
+          <div v-for="product in developedProducts" :key="product.id" class="card product-card developed">
+            <div class="card-title">{{ product.name }}</div>
+            <div class="card-revenue">${{ product.revenue }}/mo</div>
+            <div class="card-detail">
+              <button class="detail-button">Detail</button>
+            </div>
           </div>
         </div>
       </div>
       
-      <!-- Educational modal for AI products -->
-      <EducationalModal
-        :visible="showProductEducationalModal"
-        :title="productEducationalTitle"
-        :content="productEducationalContent"
-        :question="productEducationalQuestion"
-        :cancellable="true"
-        @success="completeProductEducation"
-        @cancel="cancelProductEducation"
-      />
+      <!-- Discoveries Panel -->
+      <div class="section discoveries-section">
+        <h3>Discoveries</h3>
+        <div class="cards-grid discoveries-grid">
+          <!-- Available discoveries -->
+          <div v-for="(discovery, index) in availableDiscoveries" :key="index" class="card discovery-card available">
+            <div class="card-status">
+              <span class="status-text">quiz not done yet</span>
+            </div>
+          </div>
+          
+          <!-- Unlocked discoveries -->
+          <div v-for="(discovery, index) in unlockedDiscoveries" :key="index" class="card discovery-card unlocked">
+            <span class="status-text">unlocked</span>
+          </div>
+          
+          <!-- Active discoveries -->
+          <div v-for="(discovery, index) in activeDiscoveries" :key="index" class="card discovery-card active">
+            <span class="status-text">active</span>
+          </div>
+        </div>
+      </div>
     </div>
     
-    <!-- Educational modal for hardware upgrades -->
+    <!-- Tech Tree Section -->
+    <div class="tech-tree-section">
+      <h3>Tech Tree</h3>
+      <div class="tech-tree-placeholder">
+        <!-- Tech Tree visualization will be implemented here -->
+      </div>
+    </div>
+    
+    <!-- Educational modals -->
+    <EducationalModal
+      :visible="showProductEducationalModal"
+      :title="productEducationalTitle"
+      :content="productEducationalContent"
+      :question="productEducationalQuestion"
+      :cancellable="true"
+      @success="completeProductEducation"
+      @cancel="cancelProductEducation"
+    />
+    
     <EducationalModal
       :visible="showEducationalModal"
       :title="educationalModalTitle"
@@ -197,7 +183,6 @@ import { computed, ref } from 'vue';
 import ProgressButton from '@/components/ProgressButton.vue';
 import EducationalModal from '@/components/EducationalModal.vue';
 import { useGameStore } from '@/store';
-import { HIRE_RESEARCHER_COST } from '@/store/researchers';
 import type { EducationalQuestion } from '@/types';
 import { GamePhase } from '@/types/game-phase';
 import type { AIProduct } from '@/store/ai-products';
@@ -206,11 +191,9 @@ const gameStore = useGameStore();
 const resources = gameStore.resources;
 const researchers = gameStore.researchers;
 const hardware = gameStore.hardware;
-
-// AI products from the store
 const aiProducts = gameStore.aiProducts;
 
-// Modal state
+// Modal state for educational content
 const showEducationalModal = ref(false);
 const educationalModalTitle = ref('');
 const educationalModalContent = ref('');
@@ -222,68 +205,6 @@ const educationalModalQuestion = ref<EducationalQuestion>({
 });
 const pendingAction = ref<string | null>(null);
 
-// Computed properties for researcher UI
-const monthlyNetIncome = computed(() => researchers.monthlyNetIncome);
-const insightRate = computed(() => researchers.insightRate);
-const allocatedToSalaries = computed(() => researchers.allocatedToSalaries);
-const allocatedToHardware = computed(() => researchers.allocatedToHardware);
-
-// Maximum affordable researchers based on money
-const maxResearchers = computed(() => {
-  return Math.floor(resources.money / HIRE_RESEARCHER_COST);
-});
-
-// Can afford at least one researcher
-const canAffordResearcher = computed(() => {
-  return resources.money >= HIRE_RESEARCHER_COST || researchers.count > 0;
-});
-
-// Researcher count model with watcher
-const researcherCount = computed({
-  get: () => researchers.count,
-  set: (value) => {
-    const newCount = Number(value);
-    const currentCount = researchers.count;
-    
-    if (newCount > currentCount) {
-      // Hire researchers
-      for (let i = 0; i < newCount - currentCount; i++) {
-        researchers.hireResearcher();
-      }
-    } else if (newCount < currentCount) {
-      // Fire researchers
-      for (let i = 0; i < currentCount - newCount; i++) {
-        researchers.fireResearcher();
-      }
-    }
-  }
-});
-
-// Allocation model with watcher
-const allocation = computed({
-  get: () => researchers.allocation,
-  set: (value) => researchers.setAllocation(Number(value))
-});
-
-// Computed properties from the hardware store
-const currentHardware = computed(() => hardware.currentHardware);
-const nextHardware = computed(() => hardware.nextHardware);
-const canUpgrade = computed(() => hardware.canUpgrade);
-const upgradeProgress = computed(() => hardware.upgradeProgress);
-const savings = computed(() => hardware.savings);
-
-// Calculate hardware multiplier for display
-const hardwareMultiplier = computed(() => {
-  if (!hardware.currentFlops.value) return 1;
-  
-  // Calculate multiplier with same formula as in researchers.ts
-  const multiplier = 1 + Math.log10(hardware.currentFlops.value) * 0.5;
-  
-  // Round to 1 decimal place
-  return Math.round(multiplier * 10) / 10;
-});
-
-// AI Products modal state
 const showProductEducationalModal = ref(false);
 const productEducationalTitle = ref('');
 const productEducationalContent = ref('');
@@ -295,29 +216,62 @@ const productEducationalQuestion = ref<EducationalQuestion>({
 });
 const pendingProductId = ref<string | null>(null);
 
-// AI Product related computed properties
-const selectedAIProductId = computed(() => aiProducts.selectedProductId);
-const selectedAIProduct = computed(() => aiProducts.selectedProduct);
-const displayableAIProducts = computed(() => aiProducts.displayableProducts);
-const canDevelopSelectedAIProduct = computed(() => aiProducts.canDevelopSelectedProduct);
+// Hardware related computed properties
+const currentHardware = computed(() => hardware.currentHardware);
+const nextHardware = computed(() => hardware.nextHardware);
+const canUpgrade = computed(() => hardware.canUpgrade);
+const upgradeProgress = computed(() => hardware.upgradeProgress);
 
-// Product development progress - now showing progress based on insights
-const aiProductDevelopmentProgress = computed(() => {
-  if (!selectedAIProduct.value) return 0;
-  return Math.min(resources.insights / selectedAIProduct.value.insightCost, 1);
+// Research and insight related properties
+const insightRate = computed(() => researchers.insightRate);
+
+// Resource allocation slider - controls balance between product development and research
+const allocation = computed({
+  get: () => researchers.allocation,
+  set: (value) => researchers.setAllocation(Number(value))
 });
 
-// No longer need explicit hire/fire methods as they're handled by the slider
+// Product development status
+const productInProgress = computed(() => !!aiProducts.selectedProduct);
 
+// Research in progress status - placeholder for now
+const researchInProgress = ref(false);
+
+// Products organized by state
+const availableProducts = computed(() => {
+  return aiProducts.displayableProducts.filter(product => 
+    isAIProductAvailable(product.id) && 
+    !isAIProductUnlocked(product.id) && 
+    !isAIProductDeveloped(product.id)
+  );
+});
+
+const unlockedProducts = computed(() => {
+  return aiProducts.displayableProducts.filter(product => 
+    isAIProductUnlocked(product.id) && 
+    !isAIProductDeveloped(product.id)
+  );
+});
+
+const developedProducts = computed(() => {
+  return aiProducts.displayableProducts.filter(product => 
+    isAIProductDeveloped(product.id)
+  );
+});
+
+// Placeholder discoveries data - will be implemented in future
+const availableDiscoveries = ref([{}, {}]); // Placeholder for available discoveries
+const unlockedDiscoveries = ref([{}]);     // Placeholder for unlocked discoveries
+const activeDiscoveries = ref([{}]);       // Placeholder for active discoveries
+
+// Core gameplay functions
 function doResearch() {
   researchers.generateInsights(1);
-  // Future: Could show a toast or animation with the amount gained
 }
 
 function upgradeHardware() {
   if (!canUpgrade.value || !nextHardware.value) return;
   
-  // If the next hardware has educational content, show the modal
   if (nextHardware.value.educationalContent) {
     showHardwareEducationalModal();
   } else {
@@ -339,7 +293,7 @@ function completeHardwareUpgrade() {
   hardware.upgrade();
 }
 
-// AI Product related methods
+// Product related functions
 function selectAIProduct(productId: string) {
   const product = aiProducts.getProduct(productId);
   if (!product) return;
@@ -379,35 +333,15 @@ function hasEnoughFlops(productId: string): boolean {
   return aiProducts.hasEnoughFlops(productId);
 }
 
-function formatFlops(flops: number): string {
-  if (flops >= 1000000) {
-    return (flops / 1000000).toFixed(1) + 'M';
-  } else if (flops >= 1000) {
-    return (flops / 1000).toFixed(1) + 'K';
-  }
-  return flops.toString();
-}
-
-function formatPrerequisites(product: any): string {
-  if (!product.prerequisites || product.prerequisites.length === 0) return '';
-  
-  return product.prerequisites.map((prereqId: string) => {
-    const prereq = aiProducts.getProduct(prereqId);
-    return prereq ? prereq.name : prereqId;
-  }).join(', ');
-}
-
 function showProductEducationalContent(productId: string) {
   const product = aiProducts.getProduct(productId);
   if (!product || !product.educationalContent) return;
   
-  // Set up the educational modal
   productEducationalTitle.value = product.name;
   productEducationalContent.value = product.description;
   productEducationalQuestion.value = product.educationalContent;
   pendingProductId.value = productId;
   
-  // Show the modal
   showProductEducationalModal.value = true;
 }
 
@@ -423,31 +357,13 @@ function completeProductEducation() {
   // Select it for development
   aiProducts.selectProduct(pendingProductId.value);
   
-  // Clear modal state
   showProductEducationalModal.value = false;
   pendingProductId.value = null;
 }
 
 function cancelProductEducation() {
-  // Just close the modal without unlocking
   showProductEducationalModal.value = false;
   pendingProductId.value = null;
-}
-
-function developAIProduct() {
-  if (!selectedAIProduct.value || !canDevelopSelectedAIProduct.value) return;
-  
-  // Develop the product - this will spend insights and add revenue
-  const result = aiProducts.developProduct();
-  
-  if (result && isFirstProductDeveloped()) {
-    // If this is the first product developed, progress to the INDUSTRY_PHASE
-    gameStore.enterPhase(GamePhase.INDUSTRY_PHASE);
-  }
-}
-
-function isFirstProductDeveloped(): boolean {
-  return aiProducts.developedProducts.length === 1;
 }
 
 function completeEducation() {
@@ -456,7 +372,6 @@ function completeEducation() {
   if (pendingAction.value === 'hardware_upgrade') {
     completeHardwareUpgrade();
   }
-  // Future: Add other educational completions here
   
   pendingAction.value = null;
 }
@@ -466,320 +381,257 @@ function completeEducation() {
 .lab-phase {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 15px;
 }
 
-.lab-content {
-  display: flex;
-  gap: 20px;
-  margin-bottom: 20px;
-}
-
+/* Common section styling */
 .section {
-  flex: 1;
   background-color: white;
   border-radius: 8px;
-  padding: 15px;
+  padding: 12px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .section h3 {
   margin-top: 0;
+  margin-bottom: 10px;
   color: var(--primary-color);
   border-bottom: 1px solid var(--border-color);
-  padding-bottom: 8px;
-  margin-bottom: 15px;
+  padding-bottom: 5px;
+  font-size: 1rem;
 }
 
-.researcher-controls {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
+/* Top row with hardware and research */
+.top-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
 }
 
-.hire-button, .fire-button {
-  flex: 1;
-  padding: 8px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.hire-button {
-  background-color: var(--hire-color);
-  color: white;
-}
-
-.hire-button:hover:not(:disabled) {
-  background-color: var(--hire-hover);
-}
-
-.fire-button {
-  background-color: var(--fire-color);
-  color: white;
-}
-
-.fire-button:hover:not(:disabled) {
-  background-color: var(--fire-hover);
-}
-
-.researcher-info {
-  text-align: left;
-  margin-bottom: 15px;
-}
-
-.researcher-info p {
-  margin: 5px 0;
-}
-
-.positive {
-  color: var(--positive-color);
-}
-
-.negative {
-  color: var(--negative-color);
-}
-
-.allocation-control {
-  margin-top: 15px;
-}
-
-.allocation-labels {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 5px;
-  font-size: 14px;
-}
-
-.allocation-slider,
-.researcher-slider {
-  width: 100%;
-  margin: 10px 0;
-}
-
-.researcher-slider-control {
-  margin-top: 15px;
-  margin-bottom: 15px;
-}
-
-.researcher-count-display {
-  font-weight: bold;
-  font-size: 18px;
-  margin-top: 5px;
+.hardware-section {
   text-align: center;
 }
 
 .hardware-info {
-  text-align: left;
-  margin-bottom: 15px;
-}
-
-.hardware-multiplier {
-  color: var(--primary-color);
-  font-size: 18px;
-}
-
-.next-hardware {
-  margin-top: 15px;
-}
-
-.next-hardware h4 {
-  margin-top: 0;
   margin-bottom: 10px;
-  color: var(--secondary-color);
 }
 
-.progress-container {
-  width: 100%;
-  height: 10px;
-  background-color: var(--progress-bg);
-  border-radius: 5px;
-  overflow: hidden;
+.hardware-info p {
+  margin: 5px 0;
+  font-size: 0.9rem;
+}
+
+.research-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Insight multiplier display */
+.insight-rate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   margin: 10px 0;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 20px;
+  padding: 5px 15px;
+  border: 1px solid var(--border-color);
 }
 
-.progress-bar {
-  height: 100%;
-  background-color: var(--secondary-color);
-  transition: width 0.3s ease;
+.insight-multiplier {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--primary-color);
 }
 
-.upgrade-button {
-  width: 100%;
+.insight-label {
+  font-size: 0.8rem;
+  color: var(--muted-text);
+}
+
+/* Resource allocation slider */
+.resource-allocation {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 15px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.allocation-label {
+  font-size: 0.8rem;
+  color: var(--text-color);
+  flex-shrink: 0;
+}
+
+.allocation-slider {
+  flex-grow: 1;
+}
+
+/* Work panels */
+.work-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.product-panel, .research-panel {
+  min-height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 10px;
+}
+
+.in-progress-product, .in-progress-research {
+  width: 100%;
+  height: 100px;
+  background-color: #f5f5f5;
+  border-radius: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px dashed var(--border-color);
+}
+
+.no-product, .no-research {
+  color: var(--muted-text);
+  font-style: italic;
+}
+
+/* Products and Discoveries Row */
+.cards-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  max-height: 250px;
+  overflow-y: auto;
+  padding: 5px;
+}
+
+/* Card Styling */
+.card {
+  background-color: #f5f5f5;
+  border-radius: 6px;
+  padding: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.card-title {
+  font-weight: bold;
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+}
+
+.card-status {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 2px 5px;
+  border-radius: 0 6px 0 6px;
+  font-size: 0.7rem;
+}
+
+.card-action {
+  margin-top: 8px;
+}
+
+.action-button {
+  width: 100%;
+  padding: 5px;
+  font-size: 0.8rem;
   background-color: var(--secondary-color);
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+}
+
+.card-revenue {
+  color: var(--positive-color);
   font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.detail-button {
+  margin-top: 5px;
+  padding: 3px;
+  font-size: 0.7rem;
+  background-color: transparent;
+  color: var(--muted-text);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+/* Card states */
+.card.available {
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+}
+
+.card.unlocked {
+  background-color: #f0f8ff;
+  border: 1px solid var(--secondary-color);
+}
+
+.card.developed, .card.active {
+  background-color: #e8f5e9;
+  border: 1px solid var(--positive-color);
+}
+
+.status-text {
+  color: var(--muted-text);
+  font-size: 0.7rem;
+}
+
+/* Tech Tree Section */
+.tech-tree-section {
   margin-top: 10px;
 }
 
-.upgrade-button:hover:not(:disabled) {
-  background-color: var(--secondary-hover);
-}
-
-.upgrade-button:disabled {
-  background-color: var(--disabled-color);
-  cursor: not-allowed;
-}
-
-.research-section,
-.product-section {
-  margin-top: 20px;
-  text-align: center;
-}
-
-.research-description {
-  margin-bottom: 15px;
-  font-size: 14px;
-  color: #666;
-}
-
-/* Product Grid Layout */
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 15px;
-  margin-top: 20px;
-  max-height: 400px;
-  overflow-y: auto;
-  padding: 10px 0;
-}
-
-/* Product Cards */
-.product-card {
+.tech-tree-placeholder {
+  height: 50px;
   background-color: #f5f5f5;
-  border-radius: 8px;
-  padding: 15px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
-  cursor: pointer;
+  border-radius: 6px;
   display: flex;
-  flex-direction: column;
-  position: relative;
-  border: 2px solid transparent;
-}
-
-.product-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.product-card.product-locked {
-  opacity: 0.7;
-  background-color: #e0e0e0;
-}
-
-.product-card.product-unlocked {
-  background-color: #f0f8ff;
-}
-
-.product-card.product-developed {
-  background-color: #e8f5e9;
-  border-color: var(--positive-color);
-}
-
-.product-card.product-available {
-  border-color: var(--secondary-color);
-}
-
-.product-card.product-selected {
-  border-color: var(--primary-color);
-  background-color: #f0fff0;
-}
-
-.product-header {
-  display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  margin-bottom: 10px;
+  color: var(--muted-text);
+  font-style: italic;
 }
 
-.product-name {
-  font-weight: bold;
-  font-size: 16px;
-  color: var(--text-color);
-}
-
-.product-revenue {
-  font-weight: bold;
-  color: var(--positive-color);
-  font-size: 14px;
-}
-
-.product-description {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 10px;
-  flex-grow: 1;
-}
-
-.product-requirements {
-  font-size: 12px;
-  color: #888;
-  margin-top: auto;
-  margin-bottom: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.flops-req, .prereq {
-  color: var(--negative-color);
-}
-
-.requirement-met {
-  color: var(--positive-color);
-}
-
-.product-status {
-  font-size: 12px;
-  font-weight: bold;
-  text-align: right;
-  text-transform: uppercase;
-}
-
-.status-developed {
-  color: var(--positive-color);
-}
-
-.status-unlocked {
-  color: var(--secondary-color);
-}
-
-.status-available {
-  color: var(--primary-color);
-}
-
-.status-locked {
-  color: var(--negative-color);
-}
-
-/* Current Product Development */
-.current-product {
-  margin-bottom: 20px;
-}
-
-.current-product h4 {
-  margin-bottom: 10px;
-  color: var(--primary-color);
-}
-
-.selected-product {
-  cursor: default;
-}
-
-.selected-product:hover {
-  transform: none;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
+/* Responsive adjustments */
 @media (max-width: 768px) {
-  .lab-content {
+  .top-row, .work-panels, .cards-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .resource-allocation {
     flex-direction: column;
+  }
+  
+  .allocation-slider {
+    width: 100%;
   }
 }
 </style>
