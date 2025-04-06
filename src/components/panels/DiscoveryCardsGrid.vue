@@ -1,57 +1,131 @@
 <template>
-  <div class="section discoveries-section">
-    <h3>Discoveries</h3>
-    <div class="cards-grid discoveries-grid">
-      <!-- Available discoveries -->
-      <!-- TODO this is totally wrong - "Available", "Unlocked" etc are "regions" that cards can be in. The text should be capitalized "Active" in grayed out text in the background, and there should be cards in the foreground. Cards shift between these 3 regions first when the user completes the quiz, and second when the research/development is completed. -->
-      <div v-for="(discovery, index) in availableDiscoveries" :key="index" class="card discovery-card available">
-        <!-- TODO card status doesn't need to be shown, it's implicit from which area the card's in. -->
-        <div class="card-status">
-          <span class="status-text">quiz not done yet</span>
+  <div class="section cards-section">
+    <h3>{{ title }}</h3>
+    <div class="cards-grid">
+      <!-- Region for Available cards -->
+      <div class="card-region">
+        <div class="region-label">Available</div>
+        <div v-for="card in availableCards" :key="card.id" class="card available"
+             @click="selectCard(card.id)">
+          <div class="card-title">{{ card.name }}</div>
+          <div class="card-description" v-if="showDescription">{{ card.description }}</div>
         </div>
       </div>
 
-      <!-- Unlocked discoveries -->
-      <div v-for="(discovery, index) in unlockedDiscoveries" :key="index" class="card discovery-card unlocked">
-        <span class="status-text">unlocked</span>
+      <!-- Region for Unlocked cards -->
+      <div class="card-region">
+        <div class="region-label">Unlocked</div>
+        <div v-for="card in unlockedCards" :key="card.id" class="card unlocked"
+             @click="selectCard(card.id)">
+          <div class="card-title">{{ card.name }}</div>
+          <div class="card-description" v-if="showDescription">{{ card.description }}</div>
+          <div class="card-revenue" v-if="card.revenue">${{ card.revenue }}/mo</div>
+        </div>
       </div>
 
-      <!-- Active discoveries -->
-      <div v-for="(discovery, index) in activeDiscoveries" :key="index" class="card discovery-card active">
-        <span class="status-text">active</span>
+      <!-- Region for Active/Developed cards -->
+      <div class="card-region">
+        <div class="region-label">{{ activeRegionLabel }}</div>
+        <div v-for="card in activeCards" :key="card.id" class="card active"
+             @click="showDetails(card.id)">
+          <div class="card-title">{{ card.name }}</div>
+          <div class="card-description" v-if="showDescription">{{ card.description }}</div>
+          <div class="card-revenue" v-if="card.revenue">${{ card.revenue }}/mo</div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+interface Card {
+  id: string;
+  name: string;
+  description?: string;
+  revenue?: number;
+  // Add other properties as needed
+}
+
 const props = defineProps<{
-  // Using any for now since discovery type isn't fully defined yet
-  availableDiscoveries: any[];
-  unlockedDiscoveries: any[];
-  activeDiscoveries: any[];
+  // Title for the card grid
+  title: string;
+  
+  // Cards for each region
+  availableCards: Card[];
+  unlockedCards: Card[];
+  activeCards: Card[];
+  
+  // Optional props
+  activeRegionLabel?: string;
+  showDescription?: boolean;
 }>();
+
+const emit = defineEmits<{
+  (e: 'selectCard', id: string): void;
+  (e: 'showDetails', id: string): void;
+}>();
+
+// Provide default values for optional props
+const activeRegionLabel = props.activeRegionLabel || 'Active';
+
+function selectCard(id: string) {
+  emit('selectCard', id);
+}
+
+function showDetails(id: string) {
+  emit('showDetails', id);
+}
 </script>
 
 <style scoped>
+.cards-section {
+  display: flex;
+  flex-direction: column;
+  max-height: 300px;
+  margin-bottom: 15px;
+  background-color: white;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
 .cards-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
-  max-height: 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
   overflow-y: auto;
   padding: 5px;
 }
 
+.card-region {
+  position: relative;
+  border-radius: 6px;
+  background-color: rgba(0, 0, 0, 0.03);
+  padding: 20px 10px 10px 10px;
+  min-height: 40px;
+}
+
+.region-label {
+  position: absolute;
+  top: 0;
+  left: 10px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  color: var(--muted-text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 /* Card Styling */
 .card {
-  background-color: #f5f5f5;
+  background-color: white;
   border-radius: 6px;
   padding: 10px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   position: relative;
   transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
+  margin-bottom: 8px;
 }
 
 .card:hover {
@@ -59,35 +133,46 @@ const props = defineProps<{
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
 }
 
-.card-status {
-  position: absolute;
-  top: 0;
-  right: 0;
-  background-color: rgba(0, 0, 0, 0.1);
-  padding: 2px 5px;
-  border-radius: 0 6px 0 6px;
-  font-size: 0.7rem;
+.card-title {
+  font-weight: bold;
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+}
+
+.card-description {
+  font-size: 0.8rem;
+  color: var(--text-color);
+  margin-bottom: 5px;
+}
+
+.card-revenue {
+  color: var(--positive-color);
+  font-weight: bold;
+  font-size: 0.9rem;
 }
 
 /* Card states */
 .card.available {
-  background-color: #f0f0f0;
-  border: 1px solid #ddd;
+  border-left: 3px solid #ddd;
 }
 
 .card.unlocked {
-  background-color: #f0f8ff;
-  border: 1px solid var(--primary-color);
+  border-left: 3px solid var(--primary-color);
 }
 
 .card.active {
-  background-color: #e8f5e9;
-  border: 1px solid var(--positive-color);
+  border-left: 3px solid var(--positive-color);
 }
 
-.status-text {
+/* Empty state */
+.card-region:empty::after {
+  content: "None";
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
   color: var(--muted-text);
-  font-size: 0.7rem;
-  padding: 5px;
+  font-style: italic;
+  font-size: 0.8rem;
 }
 </style>
