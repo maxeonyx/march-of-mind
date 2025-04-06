@@ -2,8 +2,15 @@
   <div class="phase-container lab-phase">
     <!-- Main game layout: two-column grid -->
     <div class="main-layout">
-      <!-- Left column for Datacentre Panel -->
+      <!-- Left column for Resource Display and Datacentre Panel -->
       <div class="left-column">
+        <!-- Resource display - show different stats based on game phase -->
+        <ResourceDisplay 
+          :showIncomeStats="true" 
+          :showResearchStats="true"
+          :showHardwareStats="true"
+        />
+        
         <!-- Datacentre Panel (contains hardware, research, insight rate, and allocation) -->
         <DatacentrePanel
           :hardware="hardware"
@@ -84,6 +91,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import EducationalModal from '@/components/EducationalModal.vue';
+import ResourceDisplay from '@/components/ResourceDisplay.vue';
 import DatacentrePanel from '@/components/panels/DatacentrePanel.vue';
 import ResearchPanel from '@/components/panels/ResearchPanel.vue';
 

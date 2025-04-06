@@ -22,13 +22,6 @@
     <h2>{{ gameStore.phaseTitle }}</h2>
 
     <div class="game-container">
-      <!-- Resource display - show different stats based on game phase -->
-      <ResourceDisplay 
-        :showIncomeStats="gameStore.phase === 'lab_phase' || gameStore.phase === 'industry_phase' || gameStore.phase === 'agi_phase'" 
-        :showResearchStats="gameStore.phase === 'research_phase' || gameStore.phase === 'lab_phase' || gameStore.phase === 'industry_phase' || gameStore.phase === 'agi_phase'"
-        :showHardwareStats="gameStore.phase === 'lab_phase' || gameStore.phase === 'industry_phase' || gameStore.phase === 'agi_phase'"
-      />
-
       <!-- Educational Game Phases -->
       <ResearchPhase v-if="gameStore.phase === 'research_phase'" />
       <LabPhase v-if="gameStore.phase === 'lab_phase'" />
