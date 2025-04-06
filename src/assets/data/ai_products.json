@@ -3,7 +3,7 @@
     "id": "basic-ai-tool",
     "name": "Basic AI Tool",
     "description": "A simple pattern-matching AI that can automate basic tasks.",
-    "flopsRequired": 1000,
+    "flopsRequired": 1,
     "insightCost": 20,
     "revenue": 10,
     "yearAvailable": 1960,
