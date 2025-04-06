@@ -358,8 +358,8 @@ function showProductDetails(productId: string) {
 /* Two-column layout */
 .main-layout {
   display: grid;
-  grid-template-columns: 350px 1fr;
-  gap: 15px;
+  grid-template-columns: 400px 1fr; /* Increase from 350px to 400px */
+  gap: 20px; /* Increase gap slightly */
 }
 
 .left-column, .right-column {
