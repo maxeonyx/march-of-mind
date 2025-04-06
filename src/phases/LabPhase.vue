@@ -1,106 +1,113 @@
 <template>
   <div class="phase-container lab-phase">
-    <!-- Top row with hardware and research panels -->
-    <div class="top-row">
-      <!-- Hardware Panel -->
-      <HardwarePanel
-        :hardware="hardware"
-        :onUpgrade="upgradeHardware"
-      />
+    <!-- Main game layout: two-column grid -->
+    <div class="main-layout">
+      <!-- Left column for controls and work panels -->
+      <div class="left-column">
+        <!-- Top row with hardware and research panels -->
+        <div class="top-row">
+          <!-- Hardware Panel -->
+          <HardwarePanel
+            :hardware="hardware"
+            :onUpgrade="upgradeHardware"
+          />
 
-      <!-- Research Panel -->
-      <ResearchPanel
-        @research="doResearch"
-      />
-    </div>
+          <!-- Research Panel -->
+          <ResearchPanel
+            @research="doResearch"
+          />
+        </div>
 
-    <!-- Insight Rate Indicator -->
-    <InsightRateDisplay :rate="insightRate" />
+        <!-- Insight Rate Indicator -->
+        <InsightRateDisplay :rate="gameStore.researchers.insightRate" />
 
-    <!-- Resource Allocation Slider -->
-    <ResourceAllocationSlider
-      v-model="allocation"
-      :leftValue="insightsToProducts"
-      :rightValue="insightsToPureResearch"
-    />
+        <!-- Resource Allocation Slider -->
+        <ResourceAllocationSlider
+          v-model="allocation"
+          :leftValue="insightsToProducts"
+          :rightValue="insightsToPureResearch"
+        />
 
-    <!-- Work Panels -->
-    <!-- TODO products and discoveries are functionally the same (other than having different types of cards in them) and should be just one concept in the code. -->
-    <div class="work-panels">
-      <!-- Product Development Panel -->
-       <!-- TODO just have two copies of the same component. -->
+        <!-- Work Panels -->
+        <div class="work-panels">
+          <!-- Product Development Panel -->
+          <ProductWorkPanel
+            :hasProductInProgress="productInProgress"
+            :productName="productInProgress ? aiProducts.selectedProduct.name : ''"
+            :productDescription="productInProgress ? aiProducts.selectedProduct.description : ''"
+            :progress="aiProducts.productProgress"
+            :allocationValue="insightsToProducts"
+          />
 
-      <ProductWorkPanel
-        :hasProductInProgress="productInProgress"
-        :productName="productInProgress ? aiProducts.selectedProduct.name : ''"
-        :productDescription="productInProgress ? aiProducts.selectedProduct.description : ''"
-        :progress="aiProducts.productProgress"
-        :allocationValue="insightsToProducts"
-      />
+          <!-- Research Development Panel -->
+          <ResearchWorkPanel
+            :hasResearchInProgress="researchInProgress"
+            researchTitle="Pure Research"
+            researchDescription="Advance your theoretical understanding by investing in pure research."
+            :progress="researchProgress"
+            :allocationValue="insightsToPureResearch"
+            :canStartResearch="canStartResearch"
+            @startResearch="startResearch"
+          />
+        </div>
+      </div>
+      
+      <!-- Right column for cards -->
+      <div class="right-column">
 
-      <!-- Research Development Panel -->
-      <ResearchWorkPanel
-        :hasResearchInProgress="researchInProgress"
-        researchTitle="Pure Research"
-        researchDescription="Advance your theoretical understanding by investing in pure research."
-        :progress="researchProgress"
-        :allocationValue="insightsToPureResearch"
-        :canStartResearch="canStartResearch"
-        @startResearch="startResearch"
-      />
-    </div>
+        <!-- Products Cards -->
+        <DiscoveryCardsGrid
+          title="Products"
+          :availableCards="availableProducts"
+          :unlockedCards="unlockedProducts"
+          :activeCards="developedProducts"
+          activeRegionLabel="Developed"
+          :showDescription="true"
+          @selectCard="selectAIProduct"
+          @showDetails="showProductDetails"
+        />
 
-    <!-- Products and Discoveries -->
-    <!-- TODO: this should be shown on the right hand side as a separate column -->
-
-    <div class="cards-row">
-      <!-- Products Panel -->
-       <!-- TODO merge into discovery cards grid-->
-      <ProductCardsGrid
-        :availableProducts="availableProducts"
-        :unlockedProducts="unlockedProducts"
-        :developedProducts="developedProducts"
-        :isProductUnlocked="isAIProductUnlocked"
-        @selectProduct="selectAIProduct"
-        @showDetails="showProductDetails"
-      />
-
-      <!-- Discoveries Panel -->
-      <DiscoveryCardsGrid
-        :availableDiscoveries="availableDiscoveries"
-        :unlockedDiscoveries="unlockedDiscoveries"
-        :activeDiscoveries="activeDiscoveries"
-      />
-    </div>
-
-    <!-- Tech Tree Section -->
-     <!-- TODO Tech tree should show as a modal from a button in the footer. However Tech tree is low priority. -->
-    <div class="tech-tree-section">
-      <h3>Tech Tree</h3>
-      <div class="tech-tree-placeholder">
-        <!-- Tech Tree visualization will be implemented here -->
+        <!-- Discoveries Cards -->
+        <DiscoveryCardsGrid
+          title="Discoveries"
+          :availableCards="availableDiscoveries"
+          :unlockedCards="unlockedDiscoveries"
+          :activeCards="activeDiscoveries" 
+          activeRegionLabel="Active"
+          :showDescription="true"
+        />
       </div>
     </div>
 
-    <!-- Educational modals -->
-    <!-- TODO: as before products and discoveries are essentially the same and can share a modal. -->
-    <EducationalModal
-      :visible="showProductEducationalModal"
-      :title="productEducationalTitle"
-      :content="productEducationalContent"
-      :question="productEducationalQuestion"
-      :cancellable="true"
-      @success="completeProductEducation"
-      @cancel="cancelProductEducation"
-    />
+    <!-- Tech Tree Button (in footer) -->
+    <div class="footer-controls">
+      <button class="tech-tree-button" @click="showTechTree">
+        View Tech Tree
+      </button>
+    </div>
+    
+    <!-- Tech Tree Modal (will be implemented later) -->
+    <!-- Low priority feature, just stub for now -->
+    <div v-if="techTreeVisible" class="modal-overlay" @click="hideTechTree">
+      <div class="modal-content" @click.stop>
+        <h3>Tech Tree</h3>
+        <div class="tech-tree-placeholder">
+          <!-- Tech Tree visualization will be implemented here -->
+          <p>Tech Tree visualization coming soon</p>
+        </div>
+        <button class="close-button" @click="hideTechTree">Close</button>
+      </div>
+    </div>
 
+    <!-- Educational modal (shared for all educational content) -->
     <EducationalModal
       :visible="showEducationalModal"
       :title="educationalModalTitle"
       :content="educationalModalContent"
       :question="educationalModalQuestion"
-      :cancellable="false"
+      :cancellable="educationalModalCancellable"
       @success="completeEducation"
+      @cancel="cancelEducation"
     />
   </div>
 </template>
@@ -114,7 +121,8 @@ import InsightRateDisplay from '@/components/panels/InsightRateDisplay.vue';
 import ResourceAllocationSlider from '@/components/panels/ResourceAllocationSlider.vue';
 import ProductWorkPanel from '@/components/panels/ProductWorkPanel.vue';
 import ResearchWorkPanel from '@/components/panels/ResearchWorkPanel.vue';
-import ProductCardsGrid from '@/components/panels/ProductCardsGrid.vue';
+// ProductCardsGrid is being replaced by DiscoveryCardsGrid
+// import ProductCardsGrid from '@/components/panels/ProductCardsGrid.vue';
 import DiscoveryCardsGrid from '@/components/panels/DiscoveryCardsGrid.vue';
 
 import { useGameStore } from '@/store';
@@ -136,21 +144,17 @@ const educationalModalQuestion = ref<EducationalQuestion>({
   explanation: ''
 });
 const pendingAction = ref<string | null>(null);
-
-const showProductEducationalModal = ref(false);
-const productEducationalTitle = ref('');
-const productEducationalContent = ref('');
-const productEducationalQuestion = ref<EducationalQuestion>({
-  question: '',
-  answers: [],
-  correctAnswerIndex: 0,
-  explanation: ''
-});
 const pendingProductId = ref<string | null>(null);
 
-// Research and insight related properties
-// TODO tiny computed properties like this are redundant. Prefer just directly accessing gameStore in the html. Put this as a comment at the top of this file.
-const insightRate = computed(() => researchers.insightRate);
+// Added for tech tree and educational modal config
+const techTreeVisible = ref(false);
+const educationalModalCancellable = ref(false);
+
+/*
+ * Note: Prefer accessing gameStore directly in the template rather than creating 
+ * tiny computed properties. For example, use gameStore.researchers.insightRate
+ * instead of creating a computed property for it.
+ */
 
 // Resource allocation slider - controls balance between product development and research
 // This allocation determines how insights are distributed between product development and research
@@ -160,22 +164,20 @@ const allocation = computed({
   set: (value) => researchers.setAllocation(Number(value))
 });
 
-// TODO: move some of the below properties and functions into the appropriate components.
-
 // Calculate estimated insight distribution based on allocation
 const insightsToProducts = computed(() => {
-  return Math.round((1 - allocation.value) * insightRate.value * 10) / 10;
+  return Math.round((1 - allocation.value) * researchers.insightRate.value * 10) / 10;
 });
 
 const insightsToPureResearch = computed(() => {
-  return Math.round(allocation.value * insightRate.value * 10) / 10;
+  return Math.round(allocation.value * researchers.insightRate.value * 10) / 10;
 });
 
 // Product development status
 const productInProgress = computed(() => !!aiProducts.selectedProduct);
 
-// Research in progress status and related properties
-// TODO: Don't define state in the component, put it in the store so that saving and loading works well.
+// Research state - this should be moved to the discoveries store later
+// Access to this state should be via the store for proper save/load
 const researchInProgress = ref(false);
 const researchProgress = ref(0);
 const canStartResearch = ref(true);
@@ -209,14 +211,14 @@ const developedProducts = computed(() => {
   );
 });
 
-// Placeholder discoveries data - will be implemented in future
-// TODO again, don't put state here, put it in the store so that saving and loading works well.
-const availableDiscoveries = ref([{}, {}]); // Placeholder for available discoveries
-const unlockedDiscoveries = ref([{}]);     // Placeholder for unlocked discoveries
-const activeDiscoveries = ref([{}]);       // Placeholder for active discoveries
+// Discovery data - this should come from the discoveries store
+// Placeholder implementation until discoveries store is fully implemented
+const availableDiscoveries = computed(() => discoveries.availableDiscoveries.value || []);
+const unlockedDiscoveries = computed(() => discoveries.unlockedDiscoveriesData.value || []);
+const activeDiscoveries = ref([{}]); // Placeholder - will eventually come from store
 
-// Core gameplay functions
-// TODO move to the research panel component.
+// Main research function
+// This should eventually be moved to a dedicated research service
 function doResearch() {
   const totalInsights = researchers.generateInsights(1);
 
@@ -253,29 +255,23 @@ function doResearch() {
   }
 }
 
-// TODO move to the hardware panel component.
+// Hardware upgrade flow
+// This bridges between hardware panel and educational content
 function upgradeHardware() {
   if (!hardware.canUpgrade || !hardware.nextHardware) return;
 
   if (hardware.nextHardware.educationalContent) {
-    showHardwareEducationalModal();
+    // Show educational content before upgrading
+    educationalModalTitle.value = hardware.nextHardware.name;
+    educationalModalContent.value = hardware.nextHardware.description;
+    educationalModalQuestion.value = hardware.nextHardware.educationalContent;
+    educationalModalCancellable.value = false;
+    pendingAction.value = 'hardware_upgrade';
+    showEducationalModal.value = true;
   } else {
-    completeHardwareUpgrade();
+    // Directly upgrade if no educational content
+    hardware.upgrade();
   }
-}
-
-function showHardwareEducationalModal() {
-  if (!hardware.nextHardware || !hardware.nextHardware.educationalContent) return;
-
-  educationalModalTitle.value = hardware.nextHardware.name;
-  educationalModalContent.value = hardware.nextHardware.description;
-  educationalModalQuestion.value = hardware.nextHardware.educationalContent;
-  pendingAction.value = 'hardware_upgrade';
-  showEducationalModal.value = true;
-}
-
-function completeHardwareUpgrade() {
-  hardware.upgrade();
 }
 
 // Product related functions
@@ -295,72 +291,71 @@ function selectAIProduct(productId: string) {
   }
 }
 
-// TODO lots of redundant functions here. Prefer using the store directly from
-//      the html.
-function isAIProductUnlocked(productId: string): boolean {
-  return aiProducts.isProductUnlocked(productId);
-}
-
-function isAIProductDeveloped(productId: string): boolean {
-  return aiProducts.isProductDeveloped(productId);
-}
-
+// Helper function to determine if a product is available
+// This should ideally be a computed property in the store
 function isAIProductAvailable(productId: string): boolean {
   const product = aiProducts.getProduct(productId);
   if (!product) return false;
 
-  return meetsPrerequisites(productId) && hasEnoughFlops(productId);
-}
-
-function meetsPrerequisites(productId: string): boolean {
-  return aiProducts.meetsPrerequisites(productId);
-}
-
-function hasEnoughFlops(productId: string): boolean {
-  return aiProducts.hasEnoughFlops(productId);
+  return aiProducts.meetsPrerequisites(productId) && aiProducts.hasEnoughFlops(productId);
 }
 
 function showProductEducationalContent(productId: string) {
   const product = aiProducts.getProduct(productId);
   if (!product || !product.educationalContent) return;
 
-  productEducationalTitle.value = product.name;
-  productEducationalContent.value = product.description;
-  productEducationalQuestion.value = product.educationalContent;
+  // Set up educational modal with product content
+  educationalModalTitle.value = product.name;
+  educationalModalContent.value = product.description;
+  educationalModalQuestion.value = product.educationalContent;
+  educationalModalCancellable.value = true;
+  
+  // Track what we're showing education for
+  pendingAction.value = 'product_education';
   pendingProductId.value = productId;
-
-  showProductEducationalModal.value = true;
+  
+  // Show the modal
+  showEducationalModal.value = true;
 }
 
-function completeProductEducation() {
-  if (!pendingProductId.value) {
-    showProductEducationalModal.value = false;
-    return;
-  }
+// State for tech tree and educational modal was declared earlier
 
-  // Unlock the product
-  aiProducts.unlockProduct(pendingProductId.value);
-
-  // Select it for development
-  aiProducts.selectProduct(pendingProductId.value);
-
-  showProductEducationalModal.value = false;
-  pendingProductId.value = null;
-}
-
-function cancelProductEducation() {
-  showProductEducationalModal.value = false;
-  pendingProductId.value = null;
-}
-
+// Centralized education completion handler
 function completeEducation() {
-  showEducationalModal.value = false;
-
+  // Handle different educational content based on what's pending
   if (pendingAction.value === 'hardware_upgrade') {
-    completeHardwareUpgrade();
+    // Complete hardware upgrade
+    hardware.upgrade();
+  } else if (pendingAction.value === 'product_education' && pendingProductId.value) {
+    // Unlock the product
+    aiProducts.unlockProduct(pendingProductId.value);
+    // Select it for development
+    aiProducts.selectProduct(pendingProductId.value);
   }
-
+  
+  // Reset state
+  showEducationalModal.value = false;
   pendingAction.value = null;
+  pendingProductId.value = null;
+}
+
+// Cancel education
+function cancelEducation() {
+  // Only allows cancellation if it's marked as cancellable
+  if (educationalModalCancellable.value) {
+    showEducationalModal.value = false;
+    pendingAction.value = null;
+    pendingProductId.value = null;
+  }
+}
+
+// Tech tree visibility functions
+function showTechTree() {
+  techTreeVisible.value = true;
+}
+
+function hideTechTree() {
+  techTreeVisible.value = false;
 }
 
 function showProductDetails(productId: string) {
@@ -384,6 +379,19 @@ function showProductDetails(productId: string) {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
+/* Two-column layout */
+.main-layout {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 15px;
+}
+
+.left-column, .right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
 /* Top row with hardware and research */
 .top-row {
   display: grid;
@@ -398,45 +406,87 @@ function showProductDetails(productId: string) {
   gap: 15px;
 }
 
-/* Products and Discoveries Row */
-.cards-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
+/* Footer controls */
+.footer-controls {
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
 }
 
-/* Tech Tree Section */
-.tech-tree-section {
-  margin-top: 10px;
+.tech-tree-button {
+  padding: 8px 16px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+/* Modal styling */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
   background-color: white;
   border-radius: 8px;
-  padding: 12px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  max-width: 800px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-.tech-tree-section h3 {
+.modal-content h3 {
   margin-top: 0;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
   color: var(--primary-color);
   border-bottom: 1px solid var(--border-color);
-  padding-bottom: 5px;
-  font-size: 1rem;
+  padding-bottom: 8px;
 }
 
 .tech-tree-placeholder {
-  height: 50px;
+  min-height: 400px;
   background-color: #f5f5f5;
   border-radius: 6px;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   color: var(--muted-text);
   font-style: italic;
 }
 
+.close-button {
+  margin-top: 15px;
+  padding: 8px 16px;
+  background-color: var(--muted-text);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
 /* Responsive adjustments */
+@media (max-width: 992px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 768px) {
-  .top-row, .work-panels, .cards-row {
+  .top-row, .work-panels {
     grid-template-columns: 1fr;
   }
 }
