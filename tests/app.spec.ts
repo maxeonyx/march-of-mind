@@ -141,31 +141,28 @@ test('lab phase: manage researchers and hardware', async ({ page }) => {
     window.getStore().enterPhase(phaseValue);
     window.getStore().resources.addMoney(20); // Enough to hire a researcher
     window.getStore().resources.addInsights(5);
-    // Make sure HIRE_RESEARCHER_COST is affordable 
-    window.getStore().researchers.hireResearcher = function() {
-      this.count++;
-      return true;
-    };
   }, GamePhase.LAB_PHASE);
 
   // Verify core lab elements are visible
   const researchButton = page.getByTestId('btn-research');
   const developProductButton = page.getByTestId('btn-develop-product');
-  const hireButton = page.getByTestId('btn-hire-researcher');
-  const fireButton = page.getByTestId('btn-fire-researcher');
+  const productSelect = page.getByTestId('product-select');
   
   await expect(researchButton).toBeVisible();
   await expect(developProductButton).toBeVisible();
-  await expect(hireButton).toBeVisible();
-  await expect(fireButton).toBeVisible();
+  await expect(productSelect).toBeVisible();
   
-  // Test hiring a researcher
-  await hireButton.click();
+  // Verify researcher panel appears when we can afford one
+  await expect(page.getByTestId('researcher-slider')).toBeVisible();
   
-  // Verify researcher count increases
-  expect(await page.evaluate(() => 
-    window.getStore().researchers.count
-  )).toBe(1);
+  // Test researcher slider by setting directly
+  await page.evaluate(() => {
+    // Simulate slider changing value by directly setting count
+    window.getStore().researchers.count = 1;
+  });
+  
+  // Verify researcher count is updated in UI
+  await expect(page.locator('.researcher-count-display')).toContainText('1');
   
   // Test research button with researcher
   await researchButton.click();
@@ -185,6 +182,12 @@ test('lab phase: manage researchers and hardware', async ({ page }) => {
   expect(await page.evaluate(() => 
     Math.round(window.getStore().researchers.allocation * 10) / 10
   )).toBe(0.7);
+  
+  // Verify that the product selection works
+  await productSelect.selectOption('basic-ai');
+  
+  // Check if product name is updated in the develop button
+  await expect(developProductButton).toContainText('Develop Basic AI Tool');
 });
 
 // Test reset button functionality
@@ -212,10 +215,9 @@ test('dev reset button should reset game state', async ({ page }) => {
   // Allow a small amount of time for the UI to update
   await page.waitForTimeout(LONG_TIMEOUT);
   
-  // Check the phase directly - after reset it's going to JOB phase, not RESEARCH_PHASE
-  // because our resetGame function is explicitly calling resetPhase() which sets to JOB
+  // After reset, should be back to RESEARCH_PHASE
   const gamePhase = await page.evaluate(() => window.getStore().phase);
-  expect(gamePhase).toBe(GamePhase.JOB);
+  expect(gamePhase).toBe(GamePhase.RESEARCH_PHASE);
 
   // Money should be reset to 0
   await expect(page.getByTestId('money-value')).toContainText('$0');

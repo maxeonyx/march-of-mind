@@ -78,7 +78,7 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function resetPhase() {
-    phase.value = GamePhase.JOB;
+    phase.value = GamePhase.RESEARCH_PHASE;
   }
 
   function savePhase() {
@@ -89,7 +89,7 @@ export const useGameStore = defineStore('game', () => {
 
   function loadPhase(data: any) {
     if (data) {
-      phase.value = data.gamePhase || GamePhase.JOB;
+      phase.value = data.gamePhase || GamePhase.RESEARCH_PHASE;
     }
   }
 

@@ -1,6 +1,11 @@
 <template>
   <div class="phase-container research-phase">
-    <div class="actions">
+    <div class="section research-section">
+      <h3>Research</h3>
+      <div class="research-description">
+        <p>Generate insights through independent research.</p>
+        <p>Accumulate insights to found your own AI research lab.</p>
+      </div>
       <ProgressButton
         :enabled="true"
         :progress="0"
@@ -10,7 +15,14 @@
       >
         Research
       </ProgressButton>
-
+    </div>
+    
+    <div class="section lab-section">
+      <h3>AI Lab</h3>
+      <div class="lab-description">
+        <p>Found your own AI research lab when you have {{ LAB_FOUNDING_COST }} insights.</p>
+        <p>Current progress: {{ Math.round(labFoundingProgress * 100) }}%</p>
+      </div>
       <ProgressButton
         :enabled="canFoundLab"
         :progress="labFoundingProgress"
@@ -116,15 +128,39 @@ function completeFirstDiscovery() {
 </script>
 
 <style scoped>
-.actions {
+.research-phase {
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  align-items: center;
+  gap: 20px;
   margin-top: 20px;
 }
 
-.research-phase {
+.section {
+  background-color: white;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   text-align: center;
+}
+
+.section h3 {
+  margin-top: 0;
+  color: var(--primary-color);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+  margin-bottom: 15px;
+}
+
+.research-description,
+.lab-description {
+  margin-bottom: 15px;
+  font-size: 14px;
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  .research-phase {
+    flex-direction: column;
+  }
 }
 </style>

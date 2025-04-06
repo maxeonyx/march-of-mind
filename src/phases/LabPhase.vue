@@ -1,33 +1,31 @@
 <template>
   <div class="phase-container lab-phase">
     <div class="lab-content">
-      <!-- Researchers Section -->
-      <div class="section researchers-section">
+      <!-- Researchers Section - conditionally shown when we can have at least 1 researcher -->
+      <div v-if="canAffordResearcher" class="section researchers-section">
         <h3>Researchers</h3>
-        <div class="researcher-controls">
-          <button 
-            @click="hireResearcher" 
-            class="hire-button"
-            :disabled="!canHireResearcher"
-            data-testid="btn-hire-researcher"
-          >
-            Hire Researcher (${{ HIRE_RESEARCHER_COST }})
-          </button>
-          <button 
-            @click="fireResearcher" 
-            class="fire-button"
-            :disabled="!canFireResearcher"
-            data-testid="btn-fire-researcher"
-          >
-            Fire Researcher
-          </button>
-        </div>
         <div class="researcher-info">
           <p>Researchers: <strong>{{ researchers.count }}</strong></p>
           <p>Monthly Income: <span :class="{ positive: monthlyNetIncome > 0, negative: monthlyNetIncome < 0 }">
             ${{ monthlyNetIncome }}
           </span></p>
           <p>Insights per click: <strong>{{ insightRate }}</strong></p>
+        </div>
+        
+        <!-- Researcher Count Slider - only shown when we can have at least 2 options -->
+        <div v-if="maxResearchers > 0 || researchers.count > 0" class="researcher-slider-control">
+          <p>Researcher Count:</p>
+          <input 
+            type="range" 
+            :min="0" 
+            :max="maxResearchers" 
+            step="1" 
+            v-model="researcherCount" 
+            :disabled="maxResearchers < 1 && researchers.count == 0"
+            class="researcher-slider"
+            data-testid="researcher-slider"
+          />
+          <div class="researcher-count-display">{{ researcherCount }}</div>
         </div>
         
         <!-- Resource Allocation Slider -->
@@ -82,7 +80,13 @@
       </div>
     </div>
     
-    <div class="actions">
+    <!-- Research Panel -->
+    <div class="section research-section">
+      <h3>Research</h3>
+      <div class="research-description">
+        <p>Generate insights by clicking the Research button.</p>
+        <p v-if="researchers.count > 0">Your researchers will help increase insight generation.</p>
+      </div>
       <ProgressButton
         :enabled="true"
         :progress="0"
@@ -92,7 +96,26 @@
       >
         Research
       </ProgressButton>
-
+    </div>
+    
+    <!-- Product Development Panel -->
+    <div class="section product-section">
+      <h3>Product Development</h3>
+      <div class="product-selection">
+        <label for="product-select">Select Product:</label>
+        <select id="product-select" v-model="selectedProduct" data-testid="product-select">
+          <option value="basic-ai">Basic AI Tool (${{ PRODUCT_INCOME }} monthly)</option>
+          <option value="nlp-tool">NLP Assistant (Coming soon)</option>
+          <option value="vision-ai">Computer Vision Tool (Coming soon)</option>
+        </select>
+      </div>
+      
+      <div class="product-description">
+        <p v-if="selectedProduct === 'basic-ai'">A simple AI tool that will generate monthly income.</p>
+        <p v-else-if="selectedProduct === 'nlp-tool'">A natural language processing assistant (requires more advanced hardware).</p>
+        <p v-else-if="selectedProduct === 'vision-ai'">A computer vision application (requires specific research).</p>
+      </div>
+      
       <ProgressButton
         :enabled="canDevelopProduct"
         :progress="productDevelopmentProgress"
@@ -100,7 +123,7 @@
         theme="secondary"
         data-testid="btn-develop-product"
       >
-        Develop Product
+        Develop {{ selectedProductName }}
       </ProgressButton>
     </div>
     
@@ -134,6 +157,9 @@ const hardware = gameStore.hardware;
 const PRODUCT_DEVELOPMENT_COST = 20; // Insights needed to develop a product
 const PRODUCT_INCOME = 10; // Monthly income from a single product
 
+// Product selection
+const selectedProduct = ref('basic-ai'); // Default to basic AI
+
 // Modal state
 const showEducationalModal = ref(false);
 const educationalModalTitle = ref('');
@@ -146,15 +172,44 @@ const educationalModalQuestion = ref<EducationalQuestion>({
 });
 const pendingAction = ref<string | null>(null);
 
-// Computed properties from the researchers store
-const canHireResearcher = computed(() => researchers.canHireResearcher);
-const canFireResearcher = computed(() => researchers.canFireResearcher);
+// Computed properties for researcher UI
 const monthlyNetIncome = computed(() => researchers.monthlyNetIncome);
 const insightRate = computed(() => researchers.insightRate);
 const allocatedToSalaries = computed(() => researchers.allocatedToSalaries);
 const allocatedToHardware = computed(() => researchers.allocatedToHardware);
 
-// Allocation model with watcher to update the store
+// Maximum affordable researchers based on money
+const maxResearchers = computed(() => {
+  return Math.floor(resources.money / HIRE_RESEARCHER_COST);
+});
+
+// Can afford at least one researcher
+const canAffordResearcher = computed(() => {
+  return resources.money >= HIRE_RESEARCHER_COST || researchers.count > 0;
+});
+
+// Researcher count model with watcher
+const researcherCount = computed({
+  get: () => researchers.count,
+  set: (value) => {
+    const newCount = Number(value);
+    const currentCount = researchers.count;
+    
+    if (newCount > currentCount) {
+      // Hire researchers
+      for (let i = 0; i < newCount - currentCount; i++) {
+        researchers.hireResearcher();
+      }
+    } else if (newCount < currentCount) {
+      // Fire researchers
+      for (let i = 0; i < currentCount - newCount; i++) {
+        researchers.fireResearcher();
+      }
+    }
+  }
+});
+
+// Allocation model with watcher
 const allocation = computed({
   get: () => researchers.allocation,
   set: (value) => researchers.setAllocation(Number(value))
@@ -174,17 +229,28 @@ const productDevelopmentProgress = computed(() => {
 
 // Can develop product check
 const canDevelopProduct = computed(() => {
-  return resources.insights >= PRODUCT_DEVELOPMENT_COST;
+  if (selectedProduct.value === 'basic-ai') {
+    return resources.insights >= PRODUCT_DEVELOPMENT_COST;
+  }
+  // Other products are disabled for now
+  return false;
 });
 
-// Methods
-function hireResearcher() {
-  researchers.hireResearcher();
-}
+// Friendly name for selected product
+const selectedProductName = computed(() => {
+  switch (selectedProduct.value) {
+    case 'basic-ai':
+      return 'Basic AI Tool';
+    case 'nlp-tool':
+      return 'NLP Assistant';
+    case 'vision-ai':
+      return 'Computer Vision Tool';
+    default:
+      return 'Product';
+  }
+});
 
-function fireResearcher() {
-  researchers.fireResearcher();
-}
+// No longer need explicit hire/fire methods as they're handled by the slider
 
 function doResearch() {
   researchers.generateInsights(1);
@@ -219,12 +285,17 @@ function completeHardwareUpgrade() {
 function developProduct() {
   if (!canDevelopProduct.value) return;
   
-  // Future: Could have educational content for products too
-  // For now, just spend insights and add income
-  resources.spendInsights(PRODUCT_DEVELOPMENT_COST);
-  resources.addMoney(PRODUCT_INCOME);
-  
-  // Future: Add to products list, track products, etc.
+  // Different handling based on product type
+  if (selectedProduct.value === 'basic-ai') {
+    // Spend insights to develop the product
+    resources.spendInsights(PRODUCT_DEVELOPMENT_COST);
+    
+    // Add monthly income from the product
+    resources.addMoney(PRODUCT_INCOME);
+    
+    // Future: Track product in a products list
+  }
+  // Other product types will be implemented later
 }
 
 function completeEducation() {
@@ -329,9 +400,22 @@ function completeEducation() {
   font-size: 14px;
 }
 
-.allocation-slider {
+.allocation-slider,
+.researcher-slider {
   width: 100%;
   margin: 10px 0;
+}
+
+.researcher-slider-control {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.researcher-count-display {
+  font-weight: bold;
+  font-size: 18px;
+  margin-top: 5px;
+  text-align: center;
 }
 
 .hardware-info {
@@ -385,12 +469,28 @@ function completeEducation() {
   cursor: not-allowed;
 }
 
-.actions {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  align-items: center;
+.research-section,
+.product-section {
   margin-top: 20px;
+  text-align: center;
+}
+
+.research-description,
+.product-description {
+  margin-bottom: 15px;
+  font-size: 14px;
+  color: #666;
+}
+
+.product-selection {
+  margin-bottom: 15px;
+}
+
+.product-selection select {
+  margin-left: 10px;
+  padding: 5px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
 }
 
 @media (max-width: 768px) {

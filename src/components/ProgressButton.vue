@@ -61,7 +61,7 @@ const props = defineProps({
   theme: {
     type: String,
     default: 'primary',
-    validator: (value: string) => ['primary', 'hire', 'fire', 'product', 'marketing'].includes(value)
+    validator: (value: string) => ['primary', 'secondary', 'hire', 'fire', 'product', 'marketing'].includes(value)
   }
 });
 
@@ -102,6 +102,10 @@ function handleClick() {
 
 .progress-button[theme="primary"] {
   background-color: var(--primary-color);
+}
+
+.progress-button[theme="secondary"] {
+  background-color: var(--secondary-color);
 }
 
 .progress-button[theme="hire"] {
