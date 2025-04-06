@@ -74,7 +74,7 @@ const props = defineProps<{
   
   // Product cards props
   availableProducts: any[];
-  unlockedProducts: any[];
+  unlockedProducts?: any[]; // Now optional
   developedProducts: any[];
   
   // Discovery cards props

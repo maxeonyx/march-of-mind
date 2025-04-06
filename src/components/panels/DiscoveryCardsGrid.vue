@@ -11,7 +11,7 @@
              @click="selectCard(card.id)">
           <div class="card-title">
             {{ card.name }}
-            <span v-if="card.locked" class="lock-icon">🔒</span>
+            <span v-if="card.locked && title === 'Products'" class="lock-icon">🔒</span>
           </div>
           <div class="card-description" v-if="showDescription">{{ card.description }}</div>
           <div class="card-revenue" v-if="card.revenue">${{ card.revenue }}/mo</div>

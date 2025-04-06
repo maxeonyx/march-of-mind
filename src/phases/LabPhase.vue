@@ -161,23 +161,27 @@ function startResearch() {
 
 // Products organized by state
 const availableProducts = computed(() => {
+  // Include both locked and unlocked products in the available section
   return aiProducts.displayableProducts.filter(product =>
     isAIProductAvailable(product.id) &&
-    !isAIProductUnlocked(product.id) &&
     !isAIProductDeveloped(product.id)
-  );
-});
-
-const unlockedProducts = computed(() => {
-  return aiProducts.displayableProducts.filter(product =>
-    isAIProductUnlocked(product.id) &&
-    !isAIProductDeveloped(product.id)
-  );
+  ).map(product => ({
+    ...product,
+    locked: !isAIProductUnlocked(product.id)
+  }));
 });
 
 const developedProducts = computed(() => {
   return aiProducts.displayableProducts.filter(product =>
     isAIProductDeveloped(product.id)
+  );
+});
+
+// Keep for backward compatibility
+const unlockedProducts = computed(() => {
+  return aiProducts.displayableProducts.filter(product =>
+    isAIProductUnlocked(product.id) &&
+    !isAIProductDeveloped(product.id)
   );
 });
 
