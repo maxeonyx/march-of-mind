@@ -184,11 +184,8 @@ import ProgressButton from '@/components/ProgressButton.vue';
 import EducationalModal from '@/components/EducationalModal.vue';
 import { useGameStore } from '@/store';
 import type { EducationalQuestion } from '@/types';
-import { GamePhase } from '@/types/game-phase';
-import type { AIProduct } from '@/store/ai-products';
 
 const gameStore = useGameStore();
-const resources = gameStore.resources;
 const researchers = gameStore.researchers;
 const hardware = gameStore.hardware;
 const aiProducts = gameStore.aiProducts;
