@@ -24,16 +24,12 @@
     <div class="game-container">
       <!-- Resource display - show different stats based on game phase -->
       <ResourceDisplay 
-        :showIncomeStats="gameStore.phase === 'company' || gameStore.phase === 'lab_phase'" 
-        :showResearchStats="gameStore.phase === 'research_phase' || gameStore.phase === 'lab_phase'"
-        :showHardwareStats="gameStore.phase === 'lab_phase'"
+        :showIncomeStats="gameStore.phase === 'lab_phase' || gameStore.phase === 'industry_phase' || gameStore.phase === 'agi_phase'" 
+        :showResearchStats="gameStore.phase === 'research_phase' || gameStore.phase === 'lab_phase' || gameStore.phase === 'industry_phase' || gameStore.phase === 'agi_phase'"
+        :showHardwareStats="gameStore.phase === 'lab_phase' || gameStore.phase === 'industry_phase' || gameStore.phase === 'agi_phase'"
       />
 
-      <!-- Legacy Phases -->
-      <JobPhase v-if="gameStore.phase === 'job'" />
-      <CompanyPhase v-if="gameStore.phase === 'company'" />
-      
-      <!-- New Educational Phases -->
+      <!-- Educational Game Phases -->
       <ResearchPhase v-if="gameStore.phase === 'research_phase'" />
       <LabPhase v-if="gameStore.phase === 'lab_phase'" />
     </div>
@@ -55,11 +51,7 @@ import { useGameStore } from './store';
 import DateDisplay from './components/DateDisplay.vue';
 import ResourceDisplay from './components/ResourceDisplay.vue';
 
-// Legacy phase components
-import JobPhase from './phases/JobPhase.vue';
-import CompanyPhase from './phases/CompanyPhase.vue';
-
-// New educational phase components
+// Educational game phase components
 import ResearchPhase from './phases/ResearchPhase.vue';
 import LabPhase from './phases/LabPhase.vue';
 

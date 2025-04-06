@@ -51,30 +51,7 @@ test('homepage has title and basic components', async ({ page }) => {
 
 });
 
-// Test the legacy job phase mechanics (kept for reference)
-test.skip('job phase: earn money and progress toward founding company', async ({ page }) => {
-  // Override the default phase to test the legacy phase
-  await page.evaluate((phaseValue) => {
-    window.getStore().enterPhase(phaseValue);
-  }, GamePhase.JOB);
-
-  // Find the work and found buttons
-  const workButton = page.getByTestId('btn-work');
-  const foundButton = page.getByTestId('btn-found-company');
-
-  await expect(workButton).toBeVisible();
-  await expect(foundButton).toBeVisible();
-
-  // Since the button uses custom styling for disabled state, check for the first-time class
-  await expect(foundButton).toHaveClass(/first-time/);
-
-  // Click the work button and check money increases
-  await workButton.click();
-
-  expect(await page.evaluate(() =>
-    window.getStore().resources.money
-  )).toBe(1)
-});
+// No longer needed - test removed for the educational pivot
 
 // Test the research phase mechanics (new educational pivot)
 test('research phase: generate insights and progress toward founding lab', async ({ page }) => {

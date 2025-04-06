@@ -1,16 +1,10 @@
 /**
- * Game phases enum
+ * Game phases enum for the educational AI history game
  */
 export enum GamePhase {
-  // Original phases
-  JOB = 'job',
-  COMPANY = 'company',
-  MARKETING = 'marketing',
-  RESEARCH = 'research',
-  
-  // New phases for educational pivot
-  RESEARCH_PHASE = 'research_phase',
-  LAB_PHASE = 'lab_phase',
-  DISCOVERY_PHASE = 'discovery_phase',
-  AGI_PHASE = 'agi_phase'
+  // Educational game phases
+  RESEARCH_PHASE = 'research_phase',  // Initial phase - independent research
+  LAB_PHASE = 'lab_phase',            // Research lab with teams and hardware
+  INDUSTRY_PHASE = 'industry_phase',  // Industry applications and scaling
+  AGI_PHASE = 'agi_phase'             // Advanced AGI development
 }
