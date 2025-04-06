@@ -6,3 +6,5 @@ declare global {
     getStore(): () => ReturnType<typeof useGameStore>;
   }
 }
+
+export { };

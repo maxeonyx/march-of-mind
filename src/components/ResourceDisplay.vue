@@ -1,11 +1,19 @@
 <template>
   <div class="resource-display">
-    <h3>
-      <span>Money:</span> 
-      <span data-testid="money-value">${{ Math.floor(money) }}</span>
-    </h3>
+    <!-- Universal resources display -->
+    <div class="resources-header">
+      <div class="resource">
+        <span class="resource-label">Money:</span> 
+        <span class="resource-value" data-testid="money-value">${{ Math.floor(money) }}</span>
+      </div>
+      
+      <div class="resource">
+        <span class="resource-label">Insights:</span>
+        <span class="resource-value" data-testid="insights-value">{{ Math.floor(insights) }}</span>
+      </div>
+    </div>
 
-    <!-- Income stats (visible in company phase) -->
+    <!-- Income stats (visible in company or lab phase) -->
     <div v-if="showIncomeStats" class="income-stats" data-testid="income-stats">
       <div class="stat-row">
         <span>Monthly Income:</span>
@@ -22,15 +30,36 @@
         </span>
       </div>
     </div>
+    
+    <!-- Research stats (visible in research or lab phase) -->
+    <div v-if="showResearchStats" class="research-stats" data-testid="research-stats">
+      <div class="stat-row">
+        <span>Research Rate:</span>
+        <span class="positive">+{{ insightRate }} insights/click</span>
+      </div>
+      <div v-if="showHardwareStats" class="stat-row">
+        <span>Computing Power:</span>
+        <span class="hardware-value">{{ hardwareFlops }} FLOP/s</span>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useGameStore } from '@/store';
+import { GamePhase } from '@/types';
 
-defineProps({
+const props = defineProps({
   showIncomeStats: {
+    type: Boolean,
+    default: false
+  },
+  showResearchStats: {
+    type: Boolean,
+    default: false
+  },
+  showHardwareStats: {
     type: Boolean,
     default: false
   }
@@ -38,31 +67,80 @@ defineProps({
 
 const gameStore = useGameStore();
 const resourcesStore = gameStore.resources;
-const talentStore = gameStore.talent;
 
+// Get the right store based on game phase
+const legacyStore = gameStore.talent;
+const researchersStore = gameStore.researchers;
+const hardwareStore = gameStore.hardware;
+
+// Basic resources
 const money = computed(() => resourcesStore.money);
-const monthlyIncome = computed(() => talentStore.monthlyIncome);
-const monthlySalary = computed(() => talentStore.monthlySalary);
-const monthlyNetIncome = computed(() => talentStore.monthlyNetIncome);
+const insights = computed(() => resourcesStore.insights);
+
+// Income stats - use the right store depending on game phase
+const monthlyIncome = computed(() => {
+  return gameStore.phase === GamePhase.COMPANY 
+    ? legacyStore.monthlyIncome 
+    : researchersStore.monthlyIncome;
+});
+
+const monthlySalary = computed(() => {
+  return gameStore.phase === GamePhase.COMPANY 
+    ? legacyStore.monthlySalary 
+    : researchersStore.monthlySalary;
+});
+
+const monthlyNetIncome = computed(() => {
+  return gameStore.phase === GamePhase.COMPANY 
+    ? legacyStore.monthlyNetIncome 
+    : researchersStore.monthlyNetIncome;
+});
+
+// Research stats from the researchers system
+const insightRate = computed(() => {
+  return researchersStore.insightRate;
+});
+
+// Hardware stats from the hardware system
+const hardwareFlops = computed(() => {
+  return hardwareStore.currentFlops?.value || 0;
+});
 </script>
 
 <style scoped>
 .resource-display {
   margin-bottom: 20px;
-  padding: 10px;
+  padding: 15px;
   background-color: rgba(255, 255, 255, 0.7);
-  border-radius: 4px;
+  border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.resource-display h3 {
-  font-size: 24px;
-  color: var(--text-color);
-  margin: 0;
+.resources-header {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-bottom: 10px;
 }
 
-/* Income statistics */
-.income-stats {
+.resource {
+  text-align: center;
+}
+
+.resource-label {
+  font-weight: bold;
+  color: var(--text-color);
+  margin-right: 5px;
+}
+
+.resource-value {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+/* Stats sections */
+.income-stats,
+.research-stats {
   margin-top: 15px;
   padding: 10px;
   background-color: rgba(255, 255, 255, 0.7);
@@ -90,5 +168,10 @@ const monthlyNetIncome = computed(() => talentStore.monthlyNetIncome);
 
 .negative {
   color: var(--negative-color);
+}
+
+.hardware-value {
+  color: var(--secondary-color);
+  font-weight: bold;
 }
 </style>

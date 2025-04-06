@@ -15,7 +15,7 @@ export function useTime() {
   const time = reactive({
     totalMonths: 0, // Months since game start (January 1950)
     lastTickTime: 0,
-    timerId: null as number | null,
+    timerId: null as ReturnType<typeof setInterval> | null,
 
     startGameTicker(tickCallback: () => void) {
       // Clear any existing timer
@@ -27,7 +27,8 @@ export function useTime() {
       time.lastTickTime = Date.now();
       
       // Start a new timer
-      time.timerId = window.setInterval(() => {
+      // Using global setInterval instead of window.setInterval to avoid ESLint error
+      time.timerId = setInterval(() => {
         time.processTick(tickCallback);
       }, GAME_TICK_MS);
     },

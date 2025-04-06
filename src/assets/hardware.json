@@ -1,0 +1,135 @@
+[
+  {
+    "id": "vacuum_tubes",
+    "name": "Vacuum Tubes",
+    "year": 1950,
+    "description": "Early computers used vacuum tubes as electronic switches. While revolutionary, they were large, consumed significant power, and were prone to failure.",
+    "cost": 20,
+    "flops": 1,
+    "educationalContent": {
+      "question": "What was a major limitation of vacuum tube computers?",
+      "answers": [
+        "They couldn't perform mathematical calculations",
+        "They were too small to use effectively",
+        "They consumed excessive power and generated heat",
+        "They could only be operated outdoors"
+      ],
+      "correctAnswerIndex": 2,
+      "explanation": "Vacuum tube computers consumed enormous amounts of power, generated significant heat, and tubes frequently burned out. ENIAC, one of the first vacuum tube computers, used about 174 kilowatts of power and contained 17,468 vacuum tubes, with technicians replacing tubes almost daily."
+    }
+  },
+  {
+    "id": "transistors",
+    "name": "Transistors",
+    "year": 1958,
+    "description": "Transistors replaced vacuum tubes, being smaller, more reliable, and consuming less power. This enabled more compact computer designs.",
+    "cost": 50,
+    "flops": 10,
+    "educationalContent": {
+      "question": "How did transistors improve upon vacuum tubes?",
+      "answers": [
+        "They were larger and easier to replace",
+        "They were cheaper but less reliable",
+        "They were smaller, more reliable, and used less power",
+        "They could perform more complex calculations but ran hotter"
+      ],
+      "correctAnswerIndex": 2,
+      "explanation": "Transistors represented a significant advancement over vacuum tubes. They were smaller (allowing more components in the same space), more reliable (with no filaments to burn out), consumed less power, generated less heat, and had longer operational lifespans. This made computers more practical and reliable."
+    }
+  },
+  {
+    "id": "integrated_circuits",
+    "name": "Integrated Circuits",
+    "year": 1964,
+    "description": "Integrated circuits combined multiple transistors on a single chip, dramatically reducing size while increasing computing capabilities.",
+    "cost": 100,
+    "flops": 100,
+    "educationalContent": {
+      "question": "What key advantage did integrated circuits provide over individual transistors?",
+      "answers": [
+        "They could be produced in different colors",
+        "They combined multiple components on a single chip",
+        "They were easier to repair when damaged",
+        "They generated more processing heat"
+      ],
+      "correctAnswerIndex": 1,
+      "explanation": "Integrated circuits combined multiple electronic components (transistors, resistors, capacitors) onto a single chip of semiconductor material. This miniaturization allowed for more complex circuits in smaller spaces, reduced manufacturing costs, improved reliability, lower power consumption, and faster operation due to shorter electrical pathways."
+    }
+  },
+  {
+    "id": "microprocessors",
+    "name": "Microprocessors",
+    "year": 1971,
+    "description": "The first true microprocessors put an entire CPU on a single chip, revolutionizing computing by enabling personal computers.",
+    "cost": 200,
+    "flops": 1000,
+    "educationalContent": {
+      "question": "What innovation defined the first microprocessors?",
+      "answers": [
+        "They contained an entire CPU on a single chip",
+        "They were the first computers that could display graphics",
+        "They were the first computers to use programming languages",
+        "They could connect to the internet"
+      ],
+      "correctAnswerIndex": 0,
+      "explanation": "The revolutionary aspect of microprocessors was placing an entire Central Processing Unit (CPU) on a single integrated circuit chip. The Intel 4004, introduced in 1971, was the first commercially successful microprocessor and contained 2,300 transistors. This innovation led directly to the personal computer revolution."
+    }
+  },
+  {
+    "id": "vlsi",
+    "name": "VLSI Chips",
+    "year": 1980,
+    "description": "Very Large Scale Integration (VLSI) packed thousands of transistors onto chips, enabling more powerful and affordable computing.",
+    "cost": 500,
+    "flops": 10000,
+    "educationalContent": {
+      "question": "What distinguishes VLSI (Very Large Scale Integration) from earlier integrated circuits?",
+      "answers": [
+        "VLSI circuits were physically larger",
+        "VLSI could only be used for military applications",
+        "VLSI integrated thousands to millions of transistors on a single chip",
+        "VLSI required special cooling systems"
+      ],
+      "correctAnswerIndex": 2,
+      "explanation": "Very Large Scale Integration (VLSI) represented a significant advancement by integrating thousands to millions of transistors on a single chip. This leap in integration density enabled more complex processors, larger memory, and sophisticated integrated systems, while simultaneously reducing cost per function and improving reliability."
+    }
+  },
+  {
+    "id": "gpu",
+    "name": "Graphics Processing Units",
+    "year": 1999,
+    "description": "Initially designed for rendering graphics, GPUs proved excellent for parallel processing tasks like neural network training.",
+    "cost": 1000,
+    "flops": 100000,
+    "educationalContent": {
+      "question": "Why are GPUs particularly valuable for AI and machine learning?",
+      "answers": [
+        "They display AI results in higher resolution",
+        "They are cheaper than regular processors",
+        "They excel at parallel processing needed for neural networks",
+        "They consume less power than CPUs"
+      ],
+      "correctAnswerIndex": 2,
+      "explanation": "While originally designed for rendering graphics, GPUs excel at parallel processing - performing many calculations simultaneously. Neural networks involve numerous identical operations on different data points, making them perfectly suited for GPU architecture. This ability to process data in parallel dramatically accelerates neural network training and inference."
+    }
+  },
+  {
+    "id": "tpu",
+    "name": "Tensor Processing Units",
+    "year": 2016,
+    "description": "Custom-designed AI accelerator chips built specifically for machine learning workloads, offering unprecedented efficiency for neural networks.",
+    "cost": 2000,
+    "flops": 1000000,
+    "educationalContent": {
+      "question": "What advantage do TPUs have over GPUs for machine learning?",
+      "answers": [
+        "They're more widely available and cheaper",
+        "They're specifically optimized for tensor operations used in ML",
+        "They can run more types of applications",
+        "They use standard programming languages"
+      ],
+      "correctAnswerIndex": 1,
+      "explanation": "Tensor Processing Units (TPUs) are application-specific integrated circuits (ASICs) developed specifically for neural network machine learning. Unlike general-purpose GPUs, TPUs are optimized for tensor operations common in machine learning frameworks, offering higher performance per watt for these specific workloads. They sacrifice flexibility for efficiency in AI tasks."
+    }
+  }
+]

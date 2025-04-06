@@ -22,14 +22,20 @@
     <h2>{{ gameStore.phaseTitle }}</h2>
 
     <div class="game-container">
-      <!-- Resource display -->
-      <ResourceDisplay :showIncomeStats="gameStore.phase === 'company'" />
+      <!-- Resource display - show different stats based on game phase -->
+      <ResourceDisplay 
+        :showIncomeStats="gameStore.phase === 'company' || gameStore.phase === 'lab_phase'" 
+        :showResearchStats="gameStore.phase === 'research_phase' || gameStore.phase === 'lab_phase'"
+        :showHardwareStats="gameStore.phase === 'lab_phase'"
+      />
 
-      <!-- Job Phase -->
+      <!-- Legacy Phases -->
       <JobPhase v-if="gameStore.phase === 'job'" />
-
-      <!-- Company Phase -->
       <CompanyPhase v-if="gameStore.phase === 'company'" />
+      
+      <!-- New Educational Phases -->
+      <ResearchPhase v-if="gameStore.phase === 'research_phase'" />
+      <LabPhase v-if="gameStore.phase === 'lab_phase'" />
     </div>
   </main>
   <footer>
@@ -48,8 +54,14 @@ import { useGameStore } from './store';
 // Components
 import DateDisplay from './components/DateDisplay.vue';
 import ResourceDisplay from './components/ResourceDisplay.vue';
+
+// Legacy phase components
 import JobPhase from './phases/JobPhase.vue';
 import CompanyPhase from './phases/CompanyPhase.vue';
+
+// New educational phase components
+import ResearchPhase from './phases/ResearchPhase.vue';
+import LabPhase from './phases/LabPhase.vue';
 
 // Version info
 const versionInfo = useVersion();

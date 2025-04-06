@@ -1,0 +1,62 @@
+[
+  {
+    "id": "perceptron",
+    "name": "Mark I Perceptron",
+    "year": 1957,
+    "description": "<p>The Perceptron was one of the earliest artificial neural networks, invented in 1957 by Frank Rosenblatt at the Cornell Aeronautical Laboratory.</p><p>It was designed to model the way a human neuron works and was initially implemented as a machine rather than a program. The Mark I Perceptron was built for image recognition tasks.</p><p>This groundbreaking device could learn to distinguish simple patterns and represented the first implementation of a machine that could modify its own synaptic weights - essentially, a machine that could learn.</p>",
+    "insightCost": 10,
+    "insightBoost": 1.2,
+    "prerequisites": [],
+    "educationalContent": {
+      "question": "What was revolutionary about the Perceptron?",
+      "answers": [
+        "It could perform calculations faster than humans",
+        "It could display images in color",
+        "It could learn and modify its own weights",
+        "It was the first computer to use transistors"
+      ],
+      "correctAnswerIndex": 2,
+      "explanation": "The Perceptron was groundbreaking because it could learn from examples and modify its own synaptic weights, making it the first machine learning device that could adapt through experience."
+    }
+  },
+  {
+    "id": "backpropagation",
+    "name": "Backpropagation Algorithm",
+    "year": 1986,
+    "description": "<p>Backpropagation is a method used to train neural networks, efficiently calculating gradients for weight adjustments to minimize error.</p><p>Though conceptualized earlier, it wasn't until 1986 when David Rumelhart, Geoffrey Hinton, and Ronald Williams published their influential paper that backpropagation became widely adopted.</p><p>This algorithm was crucial in reviving interest in neural networks after the \"AI winter\" of the 1970s, as it allowed multi-layer networks to learn complex patterns effectively.</p>",
+    "insightCost": 20,
+    "insightBoost": 1.5,
+    "prerequisites": ["perceptron"],
+    "educationalContent": {
+      "question": "What problem did backpropagation solve for neural networks?",
+      "answers": [
+        "It allowed computers to recognize speech for the first time",
+        "It made neural networks run faster on limited hardware",
+        "It enabled effective training of multi-layer neural networks",
+        "It reduced the physical size of neural network hardware"
+      ],
+      "correctAnswerIndex": 2,
+      "explanation": "Backpropagation solved the crucial problem of how to efficiently train multi-layer neural networks by calculating gradients and updating weights to minimize error, allowing neural networks to learn complex patterns and relationships in data."
+    }
+  },
+  {
+    "id": "cnn",
+    "name": "Convolutional Neural Networks",
+    "year": 1998,
+    "description": "<p>Convolutional Neural Networks (CNNs) are specialized neural networks designed primarily for processing grid-like data such as images.</p><p>While the concept dates back to the 1980s with Kunihiko Fukushima's Neocognitron, modern CNNs were popularized by Yann LeCun in 1998 with LeNet-5, which was used to recognize handwritten digits for postal codes.</p><p>CNNs revolutionized computer vision by using convolutional layers that apply filters across input data, enabling the network to detect features regardless of their position in the input.</p>",
+    "insightCost": 30,
+    "insightBoost": 1.8,
+    "prerequisites": ["backpropagation"],
+    "educationalContent": {
+      "question": "What key innovation makes CNNs particularly effective for image processing?",
+      "answers": [
+        "They use more neurons than traditional neural networks",
+        "They automatically colorize black and white images",
+        "They use convolutional layers that detect features regardless of position",
+        "They process images faster by using less memory"
+      ],
+      "correctAnswerIndex": 2,
+      "explanation": "Convolutional layers are the key innovation in CNNs. They apply filters across the input data to detect features regardless of where they appear in the image, making them translation-invariant. This mimics how the visual cortex works and makes CNNs particularly effective for image recognition tasks."
+    }
+  }
+]

@@ -3,6 +3,7 @@ import { createPinia } from 'pinia';
 // Import App component
 import App from './App.vue';
 import { useGameStore } from './store';
+import { GamePhase } from './types';
 
 // Create Vue app instance
 const app = createApp(App);
@@ -22,9 +23,14 @@ if (typeof window !== 'undefined' && !window.gameStore) {
     const savedData = localStorage.getItem('marchOfMindSave');
     if (savedData) {
       game.loadGame(JSON.parse(savedData));
+    } else {
+      // For new games, start in the research phase for the educational pivot
+      game.enterPhase(GamePhase.RESEARCH_PHASE);
     }
   } catch (e) {
     console.error('Failed to load save data', e);
+    // If there's an error loading, also start in research phase
+    game.enterPhase(GamePhase.RESEARCH_PHASE);
   }
 
   // Start the game ticker with a callback to save to localStorage

@@ -158,3 +158,4 @@ Always update both this file `CLAUDE.md` AND `package.json`.
 - 0.7.0 - Implemented Phase 3 features: Marketing system with diminishing returns, product catalog with historical AI products, market saturation mechanics
 - 0.7.1 - Major architecture refactoring: Converted module stores to Vue composables using reactive state, improved type safety in tests, maintained single Pinia store for coordination
 - 0.8.0 - Redesigned game concept: Pivoted to educational focus with AI history progression, multiple-choice questions to unlock technologies, and restructured game phases (Research, Lab, Discovery, AGI phases)
+- 0.9.0 - Implemented first two educational phases: Research Phase with educational modal for first discovery, Lab Phase with researcher management and hardware upgrade system

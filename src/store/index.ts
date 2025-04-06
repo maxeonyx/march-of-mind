@@ -5,9 +5,15 @@ import { useResources } from './resources';
 import { useTime } from './time';
 import { useTalent } from './talent';
 import { useProducts } from './products';
+import { useResearchers } from './researchers';
+import { useDiscoveries } from './discoveries';
+import { useHardware } from './hardware';
 
 // Cost to found a company (moved from usePhase)
 export const COMPANY_FOUNDING_COST = 100;
+
+// Cost to found a lab in insights
+export const LAB_FOUNDING_COST = 10;
 
 /**
  * Main game store that coordinates all modules
@@ -22,17 +28,26 @@ export const useGameStore = defineStore('game', () => {
   // Initialize our module states
   const resources = useResources();
   const time = useTime();
+  
+  // Legacy modules (will be replaced)
   const talent = useTalent(resources);
   const products = useProducts(resources, talent, time);
+  
+  // New modules for educational pivot
+  const discoveries = useDiscoveries(resources);
+  const hardware = useHardware(resources);
+  const researchers = useResearchers(resources, hardware, discoveries);
 
   // Game phase directly in the store
   const phase = ref(GamePhase.JOB);
 
   // Phase-related computed properties
   const hasFoundedCompany = computed(() => phase.value !== GamePhase.JOB);
+  const hasFoundedLab = computed(() => phase.value === GamePhase.LAB_PHASE);
 
   const phaseTitle = computed(() => {
     switch (phase.value) {
+      // Original phases
       case GamePhase.JOB:
         return "Working for the Man";
       case GamePhase.COMPANY:
@@ -41,6 +56,17 @@ export const useGameStore = defineStore('game', () => {
         return "Marketing Department";
       case GamePhase.RESEARCH:
         return "Research & Development";
+        
+      // New phases
+      case GamePhase.RESEARCH_PHASE:
+        return "Research Lab";
+      case GamePhase.LAB_PHASE:
+        return "AI Research Center";
+      case GamePhase.DISCOVERY_PHASE:
+        return "Advanced Research";
+      case GamePhase.AGI_PHASE:
+        return "AGI Development";
+        
       default:
         return "March of Mind";
     }
@@ -78,6 +104,14 @@ export const useGameStore = defineStore('game', () => {
 
       // Process product development
       products.processMonthlyDevelopment();
+    }
+    
+    // Process new game phases
+    if (phase.value === GamePhase.LAB_PHASE || 
+        phase.value === GamePhase.DISCOVERY_PHASE || 
+        phase.value === GamePhase.AGI_PHASE) {
+      // Process researcher finances
+      researchers.processMonthlyFinances();
     }
 
     // Save the game
@@ -121,8 +155,15 @@ export const useGameStore = defineStore('game', () => {
       phase: savePhase(),
       resources: resources.save(),
       time: time.save(),
+      
+      // Legacy modules
       talent: talent.save(),
-      products: products.save()
+      products: products.save(),
+      
+      // New modules
+      discoveries: discoveries.save(),
+      hardware: hardware.save(),
+      researchers: researchers.save()
     };
 
     lastSavedAt.value = saveData.savedAt;
@@ -138,8 +179,15 @@ export const useGameStore = defineStore('game', () => {
       loadPhase(saveData.phase);
       resources.load(saveData.resources);
       time.load(saveData.time);
+      
+      // Legacy modules
       talent.load(saveData.talent);
       products.load(saveData.products);
+      
+      // New modules (with null checks)
+      if (saveData.discoveries) discoveries.load(saveData.discoveries);
+      if (saveData.hardware) hardware.load(saveData.hardware);
+      if (saveData.researchers) researchers.load(saveData.researchers);
 
       lastSavedAt.value = saveData.savedAt || 0;
       return true;
@@ -156,8 +204,15 @@ export const useGameStore = defineStore('game', () => {
     resetPhase();
     resources.reset();
     time.reset();
+    
+    // Legacy modules
     talent.reset();
     products.reset();
+    
+    // New modules
+    discoveries.reset();
+    hardware.reset();
+    researchers.reset();
 
     // Restart the time ticker
     startGameTicker();
@@ -175,13 +230,21 @@ export const useGameStore = defineStore('game', () => {
     phase,
     phaseTitle,
     hasFoundedCompany,
+    hasFoundedLab,
     enterPhase,
 
     // Module states (accessible as properties)
     resources,
     time,
+    
+    // Legacy modules
     talent,
     products,
+    
+    // New modules
+    discoveries,
+    hardware,
+    researchers,
 
     // Methods
     processOneMonth,
