@@ -1,12 +1,15 @@
 # March of Mind
 
-A cookie clicker style game where you run a company and balance R&D with products, hardware capital, and talent. Built with Vue.js, TypeScript, Pinia, and includes Playwright testing and GitHub Actions CI/CD setup.
+An educational incremental game that simulates the development of artificial intelligence from early computing to the singularity. Players progress through research, product development, and technological discovery with an emphasis on historical accuracy and learning.
 
 ![March of Mind logo](/src/assets/logo.png)
 
 ## Features
 
-- 💰 Simple resource management gameplay
+- 🧠 Educational gameplay with multiple-choice questions to unlock technologies
+- 💡 Research and insight generation mechanics
+- 🖥️ Hardware progression from early computing to quantum systems
+- 🔬 Historical AI discoveries and product development
 - 📦 Vue 3 with Composition API
 - 🧰 TypeScript support
 - 🗄️ Pinia state management
@@ -20,105 +23,16 @@ A cookie clicker style game where you run a company and balance R&D with product
 
 You can play the current version of the game at: [https://maxeonyx.github.io/march-of-mind/](https://maxeonyx.github.io/march-of-mind/)
 
-## Using This Template
+## Game Overview
 
-This repository is designed to be used as a starting point for new Vue.js projects. Here's how to get started:
+March of Mind takes players through the history of artificial intelligence development:
 
-### Option 1: Create a new repository from this template
+1. **Research Phase**: Generate insights by clicking the "Research" button
+2. **Lab Phase**: Discover the first AI technology, found a lab, develop products for income
+3. **Discovery Phase**: Balance product development with technological breakthroughs
+4. **AGI Phase**: Experience the exponential acceleration of technology approaching the singularity
 
-1. Click the "Use this template" button on GitHub
-2. Name your new repository and create it
-3. Clone your new repository locally
-4. Run `npm install` to install dependencies
-5. Start developing!
-
-### Option 2: Clone and reset Git history
-
-If you want to start with a clean Git history:
-
-1. Clone this repository
-   ```bash
-   git clone https://github.com/yourusername/vue-hello-world.git my-new-project
-   ```
-
-2. Navigate to the project directory
-   ```bash
-   cd my-new-project
-   ```
-
-3. Remove the existing Git history
-   ```bash
-   rm -rf .git
-   ```
-
-4. Initialize a new Git repository
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit"
-   ```
-
-5. Link to your remote repository
-   ```bash
-   git remote add origin https://github.com/yourusername/my-new-project.git
-   git push -u origin main
-   ```
-
-### Option 3: Squash existing history
-
-If you want to preserve the commit structure but start from a clean slate:
-
-1. Clone this repository
-   ```bash
-   git clone https://github.com/yourusername/vue-hello-world.git my-new-project
-   ```
-
-2. Navigate to the project directory
-   ```bash
-   cd my-new-project
-   ```
-
-3. Find the first commit hash
-   ```bash
-   git log --reverse --pretty=oneline | head -1
-   ```
-
-4. Soft reset to that commit and create a fresh initial commit
-   ```bash
-   git reset --soft <first-commit-hash>
-   git commit -m "Initial commit with Vue Hello World template"
-   ```
-
-5. Set up a new remote and push
-   ```bash
-   git remote set-url origin https://github.com/yourusername/my-new-project.git
-   git push -f origin main
-   ```
-
-## Game Development
-
-Here's how to contribute to the game development:
-
-1. **Game Mechanics**
-   - The game is a resource management simulation
-   - Currently implemented: Basic money counter with "unrealistically earn money" button
-   - Planned: R&D, products, hardware capital, and talent management
-
-2. **State Management**
-   - Game state is managed in `src/stores/app.ts`
-   - Add new resources, upgrades, and mechanics here
-
-3. **User Interface**
-   - Main game UI is in `src/App.vue`
-   - Consider creating component files for complex UI elements
-
-4. **Automated Deployment**
-   - All changes pushed to main branch are automatically deployed
-   - The deployment process:
-     - Runs tests
-     - Builds the application
-     - Deploys to GitHub Pages
-   - No manual deployment steps needed
+Players must answer educational multiple-choice questions to unlock new technologies and products, learning about AI history and concepts along the way.
 
 ## Development Workflow
 
@@ -164,16 +78,16 @@ gh run watch <run-id>
 ├── .github/workflows/   # GitHub Actions workflows
 ├── src/                 # Source code
 │   ├── assets/          # Game assets (logo, images, etc.)
-│   ├── composables/     # Reusable Vue composition functions
+│   ├── components/      # Reusable Vue components
+│   ├── phases/          # Game phase components
 │   ├── stores/          # Pinia stores for game state
-│   │   └── app.ts       # Main game state management
 │   ├── types/           # TypeScript type definitions
 │   ├── App.vue          # Main game component and UI
 │   └── main.ts          # Application entry point
 ├── tests/               # End-to-end tests
 │   └── app.spec.ts      # Game functionality tests
 ├── public/              # Static assets
-│   └── favicon.ico      # Game icon for browser tab
+├── PLAN.md              # Detailed game development plan
 ├── CLAUDE.md            # Project documentation and version history
 ├── index.html           # HTML entry point
 ├── vite.config.ts       # Vite configuration with base path
@@ -186,7 +100,7 @@ gh run watch <run-id>
 
 The project follows these development best practices:
 
-- **Game Design**: Balance complexity with accessibility
+- **Game Design**: Balance educational content with engaging gameplay
 - **Type Safety**: Use TypeScript for all code
 - **Testing**: Write tests for all game features before implementing
 - **State Management**: Use Pinia for centralized game state
@@ -197,7 +111,7 @@ The project follows these development best practices:
 
 ## Current Version
 
-**0.2.0** - Basic game setup with money counter and "unrealistically earn money" button
+**0.7.1** - Major architecture refactoring with modular Pinia stores and improved type safety.
 
 ## License
 

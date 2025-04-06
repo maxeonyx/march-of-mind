@@ -1,7 +1,7 @@
 # CLAUDE.md - Project Guidelines
 
 ## Project Overview
-March of Mind - A cookie clicker style game where you run a company and balance R&D with products, hardware capital and talent. Built with Vue.js, TypeScript, Pinia, and includes Playwright testing and GitHub Actions CI/CD setup.
+March of Mind - An educational incremental game that simulates the development of artificial intelligence from early computing to the singularity. Players progress through research, product development, and technological discovery with an emphasis on historical accuracy and learning. Built with Vue.js, TypeScript, Pinia, and includes Playwright testing and GitHub Actions CI/CD setup.
 
 ## Development Philosophy
 
@@ -113,21 +113,26 @@ March of Mind - A cookie clicker style game where you run a company and balance 
 # Main UI files
 - `src/App.vue`
 - `src/phases/` - Phase-specific UI layouts
-  - `JobPhase.vue` - Initial game phase UI
-  - `CompanyPhase.vue` - Company management phase UI
+  - `JobPhase.vue` - Will be renamed to ResearchPhase.vue (initial research phase)
+  - `CompanyPhase.vue` - Will be renamed to LabPhase.vue (lab management phase)
+  - Will add DiscoveryPhase.vue and AGIPhase.vue in future phases
 
 ### Components
 - `src/components/DateDisplay.vue` - Game date display component
 - `src/components/ProgressButton.vue` - Reusable button with progress indicator
 - `src/components/ResourceDisplay.vue` - Shows player resources (money, insights)
+- Will add components for educational modals with multiple-choice questions
 
 ### State Management
 - `src/store/index.ts` - Main game state store (Pinia)
 - `src/store/products.ts` - Product development and marketing
-- `src/store/resources.ts` - Player resources (money, etc.)
-- `src/store/talent.ts` - Talent management system
+- `src/store/resources.ts` - Player resources (money, insights)
+- `src/store/talent.ts` - Will be renamed to researchers.ts - Researcher management system
 - `src/store/time.ts` - Game time progression
 - `src/store/version.ts` - Reactive version information
+- Will add `src/store/hardware.ts` - Hardware acquisition and FLOP/s tracking
+- Will add `src/store/discoveries.ts` - Technology tree and discovery tracking
+- Will add `src/store/education.ts` - Educational content and quiz management
 
 ### Assets
 - `src/assets/` - Images and media assets
@@ -152,3 +157,4 @@ Always update both this file `CLAUDE.md` AND `package.json`.
 - 0.6.3 - Improved UI layout with compact horizontal header, optimized vertical space, enhanced button click using pure CSS, made text non-selectable
 - 0.7.0 - Implemented Phase 3 features: Marketing system with diminishing returns, product catalog with historical AI products, market saturation mechanics
 - 0.7.1 - Major architecture refactoring: Converted module stores to Vue composables using reactive state, improved type safety in tests, maintained single Pinia store for coordination
+- 0.8.0 - Redesigned game concept: Pivoted to educational focus with AI history progression, multiple-choice questions to unlock technologies, and restructured game phases (Research, Lab, Discovery, AGI phases)
