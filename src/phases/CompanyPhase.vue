@@ -144,8 +144,8 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue';
 import ProgressButton from '../ProgressButton.vue';
-import { useGameStore } from '../../store';
-import { HIRE_TALENT_COST, TALENT_SALARY, TALENT_INCOME, TALENT_INSIGHTS } from '../../composables/useTalent';
+import { useGameStore } from '@/store';
+import { HIRE_TALENT_COST, TALENT_SALARY, TALENT_INCOME, TALENT_INSIGHTS } from '@/store/talent';
 
 const gameStore = useGameStore();
 const talentStore = gameStore.talent;

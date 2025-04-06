@@ -57,6 +57,7 @@ test('job phase: earn money and progress toward founding company', async ({ page
   // Instead of checking the pageTitle which seems not to be set correctly in tests,
   // just verify we're in the job phase by checking for the job phase-specific buttons
   
+  // TODO: refactor the other tests (& components) to use test ids
   // Find the work and found buttons
   const workButton = page.getByTestId('btn-work');
   const foundButton = page.getByTestId('btn-found-company');
@@ -71,7 +72,7 @@ test('job phase: earn money and progress toward founding company', async ({ page
   await workButton.click();
   
   expect(await page.evaluate(() => 
-    window.getStore().resources.state.money
+    window.getStore().resources.money
   )).toBe(1)
 });
 
@@ -95,7 +96,7 @@ test('found a company when threshold is reached', async ({ page }) => {
 });
 
 // Test talent management functionality
-test.skip('talent management and income system', async ({ page }) => {
+test('talent management and income system', async ({ page }) => {
   await page.goto('/');
   
   // Set up company phase with enough money to hire talent
@@ -158,39 +159,6 @@ test.skip('talent management and income system', async ({ page }) => {
   expect(updatedIncomeStatsText).toContain('Monthly Income:+$0');
   expect(updatedIncomeStatsText).toContain('Monthly Expenses:-$0');
   expect(updatedIncomeStatsText).toContain('Net Monthly:+$0');
-});
-
-// Test the company founding functionality fully
-test.skip('company founding complete flow with multiple clicks', async ({ page }) => {
-  await page.goto('/');
-  
-  // Set up state close to founding threshold
-  await page.evaluate(() => {
-    if (window.getStore()) {
-      window.getStore().addMoney(95);
-    } else {
-      throw new Error('gameStore not initialized');
-    }
-  });
-  
-  // Click 5 times to reach threshold
-  const workButton = page.locator('button', { hasText: 'Work for the Man' });
-  for (let i = 0; i < 5; i++) {
-    await workButton.click();
-  }
-  
-  // Wait for found button to be enabled
-  const foundButton = page.locator('button', { hasText: 'Found a Company' });
-  await expect(foundButton).toBeEnabled();
-  
-  // Found the company
-  await foundButton.click();
-  
-  // We should now be in the company phase
-  await expect(page.locator('h2')).toContainText('Company Dashboard', );
-  
-  // Company info should be visible
-  await expect(page.getByText('Your Company is Founded')).toBeVisible();
 });
 
 // Test reset button functionality

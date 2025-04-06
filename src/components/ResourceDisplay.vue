@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useGameStore } from '../store';
+import { useGameStore } from '@/store';
 
 defineProps({
   showIncomeStats: {

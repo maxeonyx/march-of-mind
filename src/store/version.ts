@@ -1,5 +1,5 @@
 import { reactive, onMounted } from 'vue';
-import type { VersionInfo } from '../types';
+import type { VersionInfo } from '@/types';
 
 export function useVersion() {
   const versionState = reactive({

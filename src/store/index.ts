@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
-import { GamePhase } from './types';
-import { useResources } from './composables/useResources';
-import { useTime } from './composables/useTime';
-import { useTalent } from './composables/useTalent';
-import { useProducts } from './composables/useProducts';
+import { GamePhase } from '@/types';
+import { useResources } from './resources';
+import { useTime } from './time';
+import { useTalent } from './talent';
+import { useProducts } from './products';
 
 // Cost to found a company (moved from usePhase)
 export const COMPANY_FOUNDING_COST = 100;
@@ -114,42 +114,34 @@ export const useGameStore = defineStore('game', () => {
       products: products.save()
     };
 
-    localStorage.setItem('marchOfMindSave', JSON.stringify(saveData));
+    // localStorage.setItem('marchOfMindSave', JSON.stringify(saveData));
     lastSavedAt.value = saveData.savedAt;
   }
 
   /**
    * Load the game state from localStorage
    */
-  function loadGame() {
-    const saveString = localStorage.getItem('marchOfMindSave');
-    if (saveString) {
-      try {
-        const saveData = JSON.parse(saveString);
-        
-        // Load each module's state
-        loadPhase(saveData.phase);
-        resources.load(saveData.resources);
-        time.load(saveData.time);
-        talent.load(saveData.talent);
-        products.load(saveData.products);
-        
-        lastSavedAt.value = saveData.savedAt || 0;
-        return true;
-      } catch (e) {
-        console.error('Failed to load save data', e);
-        return false;
-      }
+  function loadGame(saveData: any) {
+    try {
+      // Load each module's state
+      loadPhase(saveData.phase);
+      resources.load(saveData.resources);
+      time.load(saveData.time);
+      talent.load(saveData.talent);
+      products.load(saveData.products);
+      
+      lastSavedAt.value = saveData.savedAt || 0;
+      return true;
+    } catch (e) {
+      throw Error('Failed to load save data');
     }
-
-    return false;
   }
 
   /**
    * Initialize the game
    */
-  function init() {
-    loadGame();
+  function init(saveData: any) {
+    loadGame(saveData)
     startGameTicker();
   }
 
@@ -167,8 +159,6 @@ export const useGameStore = defineStore('game', () => {
     // Restart the time ticker
     startGameTicker();
 
-    // Clear localStorage
-    localStorage.removeItem('marchOfMindSave');
     lastSavedAt.value = 0;
   }
 

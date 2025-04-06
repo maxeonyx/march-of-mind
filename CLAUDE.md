@@ -3,15 +3,12 @@
 ## Project Overview
 March of Mind - A cookie clicker style game where you run a company and balance R&D with products, hardware capital and talent. Built with Vue.js, TypeScript, Pinia, and includes Playwright testing and GitHub Actions CI/CD setup.
 
-## Current Tech Stack
-- Earn Money Button (still kinda fun already lol)
-
 ## Development Philosophy
 
-1. **Quality First**: Prioritize code quality and user experience over feature quantity.
+1. **Quality First**: Prioritize keeping code clean, small and nimble.
 2. **Iterative Improvement**: Continuously improve existing code with small, well-tested changes.
-3. **Testing**: Ensure proper test coverage for all features.
-4. **Simplicity**: Keep the codebase clean and minimal.
+3. **Testing**: Ensure test coverage for all new features.
+4. **Simplicity**: Keep the codebase clean and minimal. Always remove old code.
 
 ## Development Process (STRICT REQUIREMENTS)
 
@@ -21,12 +18,13 @@ March of Mind - A cookie clicker style game where you run a company and balance 
    - ALWAYS remove old code if it is no longer required.
 
 2. **Testing Requirements**
-   - ALL code changes MUST have corresponding tests
+   - ALL code changes MUST have corresponding Playwright test.
+   - Each test can however be simple.
    - Run the full test suite with `npm run test` prior to every commit
    - Tests MUST pass before any commit
    - NEVER increase test timeouts to make tests pass. The app should respond immediately to state changes.
-   - Use NORMAL_TIMEOUT (100ms) for normal UI operations
-   - NEVER use arbitrary timeouts like page.waitForTimeout() - this hides performance issues
+   - Use NORMAL_TIMEOUT (16ms) for normal UI operations
+   - NEVER use arbitrary timeouts like page.waitForTimeout() - this hides performance issues and makes the tests slow.
 
 3. **Pre-Commit Checklist**
    BEFORE git commit, always do ALL of the following:
@@ -76,6 +74,10 @@ March of Mind - A cookie clicker style game where you run a company and balance 
 - GitHub Actions for CI/CD
 - GitHub Pages for hosting
 
+## Code style
+
+- Use `@/...` imports when importing from a different top-level module.
+
 ## Development Commands
 
 ### Project Commands
@@ -83,7 +85,7 @@ March of Mind - A cookie clicker style game where you run a company and balance 
 - `npm run typecheck` - Check types for both app and tests
 - `npm run lint` - Run ESLint code quality checks
 - `npm run test` - Run Playwright end-to-end tests
-- Do NOT use `npm run dev` or `npm run preview` - you can't view the output. Use comprehensive tests instead.
+- Do NOT use `npm run dev` or `npm run preview`. You do not need to do this, but if you must, ask the user to do it for you.
 
 ### Deployment Monitoring Commands
 - `gh run list` - Check GitHub Actions workflow status
@@ -108,24 +110,24 @@ March of Mind - A cookie clicker style game where you run a company and balance 
 - `playwright.config.ts` - End-to-end testing configuration
 - `env.d.ts` - TypeScript declarations for Vite environment
 
+# Main UI files
+- `src/App.vue`
+- `src/phases/` - Phase-specific UI layouts
+  - `JobPhase.vue` - Initial game phase UI
+  - `CompanyPhase.vue` - Company management phase UI
+
 ### Components
 - `src/components/DateDisplay.vue` - Game date display component
 - `src/components/ProgressButton.vue` - Reusable button with progress indicator
 - `src/components/ResourceDisplay.vue` - Shows player resources (money, insights)
-- `src/components/phases/` - Phase-specific components:
-  - `JobPhase.vue` - Initial game phase UI
-  - `CompanyPhase.vue` - Company management phase UI
 
 ### State Management
-- `src/stores/game.ts` - Main game state store (Pinia)
-
-### Composables and Modules
-- `src/composables/usePhase.ts` - Game phase management
-- `src/composables/useProducts.ts` - Product development and marketing
-- `src/composables/useResources.ts` - Player resources (money, etc.)
-- `src/composables/useTalent.ts` - Talent management system
-- `src/composables/useTime.ts` - Game time progression
-- `src/composables/useVersion.ts` - Reactive version information
+- `src/store/index.ts` - Main game state store (Pinia)
+- `src/store/products.ts` - Product development and marketing
+- `src/store/resources.ts` - Player resources (money, etc.)
+- `src/store/talent.ts` - Talent management system
+- `src/store/time.ts` - Game time progression
+- `src/store/version.ts` - Reactive version information
 
 ### Assets
 - `src/assets/` - Images and media assets

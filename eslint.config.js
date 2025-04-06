@@ -38,6 +38,40 @@ export default [
       '@typescript-eslint/explicit-function-return-type': 'off'
     }
   },
+  // Store code must be kept pure - these rules enforce it.
+  {
+    files: ['src/store/**/*'],
+    rules: {
+      'no-restricted-globals': [
+        'error',
+        {
+          name: 'window',
+          message: 'Do not use `window` in store files. Inject it instead.',
+        },
+        {
+          name: 'localStorage',
+          message: 'Do not use `localStorage` directly. Inject it instead.',
+        },
+        {
+          name: 'document',
+          message: 'DOM access is forbidden in stores.',
+        },
+        {
+          name: 'navigator',
+          message: 'Do not use browser globals in store files.',
+        },
+      ],
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            '**/globals', // ⛔ avoid importing from global declarations
+            '**/*.d.ts',  // ⛔ prevent accidental import of declaration files
+          ],
+        },
+      ],
+    }
+  },
   // Ignore patterns
   {
     ignores: ['dist/**', 'node_modules/**', 'playwright-report/**', 'test-results/**', 'research/**']

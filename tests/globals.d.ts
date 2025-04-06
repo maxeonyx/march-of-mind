@@ -1,15 +1,8 @@
-
-/**
- * Type declaration for the gameStore global variable
- */
-type _GameStore = ReturnType<typeof import("@app/store").useGameStore>
+import type { useGameStore } from "@app/store";
 
 declare global {
   interface Window {
-    gameStore?: _GameStore;
-    getStore(): () => _GameStore;
+    gameStore?: ReturnType<typeof useGameStore>;
+    getStore(): () => ReturnType<typeof useGameStore>;
   }
 }
-
-
-export {};

@@ -1,9 +1,9 @@
 import { reactive, computed, type ComputedRef } from 'vue';
-import type { Product, ProductInstance } from '../types';
-import productsData from '../assets/products.json';
-import { type ResourcesStore } from './useResources';
-import { useTalent } from './useTalent';
-import { useTime } from './useTime';
+import type { Product, ProductInstance } from '@/types';
+import productsData from '@/assets/products.json';
+import { type ResourcesStore } from './resources';
+import { useTalent } from './talent';
+import { useTime } from './time';
 
 // Product development constants
 export const PRODUCT_DEVELOPMENT_COST = 1; // Insights needed for first product

@@ -1,5 +1,5 @@
 import { reactive, computed, type ComputedRef } from 'vue';
-import { type ResourcesStore } from './useResources';
+import { type ResourcesStore } from './resources';
 
 // Talent system constants
 export const HIRE_TALENT_COST = 50;

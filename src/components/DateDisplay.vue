@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useGameStore } from '../store';
+import { useGameStore } from '@/store';
 
 const gameStore = useGameStore();
 const timeStore = gameStore.time;

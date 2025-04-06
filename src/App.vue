@@ -42,7 +42,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useVersion } from './composables/useVersion';
+import { useVersion } from './store/version';
 import { useGameStore } from './store';
 
 // Components
