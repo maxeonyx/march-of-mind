@@ -49,7 +49,10 @@
     
     <!-- Resource Allocation Slider -->
     <div class="resource-allocation">
-      <div class="allocation-label left">Product Development</div>
+      <div class="allocation-label-container left">
+        <div class="allocation-label">Product Development</div>
+        <div class="allocation-value">{{ insightsToProducts }}x</div>
+      </div>
       <input 
         type="range" 
         min="0" 
@@ -59,7 +62,10 @@
         class="allocation-slider"
         data-testid="resource-allocation-slider"
       />
-      <div class="allocation-label right">Pure Research</div>
+      <div class="allocation-label-container right">
+        <div class="allocation-label">Pure Research</div>
+        <div class="allocation-value">{{ insightsToPureResearch }}x</div>
+      </div>
     </div>
     
     
@@ -68,20 +74,41 @@
       <!-- Product Development Panel -->
       <div class="section product-panel">
         <div v-if="productInProgress" class="in-progress-product">
-          <div class="card-label">In progress product card</div>
+          <div class="product-title">{{ aiProducts.selectedProduct.name }}</div>
+          <div class="product-description">{{ aiProducts.selectedProduct.description }}</div>
+          <div class="progress-container">
+            <div class="progress-bar" :style="{ width: `${aiProducts.productProgress * 100}%` }"></div>
+            <div class="progress-text">{{ Math.round(aiProducts.productProgress * 100) }}%</div>
+          </div>
+          <div class="allocation-info">
+            <span class="info-label">Allocation:</span>
+            <span class="info-value">{{ insightsToProducts }}x per click</span>
+          </div>
         </div>
         <div v-else class="no-product">
-          <p>No product in development</p>
+          <p>Select a product to develop</p>
         </div>
       </div>
       
       <!-- Research Development Panel -->
       <div class="section research-panel">
         <div v-if="researchInProgress" class="in-progress-research">
-          <div class="card-label">In-progress research card</div>
+          <div class="research-title">Pure Research</div>
+          <div class="research-description">Advance your theoretical understanding by investing in pure research.</div>
+          <div class="progress-container">
+            <div class="progress-bar research-progress" :style="{ width: `${researchProgress * 100}%` }"></div>
+            <div class="progress-text">{{ Math.round(researchProgress * 100) }}%</div>
+          </div>
+          <div class="allocation-info">
+            <span class="info-label">Allocation:</span>
+            <span class="info-value research-value">{{ insightsToPureResearch }}x per click</span>
+          </div>
         </div>
         <div v-else class="no-research">
           <p>No research in progress</p>
+          <button @click="startResearch" class="start-research-button" :disabled="!canStartResearch">
+            Start Research
+          </button>
         </div>
       </div>
     </div>
@@ -223,16 +250,36 @@ const upgradeProgress = computed(() => hardware.upgradeProgress);
 const insightRate = computed(() => researchers.insightRate);
 
 // Resource allocation slider - controls balance between product development and research
+// This allocation determines how insights are distributed between product development and research
+// 0 = all to product development, 1 = all to pure research
 const allocation = computed({
   get: () => researchers.allocation,
   set: (value) => researchers.setAllocation(Number(value))
 });
 
+// Calculate estimated insight distribution based on allocation
+const insightsToProducts = computed(() => {
+  return Math.round((1 - allocation.value) * insightRate.value * 10) / 10;
+});
+
+const insightsToPureResearch = computed(() => {
+  return Math.round(allocation.value * insightRate.value * 10) / 10;
+});
+
 // Product development status
 const productInProgress = computed(() => !!aiProducts.selectedProduct);
 
-// Research in progress status - placeholder for now
+// Research in progress status and related properties
 const researchInProgress = ref(false);
+const researchProgress = ref(0);
+const canStartResearch = ref(true);
+
+// Function to start a new research project
+function startResearch() {
+  if (researchInProgress.value) return;
+  researchInProgress.value = true;
+  researchProgress.value = 0;
+}
 
 // Products organized by state
 const availableProducts = computed(() => {
@@ -263,7 +310,39 @@ const activeDiscoveries = ref([{}]);       // Placeholder for active discoveries
 
 // Core gameplay functions
 function doResearch() {
-  researchers.generateInsights(1);
+  const totalInsights = researchers.generateInsights(1);
+  
+  // Distribute insights based on allocation
+  if (productInProgress.value) {
+    // If we have a product in progress, allocate some insights to it
+    const productInsights = totalInsights * (1 - allocation.value);
+    
+    // Apply insights toward product development
+    const productCompleted = aiProducts.addProductProgress(productInsights);
+    
+    // If product was completed, update our status
+    if (productCompleted) {
+      console.log('Product completed!');
+    }
+  }
+  
+  if (researchInProgress.value) {
+    // If we have research in progress, allocate some insights to it
+    const researchInsights = totalInsights * allocation.value;
+    
+    // Apply insights toward pure research progress
+    researchProgress.value += researchInsights / 100; // Research requires 100 total insights
+    
+    // Check if research is complete
+    if (researchProgress.value >= 1) {
+      // Research complete - update discoveries
+      console.log('Research complete!');
+      
+      // For simplicity, we'll just reset for now
+      researchInProgress.value = false;
+      researchProgress.value = 0;
+    }
+  }
 }
 
 function upgradeHardware() {
@@ -459,14 +538,36 @@ function completeEducation() {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
+.allocation-label-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
 .allocation-label {
   font-size: 0.8rem;
   color: var(--text-color);
-  flex-shrink: 0;
+  margin-bottom: 5px;
+}
+
+.allocation-value {
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.allocation-label-container.left .allocation-value {
+  color: var(--secondary-color);
+}
+
+.allocation-label-container.right .allocation-value {
+  color: var(--primary-color);
 }
 
 .allocation-slider {
   flex-grow: 1;
+  margin: 0 15px;
 }
 
 /* Work panels */
@@ -486,18 +587,116 @@ function completeEducation() {
 
 .in-progress-product, .in-progress-research {
   width: 100%;
-  height: 100px;
+  min-height: 100px;
   background-color: #f5f5f5;
   border-radius: 6px;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  padding: 12px;
+  border: 1px solid var(--secondary-color);
+}
+
+.product-title {
+  font-weight: bold;
+  font-size: 1rem;
+  margin-bottom: 5px;
+  color: var(--secondary-color);
+}
+
+.product-description {
+  font-size: 0.8rem;
+  color: var(--text-color);
+  margin-bottom: 10px;
+  flex-grow: 1;
+}
+
+.progress-container {
+  width: 100%;
+  height: 12px;
+  background-color: var(--progress-bg);
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 10px 0;
+  position: relative;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: var(--secondary-color);
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
   align-items: center;
-  border: 1px dashed var(--border-color);
+  justify-content: center;
+  font-size: 8px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+}
+
+.allocation-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  margin-top: 5px;
+}
+
+.info-label {
+  color: var(--muted-text);
+}
+
+.info-value {
+  font-weight: bold;
+  color: var(--secondary-color);
+}
+
+.info-value.research-value {
+  color: var(--primary-color);
+}
+
+.research-title {
+  font-weight: bold;
+  font-size: 1rem;
+  margin-bottom: 5px;
+  color: var(--primary-color);
+}
+
+.research-description {
+  font-size: 0.8rem;
+  color: var(--text-color);
+  margin-bottom: 10px;
+  flex-grow: 1;
+}
+
+.progress-bar.research-progress {
+  background-color: var(--primary-color);
+}
+
+.start-research-button {
+  margin-top: 8px;
+  padding: 6px 12px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
 }
 
 .no-product, .no-research {
   color: var(--muted-text);
   font-style: italic;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 }
 
 /* Products and Discoveries Row */

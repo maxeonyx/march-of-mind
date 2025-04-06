@@ -149,6 +149,38 @@ export function useAIProducts(
       return true;
     },
     
+    // Make incremental progress on the current product
+    addProductProgress(insightAmount: number) {
+      if (!aiProducts.currentProduct) return false;
+      
+      const product = aiProducts.getProduct(aiProducts.currentProduct.productId);
+      if (!product) return false;
+      
+      // Calculate progress increment (normalized to insight cost)
+      const progressIncrement = insightAmount / product.insightCost;
+      
+      // Add to current progress
+      aiProducts.currentProduct.progress += progressIncrement;
+      
+      // Check if product is complete
+      if (aiProducts.currentProduct.progress >= 1) {
+        // Complete the product
+        if (!aiProducts.developedProducts.includes(product.id)) {
+          aiProducts.developedProducts.push(product.id);
+        }
+        
+        // Add revenue
+        resources.addMoney(product.revenue);
+        
+        // Clear current product
+        aiProducts.currentProduct = null;
+        
+        return true; // Product completed
+      }
+      
+      return false; // Product still in progress
+    },
+    
     // Calculate monthly income from all developed products
     calculateMonthlyIncome() {
       return aiProducts.developedProducts.reduce((total, id) => {
@@ -227,6 +259,12 @@ export function useAIProducts(
         resources.insights >= product.insightCost &&
         aiProducts.isProductUnlocked(product.id)
       );
+    }),
+    
+    // Get the current product development progress (0-1)
+    productProgress: computed(() => {
+      if (!aiProducts.currentProduct) return 0;
+      return aiProducts.currentProduct.progress;
     })
   };
 }
