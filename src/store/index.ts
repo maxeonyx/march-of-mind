@@ -24,13 +24,13 @@ export const useGameStore = defineStore('game', () => {
   const time = useTime();
   const talent = useTalent(resources);
   const products = useProducts(resources, talent, time);
-  
+
   // Game phase directly in the store
   const phase = ref(GamePhase.JOB);
-  
+
   // Phase-related computed properties
   const hasFoundedCompany = computed(() => phase.value !== GamePhase.JOB);
-  
+
   const phaseTitle = computed(() => {
     switch (phase.value) {
       case GamePhase.JOB:
@@ -45,22 +45,22 @@ export const useGameStore = defineStore('game', () => {
         return "March of Mind";
     }
   });
-  
+
   // Phase-related methods
   function enterPhase(newPhase: GamePhase) {
     phase.value = newPhase;
   }
-  
+
   function resetPhase() {
     phase.value = GamePhase.JOB;
   }
-  
+
   function savePhase() {
     return {
       gamePhase: phase.value
     };
   }
-  
+
   function loadPhase(data: any) {
     if (data) {
       phase.value = data.gamePhase || GamePhase.JOB;
@@ -86,9 +86,19 @@ export const useGameStore = defineStore('game', () => {
 
   /**
    * Start the game ticker
+   * @param saveCallback Optional callback to run after saving the game
    */
-  function startGameTicker() {
-    time.startGameTicker(processOneMonth);
+  function startGameTicker(saveCallback?: (saveData: any) => void) {
+    // Create a wrapper function that calls processOneMonth and then the callback
+    const tickWrapper = () => {
+      processOneMonth();
+      if (saveCallback) {
+        const saveData = saveGame();
+        saveCallback(saveData);
+      }
+    };
+
+    time.startGameTicker(tickWrapper);
   }
 
   /**
@@ -99,13 +109,14 @@ export const useGameStore = defineStore('game', () => {
   }
 
   /**
-   * Save the game state to localStorage
+   * Save the game state and return the save data object
+   * @returns The saved game data object
    */
   function saveGame() {
     // Collect save data from each module
     const saveData = {
       savedAt: Date.now(),
-      
+
       // Each module's save data
       phase: savePhase(),
       resources: resources.save(),
@@ -114,8 +125,8 @@ export const useGameStore = defineStore('game', () => {
       products: products.save()
     };
 
-    // localStorage.setItem('marchOfMindSave', JSON.stringify(saveData));
     lastSavedAt.value = saveData.savedAt;
+    return saveData;
   }
 
   /**
@@ -129,20 +140,12 @@ export const useGameStore = defineStore('game', () => {
       time.load(saveData.time);
       talent.load(saveData.talent);
       products.load(saveData.products);
-      
+
       lastSavedAt.value = saveData.savedAt || 0;
       return true;
     } catch (e) {
       throw Error('Failed to load save data');
     }
-  }
-
-  /**
-   * Initialize the game
-   */
-  function init(saveData: any) {
-    loadGame(saveData)
-    startGameTicker();
   }
 
   /**
@@ -167,21 +170,20 @@ export const useGameStore = defineStore('game', () => {
     message,
     lastSavedAt,
     showWelcomeScreen,
-    
+
     // Phase state
     phase,
     phaseTitle,
     hasFoundedCompany,
     enterPhase,
-    
+
     // Module states (accessible as properties)
     resources,
     time,
     talent,
     products,
-    
+
     // Methods
-    init,
     processOneMonth,
     startGameTicker,
     stopGameTicker,

@@ -1,5 +1,5 @@
 <template>
-  <!-- 
+  <!--
     UI Design Guidelines:
     - All content should always fit within the viewport without scrolling
     - Any scrolling should ONLY happen within individual components
@@ -15,21 +15,21 @@
       <DateDisplay />
     </div>
     <div class="header-right">
-      <button @click="gameStore.resetGame()" class="dev-button">Reset Game (Dev)</button>
+      <button @click="gameStore.resetGame()" class="dev-button" data-testid="btn-reset-game">Reset Game (Dev)</button>
     </div>
   </header>
   <main>
     <h2>{{ gameStore.phaseTitle }}</h2>
-    
+
     <div class="game-container">
       <!-- Resource display -->
-      <ResourceDisplay :showIncomeStats="gameStore.phase.value === 'company'" />
-      
+      <ResourceDisplay :showIncomeStats="gameStore.phase === 'company'" />
+
       <!-- Job Phase -->
-      <JobPhase v-if="gameStore.phase.value === 'job'" />
-      
+      <JobPhase v-if="gameStore.phase === 'job'" />
+
       <!-- Company Phase -->
-      <CompanyPhase v-if="gameStore.phase.value === 'company'" />
+      <CompanyPhase v-if="gameStore.phase === 'company'" />
     </div>
   </main>
   <footer>
@@ -48,8 +48,8 @@ import { useGameStore } from './store';
 // Components
 import DateDisplay from './components/DateDisplay.vue';
 import ResourceDisplay from './components/ResourceDisplay.vue';
-import JobPhase from './components/phases/JobPhase.vue';
-import CompanyPhase from './components/phases/CompanyPhase.vue';
+import JobPhase from './phases/JobPhase.vue';
+import CompanyPhase from './phases/CompanyPhase.vue';
 
 // Version info
 const versionInfo = useVersion();
@@ -192,20 +192,20 @@ footer .build-time {
   #app {
     padding: 0 15px;
   }
-  
+
   h1 {
     font-size: 20px;
   }
-  
+
   h2 {
     font-size: 18px;
   }
-  
+
   .logo {
     width: 30px;
     height: 30px;
   }
-  
+
   .app-header {
     padding: 5px 0;
   }

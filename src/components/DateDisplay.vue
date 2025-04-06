@@ -1,16 +1,13 @@
 <template>
   <div class="date-display">
-    <span>{{ formattedDate }}</span>
+    <span>{{ gameStore.time.formattedDate }}</span>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
 import { useGameStore } from '@/store';
 
 const gameStore = useGameStore();
-const timeStore = gameStore.time;
-const formattedDate = computed(() => timeStore.formattedDate.value);
 </script>
 
 <style scoped>

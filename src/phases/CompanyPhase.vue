@@ -2,13 +2,13 @@
   <div class="phase-container company-phase">
     <div class="company-info">
       <h3>Your Company is Founded!</h3>
-      
+
       <!-- Core Actions Panel -->
       <div class="actions-panel">
         <div class="panel-header">
           <h4>Actions</h4>
         </div>
-        
+
         <div class="company-actions">
           <ProgressButton
             :enabled="true"
@@ -18,189 +18,126 @@
           >
             Work Hard
           </ProgressButton>
-          
+
           <!-- Marketing button removed since marketing feature was scrapped -->
         </div>
       </div>
-      
+
       <!-- Talent Management Panel -->
       <div class="management-panel">
         <div class="panel-header">
           <h4>Talent Management</h4>
           <div class="talent-count">
             <span class="talent-label">Current Talent:</span>
-            <span class="talent-value">{{ talent }}</span>
+            <span class="talent-value" data-testid="talent-count">{{ gameStore.talent.count }}</span>
           </div>
         </div>
-        
+
         <div class="talent-actions">
           <ProgressButton
-            :enabled="canHireTalent"
-            :progress="hasHiredTalent ? 1 : firstHireProgress"
-            :firstTimeOnly="!hasHiredTalent"
-            :unlocked="hasHiredTalent"
+            :enabled="gameStore.talent.canHireTalent"
+            :progress="gameStore.talent.hasHiredTalent ? 1 : gameStore.talent.firstHireProgress"
+            :firstTimeOnly="!gameStore.talent.hasHiredTalent"
+            :unlocked="gameStore.talent.hasHiredTalent"
             @click="hireTalent"
             theme="hire"
+            data-testid="btn-hire-talent"
           >
             Hire Talent (${{ HIRE_TALENT_COST }})
           </ProgressButton>
-          
+
           <ProgressButton
-            :enabled="canFireTalent"
+            :enabled="gameStore.talent.canFireTalent"
             :progress="0"
             @click="fireTalent"
             theme="fire"
+            data-testid="btn-fire-talent"
           >
             Fire Talent
           </ProgressButton>
         </div>
-        
+
         <div class="talent-info">
           <p>Each talent costs ${{ TALENT_SALARY }} per month and generates ${{ TALENT_INCOME }} in revenue.</p>
           <p>Net cost per talent: ${{ TALENT_SALARY - TALENT_INCOME }} per month.</p>
           <p>Each talent generates {{ TALENT_INSIGHTS }} insights per month.</p>
         </div>
       </div>
-      
+
       <!-- Products Panel -->
       <div class="management-panel">
         <div class="panel-header">
           <h4>Products</h4>
-          <div v-if="hasProducts" class="income-badge">
+          <div v-if="gameStore.products.activeProducts.length > 0" class="income-badge">
             <span class="income-label">Monthly Income:</span>
-            <span class="income-value">${{ Math.floor(productIncome) }}</span>
+            <span class="income-value">${{ Math.floor(gameStore.products.currentIncome) }}</span>
           </div>
           <div v-else class="development-count">
             <span class="development-label">Insights:</span>
-            <span class="development-value">{{ Math.floor(insights) }}</span>
+            <span class="development-value">{{ Math.floor(gameStore.resources.insights) }}</span>
           </div>
         </div>
-        
+
         <!-- Product Development Section -->
-        <div v-if="currentProductInDevelopment" class="product-development">
-          <h5>In Development: {{ currentProductInDevelopment.name }}</h5>
+        <div v-if="gameStore.products.currentProductInDevelopment" class="product-development">
+          <h5>In Development: {{ gameStore.products.currentProductInDevelopment.name }}</h5>
           <div class="progress-container">
-            <div class="progress-bar">
-              <div 
-                class="progress-fill" 
-                :style="{ width: `${productProgress * 100}%` }"
-              ></div>
-            </div>
             <div class="progress-info">
-              {{ Math.floor(insights) }} / {{ currentProductInDevelopment.baseCost }} insights
+              {{ Math.floor(gameStore.resources.insights) }} / {{ gameStore.products.currentProductInDevelopment.baseCost }} insights
             </div>
           </div>
-          
+
           <ProgressButton
-            :enabled="canLaunchProduct"
-            :progress="productProgress"
-            :firstTimeOnly="!hasLaunchedFirstProduct && !canLaunchProduct"
-            :unlocked="hasLaunchedFirstProduct || canLaunchProduct"
+            :enabled="gameStore.products.canLaunchProduct"
+            :progress="gameStore.products.productDevelopmentProgress"
+            :firstTimeOnly="!gameStore.products.hasLaunchedFirstProduct && !gameStore.products.canLaunchProduct"
+            :unlocked="gameStore.products.hasLaunchedFirstProduct || gameStore.products.canLaunchProduct"
             @click="launchProduct"
             theme="product"
+            data-testid="btn-launch-product"
           >
             Launch Product
           </ProgressButton>
         </div>
-        
-        <!-- Active Products List -->
-        <div v-if="hasProducts" class="active-products">
-          <h5>Active Products</h5>
-          <div class="products-list">
-            <div 
-              v-for="product in activeProducts" 
-              :key="product.id"
-              class="product-item"
-            >
-              <div class="product-header">
-                <div class="product-name">{{ product.name }} ({{ product.year }})</div>
-                <div class="product-income">${{ Math.floor(product.currentIncome) }}/mo</div>
-              </div>
-              <div class="product-saturation">
-                <div class="saturation-label">Market Saturation:</div>
-                <div class="saturation-bar">
-                  <div 
-                    class="saturation-fill" 
-                    :style="{ 
-                      width: `${product.saturation}%`,
-                      backgroundColor: getSaturationColor(product.saturation)
-                    }"
-                  ></div>
-                </div>
-                <div class="saturation-value">{{ Math.floor(product.saturation) }}%</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div v-if="!hasProducts && !currentProductInDevelopment" class="products-empty">
-          <p>No products available to develop yet. Keep hiring talent to generate insights!</p>
-        </div>
+
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue';
-import ProgressButton from '../ProgressButton.vue';
+import { onMounted } from 'vue';
+import ProgressButton from '../components/ProgressButton.vue';
 import { useGameStore } from '@/store';
 import { HIRE_TALENT_COST, TALENT_SALARY, TALENT_INCOME, TALENT_INSIGHTS } from '@/store/talent';
 
 const gameStore = useGameStore();
-const talentStore = gameStore.talent;
-const productStore = gameStore.products;
-const resources = gameStore.resources;
 
 // Initialize product data
 onMounted(() => {
-  productStore.init();
+  gameStore.products.init();
 });
 
-// Talent system
-const talent = computed(() => talentStore.count);
-const canHireTalent = computed(() => talentStore.canHireTalent.value);
-const canFireTalent = computed(() => talentStore.canFireTalent.value);
-const hasHiredTalent = computed(() => talentStore.hasHiredTalent);
-const firstHireProgress = computed(() => talentStore.firstHireProgress.value);
-
-// Product development system
-const insights = computed(() => resources.insights);
-const productProgress = computed(() => productStore.productDevelopmentProgress.value);
-const canLaunchProduct = computed(() => productStore.canLaunchProduct.value);
-const currentProductInDevelopment = computed(() => productStore.currentProductInDevelopment.value);
-const hasProducts = computed(() => productStore.activeProducts.length > 0);
-const activeProducts = computed(() => productStore.activeProducts);
-const hasProduct = computed(() => productStore.hasProduct);
-const hasLaunchedFirstProduct = computed(() => productStore.hasLaunchedFirstProduct);
-const productIncome = computed(() => productStore.currentIncome);
-const marketingEffectiveness = computed(() => 1); // Since marketing is removed
-
 function workHard() {
-  resources.addMoney(1);
+  gameStore.resources.addMoney(1);
 }
 
 function hireTalent() {
-  if (canHireTalent.value) {
-    talentStore.hireTalent();
+  if (gameStore.talent.canHireTalent) {
+    gameStore.talent.hireTalent();
   }
 }
 
 function fireTalent() {
-  if (canFireTalent.value) {
-    talentStore.fireTalent(); // Fixed the bug where this was calling hireTalent
+  if (gameStore.talent.canFireTalent) {
+    gameStore.talent.fireTalent();
   }
 }
 
 function launchProduct() {
-  if (canLaunchProduct.value) {
-    productStore.launchProduct();
+  if (gameStore.products.canLaunchProduct) {
+    gameStore.products.launchProduct();
   }
-}
-
-function applyMarketing() {
-  // This function is retained but now a no-op since marketing was removed
-  console.log("Marketing feature has been removed");
 }
 
 // Color utilities
@@ -208,14 +145,6 @@ function getSaturationColor(saturation: number): string {
   // Red (high saturation) to green (low saturation)
   const green = Math.floor(255 * (1 - saturation / 100));
   const red = Math.floor(180 * (saturation / 100) + 75);
-  return `rgb(${red}, ${green}, 60)`;
-}
-
-function getMarketingButtonColor(): string {
-  // Gradient from green (high effectiveness) to red (low effectiveness)
-  const effectiveness = marketingEffectiveness.value;
-  const red = Math.floor(200 * (1 - effectiveness) + 55);
-  const green = Math.floor(180 * effectiveness + 75); 
   return `rgb(${red}, ${green}, 60)`;
 }
 </script>

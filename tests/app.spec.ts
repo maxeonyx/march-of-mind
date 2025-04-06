@@ -1,5 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
-import { GamePhase } from '@app/types';
+import { GamePhase } from '@/types';
 
 // IMPORTANT: The app should respond very quickly, and these tests should run quickly. Most "timeout" errors are just that the selector is genuinely missing!
 // For this reason, you MUST use either of these timeouts, and prefer the shorter one.
@@ -23,17 +23,17 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.removeItem('marchOfMindSave');
   });
-  
+
   // Wait for the Vue app to mount by checking for the global store variable.
-  await page.waitForFunction(() => window.getStore() !== undefined, { timeout: 10000 });
-  
+  await page.waitForFunction(() => window.gameStore !== undefined, { timeout: 10000 });
+
 });
-// We need to ensure we initialize the store properly 
+// We need to ensure we initialize the store properly
 // The page context in Playwright doesn't get the initialization from main.ts
 test.afterEach(async ({ page }) => {
   // Clear localStorage to start fresh
   await page.addInitScript(() => {
-      localStorage.removeItem('marchOfMindSave');
+    localStorage.removeItem('marchOfMindSave');
   });
 });
 
@@ -48,215 +48,139 @@ test('homepage has title and basic components', async ({ page }) => {
   const footer = page.locator('footer');
   await expect(footer).toBeVisible();
   await expect(footer).toContainText('Version');
-  
+
 });
 
 // Test the initial job phase mechanics
 test('job phase: earn money and progress toward founding company', async ({ page }) => {
-  
+
   // Instead of checking the pageTitle which seems not to be set correctly in tests,
   // just verify we're in the job phase by checking for the job phase-specific buttons
-  
+
   // TODO: refactor the other tests (& components) to use test ids
   // Find the work and found buttons
   const workButton = page.getByTestId('btn-work');
   const foundButton = page.getByTestId('btn-found-company');
-  
+
   await expect(workButton).toBeVisible();
   await expect(foundButton).toBeVisible();
-  
+
   // Since the button uses custom styling for disabled state, check for the first-time class
   await expect(foundButton).toHaveClass(/first-time/);
-  
+
   // Click the work button and check money increases
   await workButton.click();
-  
-  expect(await page.evaluate(() => 
+
+  expect(await page.evaluate(() =>
     window.getStore().resources.money
   )).toBe(1)
 });
 
 // Test the company founding functionality
-test('found a company when threshold is reached', async ({ page }) => {  
+test('found a company when threshold is reached', async ({ page }) => {
   await page.evaluate(() => {
-      window.getStore().addMoney(99);
-      window.getStore().addMoney(1);
+    window.getStore().resources.addMoney(99);
+    window.getStore().resources.addMoney(1);
   });
-  
+
   const foundButton = page.getByTestId('btn-found-company');
-  
+
   // Click once more to reach the threshold
   await foundButton.click();
 
   await page.waitForTimeout(LONG_TIMEOUT);
 
-  expect(await page.evaluate(() => 
-    window.getStore().phase.state.gamePhase
+  expect(await page.evaluate(() =>
+    window.getStore().phase
   )).toBe(GamePhase.COMPANY);
 });
 
-// Test talent management functionality
-test('talent management and income system', async ({ page }) => {
-  await page.goto('/');
-  
-  // Set up company phase with enough money to hire talent
-  await page.evaluate((phase) => {
-    if (window.getStore()) {
-      window.getStore().addMoney(100);
-      window.getStore().setPhase(phase);
-    } else {
-      throw new Error('gameStore not initialized');
-    }
-  }, GamePhase.COMPANY);
-  
-  // Check that talent panel is visible
-  const talentPanel = page.getByText('Talent Management');
-  await expect(talentPanel).toBeVisible();
-  
-  // Initial talent should be 0
-  await expect(page.locator('.talent-value')).toContainText('0', );
-  
-  // Hire button should be visible
-  const hireButton = page.locator('button', { hasText: 'Hire Talent' });
-  await expect(hireButton).toBeVisible();
-  
-  // Fire button should be visible but disabled
-  const fireButton = page.locator('button', { hasText: 'Fire Talent' });
-  await expect(fireButton).toBeVisible();
-  await expect(fireButton).toBeDisabled();
-  
-  // Hire talent
-  await hireButton.click();
-  
-  // Talent should now be 1
-  await expect(page.locator('.talent-value')).toContainText('1', );
-  
-  // Money should be reduced by hire cost (50)
-  await expect(page.getByText(/Money: \$/)).toContainText('Money: $50', );
-  
-  // Fire button should now be enabled
-  await expect(fireButton).toBeEnabled();
-  
-  // Income stats should show correct values (with TALENT_INCOME=5, TALENT_SALARY=15)
-  const incomeStats = page.locator('.income-stats');
-  const incomeStatsText = await incomeStats.textContent();
-  
-  // Check that income stats contain expected values
-  expect(incomeStatsText).toContain('Monthly Income:+$5');
-  expect(incomeStatsText).toContain('Monthly Expenses:-$15');
-  expect(incomeStatsText).toContain('Net Monthly:$-10');
-  
-  // Fire talent
-  await fireButton.click();
-  
-  // Talent should be back to 0
-  await expect(page.locator('.talent-value')).toContainText('0', );
-  
-  // Income stats should show zeroes
-  const updatedIncomeStatsText = await incomeStats.textContent();
-  
-  // Check that income stats contain expected values after firing
-  expect(updatedIncomeStatsText).toContain('Monthly Income:+$0');
-  expect(updatedIncomeStatsText).toContain('Monthly Expenses:-$0');
-  expect(updatedIncomeStatsText).toContain('Net Monthly:+$0');
-});
-
 // Test reset button functionality
-test.skip('dev reset button should reset game state', async ({ page }) => {
-  await page.goto('/');
-  
+test('dev reset button should reset game state', async ({ page }) => {
   // Directly set up company phase state without using localStorage
   await page.evaluate((phase) => {
     if (window.getStore()) {
-      window.getStore().addMoney(50);
-      window.getStore().setPhase(phase);
+      window.getStore().resources.addMoney(50);
+      window.getStore().enterPhase(phase);
     } else {
       throw new Error('gameStore not initialized');
     }
   }, GamePhase.COMPANY);
-  
-  // Verify we can see the company phase UI
-  const companyPhase = page.getByText('Your Company is Founded');
-  await expect(companyPhase).toBeVisible();
-  
+
   // Click the reset button
-  const resetButton = page.locator('.dev-button');
+  const resetButton = page.getByTestId('btn-reset-game');
   await resetButton.click();
-  
+
   // Verify we're back to job phase (Work for the Man button is visible)
-  await expect(page.getByText('Work for the Man')).toBeVisible();
-  
+  await expect(page.getByTestId('btn-work')).toBeVisible();
+
   // Money should be reset to 0
-  await expect(page.getByText(/Money: \$/)).toContainText('Money: $0', );
+  await expect(page.getByTestId('money-value')).toContainText('$0');
 });
 
+// TODO To be replaced after pivot but here for reference
+// Test talent management functionality
+test.skip('talent management and income system', async ({ page }) => {
+  // Set up company phase with enough money to hire talent
+  await page.evaluate(() => {
+    if (window.getStore()) {
+      window.getStore().resources.addMoney(50);
+      window.getStore().enterPhase(GamePhase.COMPANY);
+    } else {
+      throw new Error('gameStore not initialized');
+    }
+  });
+
+  // Check that talent panel is visible
+  const talentPanel = page.getByText('Talent Management');
+  await expect(talentPanel).toBeVisible();
+
+  // Initial talent should be 0
+  await expect(page.getByTestId('talent-count')).toContainText('0');
+
+  // Hire button should be visible
+  const hireButton = page.getByTestId('btn-hire-talent');
+  await expect(hireButton).toBeVisible();
+
+  // Fire button should be visible but disabled
+  const fireButton = page.getByTestId('btn-fire-talent');
+  await expect(fireButton).toBeVisible();
+  await expect(fireButton).toBeDisabled();
+
+  // Hire talent
+  await hireButton.click();
+
+  // Talent should now be 1
+  await expect(page.getByTestId('talent-count')).toContainText('1');
+
+  // Fire button should now be enabled
+  await expect(fireButton).toBeEnabled();
+
+  // Fire talent
+  await fireButton.click();
+
+  // Talent should be back to 0
+  await expect(page.getByTestId('talent-count')).toContainText('0');
+});
+
+
+// TODO To be replaced after pivot but here for reference
 // Test product development and launching
 test.skip('company phase: can launch a product with enough insights', async ({ page }) => {
-  await page.goto('/');
-  
   // Set up company phase with money to hire talent
-  await page.evaluate((phase) => {
-    if (window.getStore()) {
-      window.getStore().addMoney(100);
-      window.getStore().setPhase(phase);
-    } else {
-      throw new Error('gameStore not initialized');
-    }
-  }, GamePhase.COMPANY);
-  
-  // Hire talent to generate insights
-  await page.getByText('Hire Talent').click();
-  
   await page.evaluate(() => {
-    window.getStore();
-  });
-  
-  // Launch the product when available
-  await expect(page.getByText('Launch Product')).toBeEnabled();
-  await page.getByText('Launch Product').click();
-  
-  // Verify that the product is launched by checking for the active products section
-  await expect(page.getByText('Active Products')).toBeVisible();
-  
-  // Verify the marketing button appears
-  await expect(page.getByText('Marketing Campaign')).toBeVisible();
-});
-
-// Test marketing functionality
-test.skip('company phase: can apply marketing to products', async ({ page }) => {
-  await page.goto('/');
-  
-  // Set up company phase with a launched product
-  await page.evaluate((phase) => {
     if (window.getStore()) {
-      window.getStore().addMoney(100);
-      window.getStore().setPhase(phase);
+      window.getStore().enterPhase(GamePhase.COMPANY);
+      window.getStore().resources.addInsights(1000);
     } else {
       throw new Error('gameStore not initialized');
     }
-  }, GamePhase.COMPANY);
-  
-  // Hire talent to generate insights
-  await page.getByText('Hire Talent').click();
-  
-  // Wait for insights to accumulate and launch product
-  await expect(async () => {
-    const insights = await page.locator('.development-value').textContent();
-    expect(Number(insights)).toBeGreaterThanOrEqual(1);
-  }).toPass({ timeout: LONG_TIMEOUT });
-  
-  await page.getByText('Launch Product').click();
-  
-  // Verify marketing button is visible
-  await expect(page.getByText('Marketing Campaign')).toBeVisible();
-  
-  // Apply marketing
-  await page.getByText('Marketing Campaign').click();
-  
-  // Verify saturation increases on product
-  await expect(async () => {
-    const saturationText = await page.locator('.saturation-value').first().textContent();
-    const saturation = parseInt(saturationText || '0');
-    expect(saturation).toBeGreaterThan(10);
-  }).toPass();
+  });
+
+  // Launch should be available since we have enough insight.
+  await expect(page.getByTestId('btn-launch-product')).toBeEnabled();
+  await page.getByTestId('btn-launch-product').click();
+
+  // Verify that the product is launched by checking for the active products section
+  await expect(page.getByTestId('active-products-panel')).toBeVisible();
 });

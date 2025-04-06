@@ -2,7 +2,7 @@ import { reactive, computed, type ComputedRef } from 'vue';
 import { type ResourcesStore } from './resources';
 
 // Talent system constants
-export const HIRE_TALENT_COST = 50;
+export const HIRE_TALENT_COST = 10;
 export const TALENT_SALARY = 15;
 export const TALENT_INCOME = 5;
 export const TALENT_INSIGHTS = 0.02; // Insights generated per talent per month (50 talent-months per insight)
@@ -19,12 +19,12 @@ export function useTalent(resources: ResourcesStore) {
       if (resources.money >= HIRE_TALENT_COST) {
         resources.spendMoney(HIRE_TALENT_COST);
         talent.count++;
-        
+
         // Mark that we've hired at least one talent
         if (!talent.hasHiredTalent) {
           talent.hasHiredTalent = true;
         }
-        
+
         return true;
       }
       return false;
@@ -57,7 +57,7 @@ export function useTalent(resources: ResourcesStore) {
         hasHiredTalent: talent.hasHiredTalent
       };
     },
-    
+
     load(data: any) {
       if (data) {
         talent.count = data.talent || 0;
@@ -68,7 +68,7 @@ export function useTalent(resources: ResourcesStore) {
 
   return reactive({
     ...talent,
-    
+
     monthlyIncome: computed(() => {
       return talent.count * TALENT_INCOME;
     }),

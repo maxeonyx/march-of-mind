@@ -1,9 +1,12 @@
 <template>
   <div class="resource-display">
-    <h3>Money: ${{ Math.floor(money) }}</h3>
-    
+    <h3>
+      <span>Money:</span> 
+      <span data-testid="money-value">${{ Math.floor(money) }}</span>
+    </h3>
+
     <!-- Income stats (visible in company phase) -->
-    <div v-if="showIncomeStats" class="income-stats">
+    <div v-if="showIncomeStats" class="income-stats" data-testid="income-stats">
       <div class="stat-row">
         <span>Monthly Income:</span>
         <span :class="{ 'positive': monthlyIncome > 0 }">+${{ monthlyIncome }}</span>
@@ -37,10 +40,10 @@ const gameStore = useGameStore();
 const resourcesStore = gameStore.resources;
 const talentStore = gameStore.talent;
 
-const money = computed(() => resourcesStore.state.money);
-const monthlyIncome = computed(() => talentStore.monthlyIncome.value);
-const monthlySalary = computed(() => talentStore.monthlySalary.value);
-const monthlyNetIncome = computed(() => talentStore.monthlyNetIncome.value);
+const money = computed(() => resourcesStore.money);
+const monthlyIncome = computed(() => talentStore.monthlyIncome);
+const monthlySalary = computed(() => talentStore.monthlySalary);
+const monthlyNetIncome = computed(() => talentStore.monthlyNetIncome);
 </script>
 
 <style scoped>

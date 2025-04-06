@@ -1,5 +1,5 @@
 <template>
-  <div class="phase-container job-phase">    
+  <div class="phase-container job-phase">
     <div class="actions">
       <ProgressButton
         :enabled="true"
@@ -10,7 +10,7 @@
       >
         Work Hard
       </ProgressButton>
-      
+
       <ProgressButton
         :enabled="canFoundCompany"
         :progress="companyFoundingProgress"
@@ -35,7 +35,7 @@ const gameStore = useGameStore();
 const resources = gameStore.resources;
 
 // Company founding cost
-const COMPANY_FOUNDING_COST = 50;
+const COMPANY_FOUNDING_COST = 10;
 
 /**
  * Calculate progress toward founding a company (0-1)
@@ -57,6 +57,7 @@ function workHard() {
 
 function foundCompany() {
   if (canFoundCompany.value) {
+    gameStore.resources.spendMoney(COMPANY_FOUNDING_COST);
     gameStore.enterPhase(GamePhase.COMPANY);
   }
 }

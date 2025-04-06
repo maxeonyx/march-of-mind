@@ -1,8 +1,8 @@
 {
   "extends": "@vue/tsconfig/tsconfig.dom.json",
   "include": [
-    "tests/**/*.ts", 
-    "env.d.ts", 
+    "tests/**/*.ts",
+    "env.d.ts",
     "src/**/*",
     "src/**/*.json",
     "src/**/*.vue"
@@ -11,10 +11,20 @@
     "composite": true,
     "baseUrl": ".",
     "paths": {
-      "@app/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     },
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "types": ["@playwright/test", "node", "vite/client"],
+    "lib": [
+      "ES2020",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "types": [
+      "@playwright/test",
+      "node",
+      "vite/client"
+    ],
     "strict": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
