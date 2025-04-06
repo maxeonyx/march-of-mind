@@ -2,13 +2,14 @@
   <div class="resource-allocation">
     <div class="allocation-label-container left">
       <div class="allocation-label">{{ leftLabel }}</div>
+       <!-- TODO this is not a multiplier but a percentage of total insights going to right. It should dynamically update with the slider -->
       <div class="allocation-value">{{ leftValue }}x</div>
     </div>
-    <input 
-      type="range" 
-      min="0" 
-      max="1" 
-      step="0.1" 
+    <input
+      type="range"
+      min="0"
+      max="1"
+      step="0.1"
       :value="modelValue"
       @input="updateValue($event)"
       class="allocation-slider"
@@ -16,6 +17,7 @@
     />
     <div class="allocation-label-container right">
       <div class="allocation-label">{{ rightLabel }}</div>
+       <!-- TODO this is not a multiplier but a percentage of total insights going to right. It should dynamically update with the slider -->
       <div class="allocation-value">{{ rightValue }}x</div>
     </div>
   </div>
@@ -94,7 +96,7 @@ function updateValue(event: Event) {
   .resource-allocation {
     flex-direction: column;
   }
-  
+
   .allocation-slider {
     width: 100%;
   }

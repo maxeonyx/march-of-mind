@@ -7,26 +7,29 @@
         :hardware="hardware"
         :onUpgrade="upgradeHardware"
       />
-      
+
       <!-- Research Panel -->
       <ResearchPanel
         @research="doResearch"
       />
     </div>
-    
+
     <!-- Insight Rate Indicator -->
     <InsightRateDisplay :rate="insightRate" />
-    
+
     <!-- Resource Allocation Slider -->
     <ResourceAllocationSlider
       v-model="allocation"
       :leftValue="insightsToProducts"
       :rightValue="insightsToPureResearch"
     />
-    
+
     <!-- Work Panels -->
+    <!-- TODO products and discoveries are functionally the same (other than having different types of cards in them) and should be just one concept in the code. -->
     <div class="work-panels">
       <!-- Product Development Panel -->
+       <!-- TODO just have two copies of the same component. -->
+
       <ProductWorkPanel
         :hasProductInProgress="productInProgress"
         :productName="productInProgress ? aiProducts.selectedProduct.name : ''"
@@ -34,7 +37,7 @@
         :progress="aiProducts.productProgress"
         :allocationValue="insightsToProducts"
       />
-      
+
       <!-- Research Development Panel -->
       <ResearchWorkPanel
         :hasResearchInProgress="researchInProgress"
@@ -46,10 +49,13 @@
         @startResearch="startResearch"
       />
     </div>
-    
+
     <!-- Products and Discoveries -->
+    <!-- TODO: this should be shown on the right hand side as a separate column -->
+
     <div class="cards-row">
       <!-- Products Panel -->
+       <!-- TODO merge into discovery cards grid-->
       <ProductCardsGrid
         :availableProducts="availableProducts"
         :unlockedProducts="unlockedProducts"
@@ -58,7 +64,7 @@
         @selectProduct="selectAIProduct"
         @showDetails="showProductDetails"
       />
-      
+
       <!-- Discoveries Panel -->
       <DiscoveryCardsGrid
         :availableDiscoveries="availableDiscoveries"
@@ -66,16 +72,18 @@
         :activeDiscoveries="activeDiscoveries"
       />
     </div>
-    
+
     <!-- Tech Tree Section -->
+     <!-- TODO Tech tree should show as a modal from a button in the footer. However Tech tree is low priority. -->
     <div class="tech-tree-section">
       <h3>Tech Tree</h3>
       <div class="tech-tree-placeholder">
         <!-- Tech Tree visualization will be implemented here -->
       </div>
     </div>
-    
+
     <!-- Educational modals -->
+    <!-- TODO: as before products and discoveries are essentially the same and can share a modal. -->
     <EducationalModal
       :visible="showProductEducationalModal"
       :title="productEducationalTitle"
@@ -85,7 +93,7 @@
       @success="completeProductEducation"
       @cancel="cancelProductEducation"
     />
-    
+
     <EducationalModal
       :visible="showEducationalModal"
       :title="educationalModalTitle"
@@ -141,6 +149,7 @@ const productEducationalQuestion = ref<EducationalQuestion>({
 const pendingProductId = ref<string | null>(null);
 
 // Research and insight related properties
+// TODO tiny computed properties like this are redundant. Prefer just directly accessing gameStore in the html. Put this as a comment at the top of this file.
 const insightRate = computed(() => researchers.insightRate);
 
 // Resource allocation slider - controls balance between product development and research
@@ -150,6 +159,8 @@ const allocation = computed({
   get: () => researchers.allocation,
   set: (value) => researchers.setAllocation(Number(value))
 });
+
+// TODO: move some of the below properties and functions into the appropriate components.
 
 // Calculate estimated insight distribution based on allocation
 const insightsToProducts = computed(() => {
@@ -164,6 +175,7 @@ const insightsToPureResearch = computed(() => {
 const productInProgress = computed(() => !!aiProducts.selectedProduct);
 
 // Research in progress status and related properties
+// TODO: Don't define state in the component, put it in the store so that saving and loading works well.
 const researchInProgress = ref(false);
 const researchProgress = ref(0);
 const canStartResearch = ref(true);
@@ -177,61 +189,63 @@ function startResearch() {
 
 // Products organized by state
 const availableProducts = computed(() => {
-  return aiProducts.displayableProducts.filter(product => 
-    isAIProductAvailable(product.id) && 
-    !isAIProductUnlocked(product.id) && 
+  return aiProducts.displayableProducts.filter(product =>
+    isAIProductAvailable(product.id) &&
+    !isAIProductUnlocked(product.id) &&
     !isAIProductDeveloped(product.id)
   );
 });
 
 const unlockedProducts = computed(() => {
-  return aiProducts.displayableProducts.filter(product => 
-    isAIProductUnlocked(product.id) && 
+  return aiProducts.displayableProducts.filter(product =>
+    isAIProductUnlocked(product.id) &&
     !isAIProductDeveloped(product.id)
   );
 });
 
 const developedProducts = computed(() => {
-  return aiProducts.displayableProducts.filter(product => 
+  return aiProducts.displayableProducts.filter(product =>
     isAIProductDeveloped(product.id)
   );
 });
 
 // Placeholder discoveries data - will be implemented in future
+// TODO again, don't put state here, put it in the store so that saving and loading works well.
 const availableDiscoveries = ref([{}, {}]); // Placeholder for available discoveries
 const unlockedDiscoveries = ref([{}]);     // Placeholder for unlocked discoveries
 const activeDiscoveries = ref([{}]);       // Placeholder for active discoveries
 
 // Core gameplay functions
+// TODO move to the research panel component.
 function doResearch() {
   const totalInsights = researchers.generateInsights(1);
-  
+
   // Distribute insights based on allocation
   if (productInProgress.value) {
     // If we have a product in progress, allocate some insights to it
     const productInsights = totalInsights * (1 - allocation.value);
-    
+
     // Apply insights toward product development
     const productCompleted = aiProducts.addProductProgress(productInsights);
-    
+
     // If product was completed, update our status
     if (productCompleted) {
       console.log('Product completed!');
     }
   }
-  
+
   if (researchInProgress.value) {
     // If we have research in progress, allocate some insights to it
     const researchInsights = totalInsights * allocation.value;
-    
+
     // Apply insights toward pure research progress
     researchProgress.value += researchInsights / 100; // Research requires 100 total insights
-    
+
     // Check if research is complete
     if (researchProgress.value >= 1) {
       // Research complete - update discoveries
       console.log('Research complete!');
-      
+
       // For simplicity, we'll just reset for now
       researchInProgress.value = false;
       researchProgress.value = 0;
@@ -239,9 +253,10 @@ function doResearch() {
   }
 }
 
+// TODO move to the hardware panel component.
 function upgradeHardware() {
   if (!hardware.canUpgrade || !hardware.nextHardware) return;
-  
+
   if (hardware.nextHardware.educationalContent) {
     showHardwareEducationalModal();
   } else {
@@ -251,7 +266,7 @@ function upgradeHardware() {
 
 function showHardwareEducationalModal() {
   if (!hardware.nextHardware || !hardware.nextHardware.educationalContent) return;
-  
+
   educationalModalTitle.value = hardware.nextHardware.name;
   educationalModalContent.value = hardware.nextHardware.description;
   educationalModalQuestion.value = hardware.nextHardware.educationalContent;
@@ -280,6 +295,8 @@ function selectAIProduct(productId: string) {
   }
 }
 
+// TODO lots of redundant functions here. Prefer using the store directly from
+//      the html.
 function isAIProductUnlocked(productId: string): boolean {
   return aiProducts.isProductUnlocked(productId);
 }
@@ -291,7 +308,7 @@ function isAIProductDeveloped(productId: string): boolean {
 function isAIProductAvailable(productId: string): boolean {
   const product = aiProducts.getProduct(productId);
   if (!product) return false;
-  
+
   return meetsPrerequisites(productId) && hasEnoughFlops(productId);
 }
 
@@ -306,12 +323,12 @@ function hasEnoughFlops(productId: string): boolean {
 function showProductEducationalContent(productId: string) {
   const product = aiProducts.getProduct(productId);
   if (!product || !product.educationalContent) return;
-  
+
   productEducationalTitle.value = product.name;
   productEducationalContent.value = product.description;
   productEducationalQuestion.value = product.educationalContent;
   pendingProductId.value = productId;
-  
+
   showProductEducationalModal.value = true;
 }
 
@@ -320,13 +337,13 @@ function completeProductEducation() {
     showProductEducationalModal.value = false;
     return;
   }
-  
+
   // Unlock the product
   aiProducts.unlockProduct(pendingProductId.value);
-  
+
   // Select it for development
   aiProducts.selectProduct(pendingProductId.value);
-  
+
   showProductEducationalModal.value = false;
   pendingProductId.value = null;
 }
@@ -338,11 +355,11 @@ function cancelProductEducation() {
 
 function completeEducation() {
   showEducationalModal.value = false;
-  
+
   if (pendingAction.value === 'hardware_upgrade') {
     completeHardwareUpgrade();
   }
-  
+
   pendingAction.value = null;
 }
 

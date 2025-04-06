@@ -10,8 +10,11 @@ An educational incremental game that simulates the development of artificial int
 - 💡 Research and insight generation mechanics
 - 🖥️ Hardware progression from early computing to quantum systems
 - 🔬 Historical AI discoveries and product development
+
+## Tech stack
+
 - 📦 Vue 3 with Composition API
-- 🧰 TypeScript support
+- 🧰 TypeScript
 - 🗄️ Pinia state management
 - ⚡ Vite build system
 - 🧹 ESLint with modern flat config
@@ -51,7 +54,7 @@ The project follows a streamlined development workflow:
 Before committing changes, always:
 
 1. Run all checks: `npm run typecheck && npm run lint && npm run test`
-2. Update version numbers in both `package.json` and `CLAUDE.md` 
+2. Update version numbers in both `package.json` and `CLAUDE.md`
 3. Describe changes in version history in `CLAUDE.md`
 
 ### GitHub Actions

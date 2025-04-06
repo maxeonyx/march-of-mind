@@ -3,17 +3,19 @@
     <h3>Discoveries</h3>
     <div class="cards-grid discoveries-grid">
       <!-- Available discoveries -->
+      <!-- TODO this is totally wrong - "Available", "Unlocked" etc are "regions" that cards can be in. The text should be capitalized "Active" in grayed out text in the background, and there should be cards in the foreground. Cards shift between these 3 regions first when the user completes the quiz, and second when the research/development is completed. -->
       <div v-for="(discovery, index) in availableDiscoveries" :key="index" class="card discovery-card available">
+        <!-- TODO card status doesn't need to be shown, it's implicit from which area the card's in. -->
         <div class="card-status">
           <span class="status-text">quiz not done yet</span>
         </div>
       </div>
-      
+
       <!-- Unlocked discoveries -->
       <div v-for="(discovery, index) in unlockedDiscoveries" :key="index" class="card discovery-card unlocked">
         <span class="status-text">unlocked</span>
       </div>
-      
+
       <!-- Active discoveries -->
       <div v-for="(discovery, index) in activeDiscoveries" :key="index" class="card discovery-card active">
         <span class="status-text">active</span>
