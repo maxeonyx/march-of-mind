@@ -14,8 +14,8 @@
       />
     </div>
 
-    <!-- Insight Rate Indicator -->
-    <InsightRateDisplay :rate="insightRate" />
+    <!-- Thought Power Rate Indicator -->
+    <ThoughtPowerRateDisplay :rate="thoughtPowerRate" />
 
     <!-- Resource Allocation Slider -->
     <ResourceAllocationSlider
@@ -30,13 +30,13 @@
 import { computed } from 'vue';
 import HardwarePanel from '@/components/panels/HardwarePanel.vue';
 import ResearchButtonPanel from '@/components/panels/ResearchButtonPanel.vue';
-import InsightRateDisplay from '@/components/panels/InsightRateDisplay.vue';
+import ThoughtPowerRateDisplay from '@/components/panels/ThoughtPowerRateDisplay.vue';
 import ResourceAllocationSlider from '@/components/panels/ResourceAllocationSlider.vue';
 import type { HardwareStore } from '@/store/hardware';
 
 const props = defineProps<{
   hardware: HardwareStore;
-  insightRate: number;
+  thoughtPowerRate: number;
   allocation: number;
   insightsToProducts: number;
   insightsToPureResearch: number;

@@ -7,7 +7,7 @@ import { type DiscoveriesStore } from './discoveries';
 export const HIRE_RESEARCHER_COST = 10;
 export const RESEARCHER_SALARY = 15;
 export const RESEARCHER_INCOME = 5;
-export const BASE_INSIGHT_RATE = 0.1; // Base insights per researcher per click
+export const BASE_THOUGHT_POWER_RATE = 0.1; // Base thought power per researcher per click
 
 /**
  * Researchers module for managing research staff
@@ -68,23 +68,23 @@ export function useResearchers(
       }
     },
 
-    generateInsights(baseAmount: number) {
+    generateThoughtPower(baseAmount: number) {
       if (researchers.count <= 0) {
         // No researchers, just add base amount
-        resources.addInsights(baseAmount);
+        resources.addThoughtPower(baseAmount);
         return baseAmount;
       }
       
-      // Calculate total insight generation based on:
+      // Calculate total thought power generation based on:
       // 1. Base amount
       // 2. Number of researchers
       // 3. Hardware FLOP/s (if available)
       // 4. Discovery boosts (if available)
       
-      let insightAmount = baseAmount;
+      let thoughtPowerAmount = baseAmount;
       
       // Add researcher contribution
-      insightAmount += researchers.count * BASE_INSIGHT_RATE;
+      thoughtPowerAmount += researchers.count * BASE_THOUGHT_POWER_RATE;
       
       // Multiply by hardware FLOP/s if available
       if (hardware) {
@@ -94,18 +94,18 @@ export function useResearchers(
           ? 1 + Math.log10(hardware.currentFlops.value) * 0.5
           : 1;
         
-        insightAmount *= hardwareMultiplier;
+        thoughtPowerAmount *= hardwareMultiplier;
       }
       
       // Apply discovery boosts if available
       if (discoveries) {
-        insightAmount *= discoveries.totalInsightBoost.value;
+        thoughtPowerAmount *= discoveries.totalThoughtPowerBoost.value;
       }
       
-      // Add the calculated insights
-      resources.addInsights(insightAmount);
+      // Add the calculated thought power
+      resources.addThoughtPower(thoughtPowerAmount);
       
-      return insightAmount;
+      return thoughtPowerAmount;
     },
 
     reset() {
@@ -131,7 +131,7 @@ export function useResearchers(
     }
   });
 
-  return reactive({
+  const reactiveObj = reactive({
     ...researchers,
 
     monthlyIncome: computed(() => {
@@ -146,12 +146,12 @@ export function useResearchers(
       return researchers.count * (RESEARCHER_INCOME - RESEARCHER_SALARY);
     }),
 
-    insightRate: computed(() => {
-      // Base insight rate for one click
+    thoughtPowerRate: computed(() => {
+      // Base thought power rate for one click
       let rate = 1; // Base rate
       
       if (researchers.count > 0) {
-        rate += researchers.count * BASE_INSIGHT_RATE;
+        rate += researchers.count * BASE_THOUGHT_POWER_RATE;
       }
       
       // Apply hardware multiplier if available
@@ -167,7 +167,7 @@ export function useResearchers(
       
       // Apply discovery boosts if available
       if (discoveries) {
-        rate *= discoveries.totalInsightBoost.value;
+        rate *= discoveries.totalThoughtPowerBoost.value;
       }
       
       return Math.round(rate * 10) / 10; // Round to 1 decimal place
@@ -194,6 +194,16 @@ export function useResearchers(
       return researchers.allocation;
     }),
   });
+  
+  // Add insightRate property after the main object is created
+  // This avoids the circular reference
+  Object.defineProperty(reactiveObj, 'insightRate', {
+    get: function() {
+      return this.thoughtPowerRate;
+    }
+  });
+  
+  return reactiveObj;
 }
 
 export type ResearchersStore = ReturnType<typeof useResearchers>;

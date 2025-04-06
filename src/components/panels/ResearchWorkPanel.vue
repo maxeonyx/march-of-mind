@@ -9,7 +9,7 @@
       </div>
       <div class="allocation-info">
         <span class="info-label">Allocation:</span>
-        <span class="info-value research-value">{{ allocationValue }}x per click</span>
+        <span class="info-value research-value">{{ allocationValue }}x thought power per click</span>
       </div>
     </div>
     <div v-else class="no-research">

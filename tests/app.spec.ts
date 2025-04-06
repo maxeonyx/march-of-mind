@@ -71,7 +71,7 @@ test('research phase: generate insights and progress toward founding lab', async
   await researchButton.click();
 
   expect(await page.evaluate(() =>
-    window.getStore().resources.insights
+    window.getStore().resources.thoughtPower
   )).toBe(1);
   
   // Make sure the insights value is visible in the UI
@@ -83,16 +83,16 @@ test('educational modal: appears when ready to found lab', async ({ page }) => {
   // Override the default phase and give enough insights
   await page.evaluate((phaseValue) => {
     window.getStore().enterPhase(phaseValue);
-    window.getStore().resources.addInsights(10); // Enough to found a lab
+    window.getStore().resources.addThoughtPower(10); // Enough to found a lab
   }, GamePhase.RESEARCH_PHASE);
   
   // Find and click the found lab button
   const foundLabButton = page.getByTestId('btn-found-lab');
   await expect(foundLabButton).toBeVisible();
   
-  // Wait for enough insights and check if button is enabled
+  // Wait for enough thought power and check if button is enabled
   await page.waitForFunction(() => {
-    return window.getStore().resources.insights >= 10;
+    return window.getStore().resources.thoughtPower >= 10;
   }, { timeout: LONG_TIMEOUT });
   
   // Make sure the button is enabled (not checking the class directly)
@@ -117,7 +117,7 @@ test('lab phase: manage researchers and hardware', async ({ page }) => {
   await page.evaluate((phaseValue) => {
     window.getStore().enterPhase(phaseValue);
     window.getStore().resources.addMoney(20); // Enough to hire a researcher
-    window.getStore().resources.addInsights(5);
+    window.getStore().resources.addThoughtPower(5);
   }, GamePhase.LAB_PHASE);
 
   // Verify core lab elements are visible
@@ -142,9 +142,9 @@ test('lab phase: manage researchers and hardware', async ({ page }) => {
   // Test research button with researcher
   await researchButton.click();
   
-  // Verify insights increase more with a researcher
+  // Verify thought power increases more with a researcher
   expect(await page.evaluate(() => 
-    window.getStore().resources.insights > 5
+    window.getStore().resources.thoughtPower > 5
   )).toBeTruthy();
   
   // Test the allocation slider
@@ -180,9 +180,9 @@ test('dev reset button should reset game state', async ({ page }) => {
     }
   }, GamePhase.RESEARCH_PHASE);
 
-  // Add some insights too
+  // Add some thought power too
   await page.evaluate(() => {
-    window.getStore().resources.addInsights(25);
+    window.getStore().resources.addThoughtPower(25);
   });
 
   // Click the reset button
@@ -200,6 +200,6 @@ test('dev reset button should reset game state', async ({ page }) => {
   // Money should be reset to 0
   await expect(page.getByTestId('money-value')).toContainText('$0');
   
-  // Insights should be reset to 0
+  // Thought power should be reset to 0
   await expect(page.getByTestId('insights-value')).toContainText('0');
 });

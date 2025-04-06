@@ -1,7 +1,7 @@
 <template>
-  <div class="insight-rate">
-    <div class="insight-multiplier">{{ rate }}x</div>
-    <div class="insight-label">insight</div>
+  <div class="thought-power-rate">
+    <div class="thought-power-multiplier">{{ rate }}x</div>
+    <div class="thought-power-label">thought power</div>
   </div>
 </template>
 
@@ -12,7 +12,7 @@ defineProps<{
 </script>
 
 <style scoped>
-.insight-rate {
+.thought-power-rate {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -23,13 +23,13 @@ defineProps<{
   border: 1px solid var(--border-color);
 }
 
-.insight-multiplier {
+.thought-power-multiplier {
   font-size: 1.5rem;
   font-weight: bold;
   color: var(--primary-color);
 }
 
-.insight-label {
+.thought-power-label {
   font-size: 0.8rem;
   color: var(--muted-text);
 }

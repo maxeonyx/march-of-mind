@@ -14,8 +14,8 @@
         <div class="section research-section">
           <h3>Research</h3>
           <div class="research-description">
-            <p>Generate insights through independent research.</p>
-            <p>Accumulate insights to found your own AI research lab.</p>
+            <p>Generate thought power through independent research.</p>
+            <p>Accumulate thought power to found your own AI research lab.</p>
           </div>
           <ProgressButton
             :enabled="true"
@@ -31,7 +31,7 @@
         <div class="section lab-section">
           <h3>AI Lab</h3>
           <div class="lab-description">
-            <p>Found your own AI research lab when you have {{ LAB_FOUNDING_COST }} insights.</p>
+            <p>Found your own AI research lab when you have {{ LAB_FOUNDING_COST }} thought power.</p>
             <p>Current progress: {{ Math.round(labFoundingProgress * 100) }}%</p>
           </div>
           <ProgressButton
@@ -61,14 +61,14 @@
                 <div class="step-number">1</div>
                 <div class="step-content">
                   <h4>Independent Research</h4>
-                  <p>Generate insights by clicking the Research button.</p>
+                  <p>Generate thought power by clicking the Research button.</p>
                 </div>
               </div>
               <div class="journey-step">
                 <div class="step-number">2</div>
                 <div class="step-content">
                   <h4>Found a Lab</h4>
-                  <p>Accumulate {{ LAB_FOUNDING_COST }} insights to establish your research lab.</p>
+                  <p>Accumulate {{ LAB_FOUNDING_COST }} thought power to establish your research lab.</p>
                 </div>
               </div>
               <div class="journey-step">
@@ -108,7 +108,7 @@ import type { Discovery, EducationalQuestion } from '@/types';
 const gameStore = useGameStore();
 const resources = gameStore.resources;
 
-// Lab founding cost in insights
+// Lab founding cost in thought power
 const LAB_FOUNDING_COST = 10;
 
 // First discovery - Mark I Perceptron
@@ -144,18 +144,18 @@ const showEducationalModal = ref(false);
  * Calculate progress toward founding a lab (0-1)
  */
 const labFoundingProgress = computed(() => {
-  return Math.min(resources.insights / LAB_FOUNDING_COST, 1);
+  return Math.min(resources.thoughtPower / LAB_FOUNDING_COST, 1);
 });
 
 /**
  * Check if player can found a lab
  */
 const canFoundLab = computed(() => {
-  return resources.insights >= LAB_FOUNDING_COST;
+  return resources.thoughtPower >= LAB_FOUNDING_COST;
 });
 
 function doResearch() {
-  resources.addInsights(1);
+  resources.addThoughtPower(1);
 }
 
 function foundLab() {
@@ -169,8 +169,8 @@ function completeFirstDiscovery() {
   // Hide the modal
   showEducationalModal.value = false;
 
-  // Spend the insights
-  gameStore.resources.spendInsights(LAB_FOUNDING_COST);
+  // Spend the thought power
+  gameStore.resources.spendThoughtPower(LAB_FOUNDING_COST);
 
   // Enter the lab phase
   gameStore.enterPhase(GamePhase.LAB_PHASE);

@@ -9,7 +9,7 @@
           :productName="productName"
           :productDescription="productDescription"
           :progress="productProgress"
-          :allocationValue="insightsToProducts"
+          :allocationValue="thoughtPowerToProducts"
         />
         
         <!-- Products Cards -->
@@ -31,7 +31,7 @@
           :researchTitle="researchTitle"
           :researchDescription="researchDescription"
           :progress="researchProgress"
-          :allocationValue="insightsToPureResearch"
+          :allocationValue="thoughtPowerToPureResearch"
           :canStartResearch="canStartResearch"
           @startResearch="onStartResearch"
         />
@@ -63,6 +63,7 @@ const props = defineProps<{
   productDescription?: string;
   productProgress: number;
   insightsToProducts: number;
+  thoughtPowerToProducts?: number;
   
   // Research work panel props
   hasResearchInProgress: boolean;
@@ -70,6 +71,7 @@ const props = defineProps<{
   researchDescription?: string;
   researchProgress: number;
   insightsToPureResearch: number;
+  thoughtPowerToPureResearch?: number;
   canStartResearch?: boolean;
   
   // Product cards props

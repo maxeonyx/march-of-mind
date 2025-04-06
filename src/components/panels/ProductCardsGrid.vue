@@ -1,5 +1,8 @@
 <template>
-  <!-- TODO delete this file in favour of DiscoveryCardsGrid which shuold be general enough for both products and discoveries. -->
+  <!-- 
+  NOTE: This component should be replaced with the generic CardsGrid component.
+  Use <DiscoveryCardsGrid title="Products" :availableCards="availableProducts" ...> instead 
+-->
   <div class="section products-section">
     <h3>Products</h3>
     <div class="cards-grid products-grid">
@@ -18,9 +21,12 @@
       <div v-for="product in unlockedProducts" :key="product.id" class="card product-card unlocked">
         <div class="card-title">{{ product.name }}</div>
         <div class="card-action">
-          <!-- TODO there doesn't need to be a button on the card - it should just be selectable in this zone, and the "in progress" work area in the parent component should automatically update. -->
+          <!-- 
+            NOTE: Cards should be directly clickable instead of having a button.
+            The parent component should update automatically.
+          -->
           <button @click="selectProduct(product.id)" class="action-button">
-            select to put in-progress
+            Select
           </button>
         </div>
       </div>

@@ -44,17 +44,22 @@ export function useDiscoveries(resources: ResourcesStore) {
   const nextDiscovery = computed(() => {
     if (availableDiscoveries.value.length === 0) return null;
 
-    // Find the discovery with the lowest insight cost among available ones
+    // Find the discovery with the lowest thought power cost among available ones
     return availableDiscoveries.value.reduce((lowest, current) => {
-      return current.insightCost < lowest.insightCost ? current : lowest;
+      return current.insightCost < lowest.insightCost ? current : lowest; // Using insightCost property for compatibility
     }, availableDiscoveries.value[0]);
   });
 
-  const totalInsightBoost = computed(() => {
-    // Calculate cumulative insight boost from all unlocked discoveries
+  const totalThoughtPowerBoost = computed(() => {
+    // Calculate cumulative thought power boost from all unlocked discoveries
     return unlockedDiscoveriesData.value.reduce((total, discovery) => {
-      return total * discovery.insightBoost;
+      return total * discovery.insightBoost; // Using insightBoost property for compatibility
     }, 1); // Start with 1 (no boost)
+  });
+  
+  // Keep legacy property for backward compatibility
+  const totalInsightBoost = computed(() => {
+    return totalThoughtPowerBoost.value;
   });
 
   // Methods
@@ -73,8 +78,8 @@ export function useDiscoveries(resources: ResourcesStore) {
 
     if (!prerequisitesMet) return false;
 
-    // Check if player has enough insights
-    if (!resources.spendInsights(discovery.insightCost)) return false;
+    // Check if player has enough thought power
+    if (!resources.spendThoughtPower(discovery.insightCost)) return false;
 
     // Unlock the discovery
     state.unlockedDiscoveries.push(discoveryId);
@@ -113,6 +118,7 @@ export function useDiscoveries(resources: ResourcesStore) {
     availableDiscoveries,
     nextDiscovery,
     totalInsightBoost,
+    totalThoughtPowerBoost,
 
     // Methods
     unlockDiscovery,

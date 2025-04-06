@@ -2,8 +2,7 @@
   <div class="resource-allocation">
     <div class="allocation-label-container left">
       <div class="allocation-label">{{ leftLabel }}</div>
-       <!-- TODO this is not a multiplier but a percentage of total insights going to right. It should dynamically update with the slider -->
-      <div class="allocation-value">{{ leftValue }}x</div>
+      <div class="allocation-value">{{ leftPercentage }}%</div>
     </div>
     <input
       type="range"
@@ -17,8 +16,7 @@
     />
     <div class="allocation-label-container right">
       <div class="allocation-label">{{ rightLabel }}</div>
-       <!-- TODO this is not a multiplier but a percentage of total insights going to right. It should dynamically update with the slider -->
-      <div class="allocation-value">{{ rightValue }}x</div>
+      <div class="allocation-value">{{ rightPercentage }}%</div>
     </div>
   </div>
 </template>
@@ -41,6 +39,10 @@ const emit = defineEmits<{
 // Default props
 const leftLabel = computed(() => props.leftLabel || 'Product Development');
 const rightLabel = computed(() => props.rightLabel || 'Pure Research');
+
+// Calculate percentages based on the modelValue (0-1)
+const leftPercentage = computed(() => Math.round((1 - props.modelValue) * 100));
+const rightPercentage = computed(() => Math.round(props.modelValue * 100));
 
 function updateValue(event: Event) {
   const target = event.target as HTMLInputElement;

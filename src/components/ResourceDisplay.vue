@@ -8,8 +8,8 @@
       </div>
       
       <div class="resource">
-        <span class="resource-label">Insights:</span>
-        <span class="resource-value" data-testid="insights-value">{{ Math.floor(insights) }}</span>
+        <span class="resource-label">Thought Power:</span>
+        <span class="resource-value" data-testid="insights-value">{{ Math.floor(thoughtPower) }}</span>
       </div>
     </div>
 
@@ -35,7 +35,7 @@
     <div v-if="showResearchStats" class="research-stats" data-testid="research-stats">
       <div class="stat-row">
         <span>Research Rate:</span>
-        <span class="positive">+{{ insightRate }} insights/click</span>
+        <span class="positive">+{{ thoughtPowerRate }} thought power/click</span>
       </div>
       <div v-if="showHardwareStats" class="stat-row">
         <span>Computing Power:</span>
@@ -75,7 +75,7 @@ const hardwareStore = gameStore.hardware;
 
 // Basic resources
 const money = computed(() => resourcesStore.money);
-const insights = computed(() => resourcesStore.insights);
+const thoughtPower = computed(() => resourcesStore.thoughtPower);
 
 // Income stats - use the right store depending on game phase
 const monthlyIncome = computed(() => {
@@ -97,7 +97,7 @@ const monthlyNetIncome = computed(() => {
 });
 
 // Research stats from the researchers system
-const insightRate = computed(() => {
+const thoughtPowerRate = computed(() => {
   return researchersStore.insightRate;
 });
 

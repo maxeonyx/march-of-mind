@@ -9,14 +9,14 @@ export function useResources() {
   // TODO: Refactor other files in src/composables to match this style.
   const resources = reactive({
     money: 0,
-    insights: 0,
+    thoughtPower: 0,
 
     addMoney(amount: number) {
       resources.money += amount;
     },
     
-    addInsights(amount: number) {
-      resources.insights += amount;
+    addThoughtPower(amount: number) {
+      resources.thoughtPower += amount;
     },
   
     spendMoney(amount: number): boolean {
@@ -27,9 +27,9 @@ export function useResources() {
       return false;
     },
 
-    spendInsights(amount: number): boolean {
-      if (resources.insights >= amount) {
-        resources.insights -= amount;
+    spendThoughtPower(amount: number): boolean {
+      if (resources.thoughtPower >= amount) {
+        resources.thoughtPower -= amount;
         return true;
       }
       return false;
@@ -37,20 +37,20 @@ export function useResources() {
     
     reset() {
       resources.money = 0;
-      resources.insights = 0;
+      resources.thoughtPower = 0;
     },
 
     save() {
       return {
         money: resources.money,
-        insights: resources.insights,
+        thoughtPower: resources.thoughtPower,
       };
     },
 
     load(data: any) {
       if (data) {
         resources.money = data.money || 0;
-        resources.insights = data.insights || 0;
+        resources.thoughtPower = data.insights || 0; // Handle legacy saves
       }
     },
   });

@@ -14,10 +14,10 @@
         <!-- Datacentre Panel (contains hardware, research, insight rate, and allocation) -->
         <DatacentrePanel
           :hardware="hardware"
-          :insightRate="gameStore.researchers.insightRate"
+          :thoughtPowerRate="gameStore.researchers.thoughtPowerRate"
           v-model:allocation="allocation"
-          :insightsToProducts="insightsToProducts"
-          :insightsToPureResearch="insightsToPureResearch"
+          :insightsToProducts="thoughtPowerToProducts"
+          :insightsToPureResearch="thoughtPowerToPureResearch"
           @research="doResearch"
           @upgradeHardware="upgradeHardware"
         />
@@ -31,13 +31,13 @@
           :productName="productInProgress ? aiProducts.selectedProduct.name : ''"
           :productDescription="productInProgress ? aiProducts.selectedProduct.description : ''"
           :productProgress="aiProducts.productProgress"
-          :insightsToProducts="insightsToProducts"
+          :insightsToProducts="thoughtPowerToProducts"
           
           :hasResearchInProgress="researchInProgress"
           researchTitle="Pure Research"
           researchDescription="Advance your theoretical understanding by investing in pure research."
           :researchProgress="researchProgress"
-          :insightsToPureResearch="insightsToPureResearch"
+          :insightsToPureResearch="thoughtPowerToPureResearch"
           :canStartResearch="canStartResearch"
           
           :availableProducts="availableProducts"
@@ -127,21 +127,25 @@ const educationalModalCancellable = ref(false);
  */
 
 // Resource allocation slider - controls balance between product development and research
-// This allocation determines how insights are distributed between product development and research
+// This allocation determines how thought power is distributed between product development and research
 // 0 = all to product development, 1 = all to pure research
 const allocation = computed({
   get: () => researchers.allocation,
   set: (value) => researchers.setAllocation(Number(value))
 });
 
-// Calculate estimated insight distribution based on allocation
-const insightsToProducts = computed(() => {
-  return Math.round((1 - allocation.value) * researchers.insightRate * 10) / 10;
+// Calculate estimated thought power distribution based on allocation
+const thoughtPowerToProducts = computed(() => {
+  return Math.round((1 - allocation.value) * researchers.thoughtPowerRate * 10) / 10;
 });
 
-const insightsToPureResearch = computed(() => {
-  return Math.round(allocation.value * researchers.insightRate * 10) / 10;
+const thoughtPowerToPureResearch = computed(() => {
+  return Math.round(allocation.value * researchers.thoughtPowerRate * 10) / 10;
 });
+
+// Keep old property names for backward compatibility
+const insightsToProducts = computed(() => thoughtPowerToProducts.value);
+const insightsToPureResearch = computed(() => thoughtPowerToPureResearch.value);
 
 // Product development status
 const productInProgress = computed(() => !!aiProducts.selectedProduct);
@@ -200,15 +204,15 @@ const activeDiscoveries = ref([{id: 'placeholder', name: 'No Active Discoveries'
 // Main research function
 // This should eventually be moved to a dedicated research service
 function doResearch() {
-  const totalInsights = researchers.generateInsights(1);
+  const totalThoughtPower = researchers.generateThoughtPower(1);
 
-  // Distribute insights based on allocation
+  // Distribute thought power based on allocation
   if (productInProgress.value) {
-    // If we have a product in progress, allocate some insights to it
-    const productInsights = totalInsights * (1 - allocation.value);
+    // If we have a product in progress, allocate some thought power to it
+    const productThoughtPower = totalThoughtPower * (1 - allocation.value);
 
-    // Apply insights toward product development
-    const productCompleted = aiProducts.addProductProgress(productInsights);
+    // Apply thought power toward product development
+    const productCompleted = aiProducts.addProductProgress(productThoughtPower);
 
     // If product was completed, update our status
     if (productCompleted) {
@@ -217,11 +221,11 @@ function doResearch() {
   }
 
   if (researchInProgress.value) {
-    // If we have research in progress, allocate some insights to it
-    const researchInsights = totalInsights * allocation.value;
+    // If we have research in progress, allocate some thought power to it
+    const researchThoughtPower = totalThoughtPower * allocation.value;
 
-    // Apply insights toward pure research progress
-    researchProgress.value += researchInsights / 100; // Research requires 100 total insights
+    // Apply thought power toward pure research progress
+    researchProgress.value += researchThoughtPower / 100; // Research requires 100 total thought power units
 
     // Check if research is complete
     if (researchProgress.value >= 1) {

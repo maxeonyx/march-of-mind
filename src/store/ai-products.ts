@@ -129,11 +129,11 @@ export function useAIProducts(
       const product = aiProducts.getProduct(aiProducts.currentProduct.productId);
       if (!product) return false;
       
-      // Check if we have enough insights
-      if (resources.insights < product.insightCost) return false;
+      // Check if we have enough thought power
+      if (resources.thoughtPower < product.insightCost) return false;
       
-      // Spend insights and complete the product
-      resources.spendInsights(product.insightCost);
+      // Spend thought power and complete the product
+      resources.spendThoughtPower(product.insightCost);
       
       // Add to developed products
       if (!aiProducts.developedProducts.includes(product.id)) {
@@ -150,14 +150,14 @@ export function useAIProducts(
     },
     
     // Make incremental progress on the current product
-    addProductProgress(insightAmount: number) {
+    addProductProgress(thoughtPowerAmount: number) {
       if (!aiProducts.currentProduct) return false;
       
       const product = aiProducts.getProduct(aiProducts.currentProduct.productId);
       if (!product) return false;
       
-      // Calculate progress increment (normalized to insight cost)
-      const progressIncrement = insightAmount / product.insightCost;
+      // Calculate progress increment (normalized to thought power cost)
+      const progressIncrement = thoughtPowerAmount / product.insightCost; // Using insightCost for compatibility
       
       // Add to current progress
       aiProducts.currentProduct.progress += progressIncrement;
@@ -256,7 +256,7 @@ export function useAIProducts(
       return (
         aiProducts.meetsPrerequisites(product.id) &&
         aiProducts.hasEnoughFlops(product.id) &&
-        resources.insights >= product.insightCost &&
+        resources.thoughtPower >= product.insightCost &&
         aiProducts.isProductUnlocked(product.id)
       );
     }),
