@@ -105,10 +105,10 @@ function showDetails(id: string) {
   background-color: rgba(0, 0, 0, 0.03);
   padding: 20px 10px 10px 10px;
   min-height: 40px;
-  flex: 1; /* Allow regions to grow */
   display: flex;
   flex-direction: column;
   overflow-y: auto; /* Add scrolling to individual regions */
+  height: auto; /* Only as tall as needed */
 }
 
 .region-label {
@@ -146,14 +146,19 @@ function showDetails(id: string) {
 }
 
 .card-description {
+  display: none; /* Hide by default */
   font-size: 0.8rem;
   color: var(--text-color);
   margin-bottom: 5px;
   overflow: hidden;
   text-overflow: ellipsis;
-  display: -webkit-box;
   -webkit-line-clamp: 3; /* Limit to 3 lines */
   -webkit-box-orient: vertical;
+}
+
+/* Show description on hover */
+.card:hover .card-description {
+  display: -webkit-box;
 }
 
 .card-revenue {
