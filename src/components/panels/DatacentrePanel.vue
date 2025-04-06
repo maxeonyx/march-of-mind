@@ -69,7 +69,7 @@ function onUpgradeHardware() {
   display: flex;
   flex-direction: column;
   gap: 15px;
-  min-width: 380px;
+  width: 100%;
 }
 
 /* Top row with hardware and research */

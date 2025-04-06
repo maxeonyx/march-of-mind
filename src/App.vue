@@ -99,7 +99,7 @@ html, body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: var(--text-color);
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 0 20px;
   text-align: center;
@@ -170,7 +170,7 @@ main {
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  max-width: 1200px; /* Increased max-width to accommodate two-column layout */
+  max-width: 1400px; /* Increased max-width to give more space */
   margin: 0 auto;
   width: 100%;
 }

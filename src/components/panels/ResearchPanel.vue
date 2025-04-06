@@ -124,7 +124,7 @@ function onStartResearch() {
   border-radius: 8px;
   padding: 15px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  min-width: 700px;
+  width: 100%;
 }
 
 .research-panel-grid {
@@ -137,7 +137,7 @@ function onStartResearch() {
   display: flex;
   flex-direction: column;
   gap: 15px;
-  min-width: 330px;
+  width: 100%;
 }
 
 /* Responsive adjustments */
