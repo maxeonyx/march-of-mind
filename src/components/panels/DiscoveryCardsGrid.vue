@@ -4,7 +4,7 @@
     <div class="cards-grid">
       <!-- Region for Available cards -->
       <div class="card-region">
-        <div class="region-label">Available</div>
+        <div class="region-label">{{ title === 'Products' ? 'Available to develop' : 'Available to research' }}</div>
         <div v-for="card in availableCards" :key="card.id" 
              class="card available"
              :class="{ 'locked': card.locked }"
