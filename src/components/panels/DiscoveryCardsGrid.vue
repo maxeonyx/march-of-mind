@@ -5,27 +5,22 @@
       <!-- Region for Available cards -->
       <div class="card-region">
         <div class="region-label">Available</div>
-        <div v-for="card in availableCards" :key="card.id" class="card available"
+        <div v-for="card in availableCards" :key="card.id" 
+             class="card available"
+             :class="{ 'locked': card.locked }"
              @click="selectCard(card.id)">
-          <div class="card-title">{{ card.name }}</div>
-          <div class="card-description" v-if="showDescription">{{ card.description }}</div>
-        </div>
-      </div>
-
-      <!-- Region for Unlocked cards -->
-      <div class="card-region">
-        <div class="region-label">Unlocked</div>
-        <div v-for="card in unlockedCards" :key="card.id" class="card unlocked"
-             @click="selectCard(card.id)">
-          <div class="card-title">{{ card.name }}</div>
+          <div class="card-title">
+            {{ card.name }}
+            <span v-if="card.locked" class="lock-icon">🔒</span>
+          </div>
           <div class="card-description" v-if="showDescription">{{ card.description }}</div>
           <div class="card-revenue" v-if="card.revenue">${{ card.revenue }}/mo</div>
         </div>
       </div>
 
-      <!-- Region for Active/Developed cards -->
+      <!-- Region for Developed/Discovered cards -->
       <div class="card-region">
-        <div class="region-label">{{ activeRegionLabel }}</div>
+        <div class="region-label">{{ title === 'Products' ? 'Developed' : 'Discovered' }}</div>
         <div v-for="card in activeCards" :key="card.id" class="card active"
              @click="showDetails(card.id)">
           <div class="card-title">{{ card.name }}</div>
@@ -43,6 +38,7 @@ interface Card {
   name: string;
   description?: string;
   revenue?: number;
+  locked?: boolean;
   // Add other properties as needed
 }
 
@@ -50,13 +46,13 @@ const props = defineProps<{
   // Title for the card grid
   title: string;
   
-  // Cards for each region
+  // Cards for each region - now we only use availableCards and activeCards
   availableCards: Card[];
-  unlockedCards: Card[];
+  unlockedCards?: Card[]; // Keep for backward compatibility
   activeCards: Card[];
   
   // Optional props
-  activeRegionLabel?: string;
+  activeRegionLabel?: string; // No longer used, but kept for compatibility
   showDescription?: boolean;
 }>();
 
@@ -64,9 +60,6 @@ const emit = defineEmits<{
   (e: 'selectCard', id: string): void;
   (e: 'showDetails', id: string): void;
 }>();
-
-// Provide default values for optional props
-const activeRegionLabel = props.activeRegionLabel || 'Active';
 
 function selectCard(id: string) {
   emit('selectCard', id);
@@ -172,12 +165,19 @@ function showDetails(id: string) {
   border-left: 3px solid #ddd;
 }
 
-.card.unlocked {
-  border-left: 3px solid var(--primary-color);
+.card.available.locked {
+  border-left: 3px solid var(--muted-text);
+  background-color: rgba(0, 0, 0, 0.02);
 }
 
 .card.active {
   border-left: 3px solid var(--positive-color);
+}
+
+.lock-icon {
+  font-size: 0.8rem;
+  margin-left: 5px;
+  color: var(--muted-text);
 }
 
 /* Empty state */

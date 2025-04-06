@@ -16,9 +16,7 @@
         <DiscoveryCardsGrid
           title="Products"
           :availableCards="availableProducts"
-          :unlockedCards="unlockedProducts"
           :activeCards="developedProducts"
-          activeRegionLabel="Developed"
           :showDescription="true"
           @selectCard="onSelectProduct"
           @showDetails="onShowProductDetails"
@@ -42,9 +40,7 @@
         <DiscoveryCardsGrid
           title="Discoveries"
           :availableCards="availableDiscoveries"
-          :unlockedCards="unlockedDiscoveries"
           :activeCards="activeDiscoveries" 
-          activeRegionLabel="Active"
           :showDescription="true"
           @selectCard="onSelectDiscovery"
           @showDetails="onShowDiscoveryDetails"
