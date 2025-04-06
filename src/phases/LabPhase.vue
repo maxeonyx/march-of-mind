@@ -4,28 +4,15 @@
     <div class="main-layout">
       <!-- Left column for controls and work panels -->
       <div class="left-column">
-        <!-- Top row with hardware and research panels -->
-        <div class="top-row">
-          <!-- Hardware Panel -->
-          <HardwarePanel
-            :hardware="hardware"
-            :onUpgrade="upgradeHardware"
-          />
-
-          <!-- Research Panel -->
-          <ResearchPanel
-            @research="doResearch"
-          />
-        </div>
-
-        <!-- Insight Rate Indicator -->
-        <InsightRateDisplay :rate="gameStore.researchers.insightRate" />
-
-        <!-- Resource Allocation Slider -->
-        <ResourceAllocationSlider
-          v-model="allocation"
-          :leftValue="insightsToProducts"
-          :rightValue="insightsToPureResearch"
+        <!-- Datacentre Panel (contains hardware, research, insight rate, and allocation) -->
+        <DatacentrePanel
+          :hardware="hardware"
+          :insightRate="gameStore.researchers.insightRate"
+          v-model:allocation="allocation"
+          :insightsToProducts="insightsToProducts"
+          :insightsToPureResearch="insightsToPureResearch"
+          @research="doResearch"
+          @upgradeHardware="upgradeHardware"
         />
 
         <!-- Work Panels -->
@@ -115,10 +102,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import EducationalModal from '@/components/EducationalModal.vue';
-import HardwarePanel from '@/components/panels/HardwarePanel.vue';
-import ResearchPanel from '@/components/panels/ResearchPanel.vue';
-import InsightRateDisplay from '@/components/panels/InsightRateDisplay.vue';
-import ResourceAllocationSlider from '@/components/panels/ResourceAllocationSlider.vue';
+import DatacentrePanel from '@/components/panels/DatacentrePanel.vue';
 import ProductWorkPanel from '@/components/panels/ProductWorkPanel.vue';
 import ResearchWorkPanel from '@/components/panels/ResearchWorkPanel.vue';
 // ProductCardsGrid is being replaced by DiscoveryCardsGrid
