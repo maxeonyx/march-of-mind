@@ -81,7 +81,7 @@ function showDetails(id: string) {
 .cards-section {
   display: flex;
   flex-direction: column;
-  max-height: 300px;
+  height: 900px; /* Triple the height */
   margin-bottom: 15px;
   background-color: white;
   border-radius: 8px;
@@ -95,6 +95,8 @@ function showDetails(id: string) {
   gap: 15px;
   overflow-y: auto;
   padding: 5px;
+  flex: 1; /* Allow it to grow */
+  height: 100%; /* Take full height */
 }
 
 .card-region {
@@ -103,6 +105,10 @@ function showDetails(id: string) {
   background-color: rgba(0, 0, 0, 0.03);
   padding: 20px 10px 10px 10px;
   min-height: 40px;
+  flex: 1; /* Allow regions to grow */
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; /* Add scrolling to individual regions */
 }
 
 .region-label {
@@ -143,6 +149,11 @@ function showDetails(id: string) {
   font-size: 0.8rem;
   color: var(--text-color);
   margin-bottom: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Limit to 3 lines */
+  -webkit-box-orient: vertical;
 }
 
 .card-revenue {
