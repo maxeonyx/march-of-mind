@@ -166,11 +166,11 @@ const allocation = computed({
 
 // Calculate estimated insight distribution based on allocation
 const insightsToProducts = computed(() => {
-  return Math.round((1 - allocation.value) * researchers.insightRate.value * 10) / 10;
+  return Math.round((1 - allocation.value) * researchers.insightRate * 10) / 10;
 });
 
 const insightsToPureResearch = computed(() => {
-  return Math.round(allocation.value * researchers.insightRate.value * 10) / 10;
+  return Math.round(allocation.value * researchers.insightRate * 10) / 10;
 });
 
 // Product development status
@@ -213,9 +213,15 @@ const developedProducts = computed(() => {
 
 // Discovery data - this should come from the discoveries store
 // Placeholder implementation until discoveries store is fully implemented
-const availableDiscoveries = computed(() => gameStore.discoveries.availableDiscoveries || []);
-const unlockedDiscoveries = computed(() => gameStore.discoveries.unlockedDiscoveriesData || []);
-const activeDiscoveries = ref([{}]); // Placeholder - will eventually come from store
+const availableDiscoveries = computed(() => {
+  // Safely access discoveries data with fallbacks
+  return gameStore.discoveries?.availableDiscoveries || [];
+});
+const unlockedDiscoveries = computed(() => {
+  // Safely access discoveries data with fallbacks
+  return gameStore.discoveries?.unlockedDiscoveriesData || [];
+});
+const activeDiscoveries = ref([{id: 'placeholder', name: 'No Active Discoveries'}]); // Placeholder - will eventually come from store
 
 // Main research function
 // This should eventually be moved to a dedicated research service
@@ -291,13 +297,21 @@ function selectAIProduct(productId: string) {
   }
 }
 
-// Helper function to determine if a product is available
-// This should ideally be a computed property in the store
+// Helper functions to determine product state
+// These should ideally be computed properties in the store
 function isAIProductAvailable(productId: string): boolean {
   const product = aiProducts.getProduct(productId);
   if (!product) return false;
 
   return aiProducts.meetsPrerequisites(productId) && aiProducts.hasEnoughFlops(productId);
+}
+
+function isAIProductUnlocked(productId: string): boolean {
+  return aiProducts.isProductUnlocked(productId);
+}
+
+function isAIProductDeveloped(productId: string): boolean {
+  return aiProducts.isProductDeveloped(productId);
 }
 
 function showProductEducationalContent(productId: string) {

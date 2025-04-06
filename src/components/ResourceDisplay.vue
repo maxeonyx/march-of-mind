@@ -103,7 +103,7 @@ const insightRate = computed(() => {
 
 // Hardware stats from the hardware system
 const hardwareFlops = computed(() => {
-  return hardwareStore.currentFlops?.value || 0;
+  return hardwareStore.currentFlops || 0;
 });
 </script>
 
