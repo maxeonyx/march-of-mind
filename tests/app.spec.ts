@@ -1,5 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
-import { GamePhase } from '@/types';
+import { GamePhase } from '@/types/game-phase';
 
 // IMPORTANT: The app should respond very quickly, and these tests should run quickly. Most "timeout" errors are just that the selector is genuinely missing!
 // For this reason, you MUST use either of these timeouts, and prefer the shorter one.

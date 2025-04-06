@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
-import { GamePhase } from '@/types';
+import { GamePhase } from '@/types/game-phase';
 import { useResources } from './resources';
 import { useTime } from './time';
 import { useTalent } from './talent';

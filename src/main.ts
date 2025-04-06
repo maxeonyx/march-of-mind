@@ -3,7 +3,7 @@ import { createPinia } from 'pinia';
 // Import App component
 import App from './App.vue';
 import { useGameStore } from './store';
-import { GamePhase } from './types';
+import { GamePhase } from './types/game-phase';
 
 // Create Vue app instance
 const app = createApp(App);

@@ -29,7 +29,7 @@
 import { computed } from 'vue';
 import ProgressButton from '@/components/ProgressButton.vue';
 import { useGameStore } from '@/store';
-import { GamePhase } from '@/types'
+import { GamePhase } from '@/types/game-phase';
 
 const gameStore = useGameStore();
 const resources = gameStore.resources;

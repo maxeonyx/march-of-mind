@@ -123,7 +123,7 @@ import EducationalModal from '@/components/EducationalModal.vue';
 import { useGameStore } from '@/store';
 import { HIRE_RESEARCHER_COST } from '@/store/researchers';
 import type { EducationalQuestion } from '@/types';
-import { GamePhase } from '@/types';
+import { GamePhase } from '@/types/game-phase';
 
 const gameStore = useGameStore();
 const resources = gameStore.resources;

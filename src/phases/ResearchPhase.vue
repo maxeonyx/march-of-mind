@@ -40,7 +40,8 @@ import { computed, ref } from 'vue';
 import ProgressButton from '@/components/ProgressButton.vue';
 import EducationalModal from '@/components/EducationalModal.vue';
 import { useGameStore } from '@/store';
-import type { GamePhase, Discovery, EducationalQuestion } from '@/types';
+import { GamePhase } from '@/types/game-phase';
+import type { Discovery, EducationalQuestion } from '@/types';
 
 const gameStore = useGameStore();
 const resources = gameStore.resources;
