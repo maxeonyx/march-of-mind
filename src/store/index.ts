@@ -6,6 +6,7 @@ import { useTime } from './time';
 import { useResearchers } from './researchers';
 import { useDiscoveries } from './discoveries';
 import { useHardware } from './hardware';
+import { useAIProducts } from './ai-products';
 
 // Cost to found a lab in insights
 export const LAB_FOUNDING_COST = 10;
@@ -28,6 +29,7 @@ export const useGameStore = defineStore('game', () => {
   const discoveries = useDiscoveries(resources);
   const hardware = useHardware(resources);
   const researchers = useResearchers(resources, hardware, discoveries);
+  const aiProducts = useAIProducts(resources, hardware);
 
   // Game phase directly in the store
   const phase = ref(GamePhase.RESEARCH_PHASE);
@@ -84,6 +86,9 @@ export const useGameStore = defineStore('game', () => {
         phase.value === GamePhase.AGI_PHASE) {
       // Process researcher finances
       researchers.processMonthlyFinances();
+      
+      // Add income from developed AI products
+      resources.addMoney(aiProducts.monthlyIncome.value);
     }
 
     // Save the game
@@ -131,7 +136,8 @@ export const useGameStore = defineStore('game', () => {
       // Core modules
       discoveries: discoveries.save(),
       hardware: hardware.save(),
-      researchers: researchers.save()
+      researchers: researchers.save(),
+      aiProducts: aiProducts.save()
     };
 
     lastSavedAt.value = saveData.savedAt;
@@ -152,6 +158,7 @@ export const useGameStore = defineStore('game', () => {
       if (saveData.discoveries) discoveries.load(saveData.discoveries);
       if (saveData.hardware) hardware.load(saveData.hardware);
       if (saveData.researchers) researchers.load(saveData.researchers);
+      if (saveData.aiProducts) aiProducts.load(saveData.aiProducts);
 
       lastSavedAt.value = saveData.savedAt || 0;
       return true;
@@ -173,6 +180,7 @@ export const useGameStore = defineStore('game', () => {
     discoveries.reset();
     hardware.reset();
     researchers.reset();
+    aiProducts.reset();
 
     // Restart the time ticker
     startGameTicker();
@@ -200,6 +208,7 @@ export const useGameStore = defineStore('game', () => {
     discoveries,
     hardware,
     researchers,
+    aiProducts,
 
     // Methods
     processOneMonth,

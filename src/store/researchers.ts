@@ -88,10 +88,10 @@ export function useResearchers(
       
       // Multiply by hardware FLOP/s if available
       if (hardware) {
-        // Log scale multiplier based on FLOP/s
-        // This ensures exponential hardware improvements give linear-ish benefits
+        // More significant multiplier based on FLOP/s
+        // This makes hardware upgrades much more impactful
         const hardwareMultiplier = hardware.currentFlops.value > 0 
-          ? 1 + Math.log10(hardware.currentFlops.value) * 0.2
+          ? 1 + Math.log10(hardware.currentFlops.value) * 0.5
           : 1;
         
         insightAmount *= hardwareMultiplier;
@@ -156,9 +156,10 @@ export function useResearchers(
       
       // Apply hardware multiplier if available
       if (hardware) {
-        // Log scale multiplier based on FLOP/s
+        // Significantly larger multiplier based on FLOP/s
+        // Make vacuum tubes more impactful
         const hardwareMultiplier = hardware.currentFlops.value > 0 
-          ? 1 + Math.log10(hardware.currentFlops.value) * 0.2
+          ? 1 + Math.log10(hardware.currentFlops.value) * 0.5
           : 1;
         
         rate *= hardwareMultiplier;

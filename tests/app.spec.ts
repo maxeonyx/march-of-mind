@@ -122,12 +122,11 @@ test('lab phase: manage researchers and hardware', async ({ page }) => {
 
   // Verify core lab elements are visible
   const researchButton = page.getByTestId('btn-research');
-  const developProductButton = page.getByTestId('btn-develop-product');
-  const productSelect = page.getByTestId('product-select');
   
   await expect(researchButton).toBeVisible();
-  await expect(developProductButton).toBeVisible();
-  await expect(productSelect).toBeVisible();
+  
+  // Check for product cards (now using cards instead of dropdown)
+  await expect(page.locator('.product-card')).toBeVisible();
   
   // Verify researcher panel appears when we can afford one
   await expect(page.getByTestId('researcher-slider')).toBeVisible();
@@ -160,11 +159,8 @@ test('lab phase: manage researchers and hardware', async ({ page }) => {
     Math.round(window.getStore().researchers.allocation * 10) / 10
   )).toBe(0.7);
   
-  // Verify that the product selection works
-  await productSelect.selectOption('basic-ai');
-  
-  // Check if product name is updated in the develop button
-  await expect(developProductButton).toContainText('Develop Basic AI Tool');
+  // Now we just verify the product section is visible with cards
+  await expect(page.locator('.product-section')).toBeVisible();
 });
 
 // Test reset button functionality
