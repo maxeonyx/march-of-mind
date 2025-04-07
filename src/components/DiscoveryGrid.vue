@@ -1,31 +1,35 @@
 <template>
   <div class="discovery-grid">
-    <h4>Available Discoveries</h4>
-    <div class="available-discoveries">
-      <TechCard
-        v-for="id in techTreeStore.availableDiscoveries"
-        :key="id"
-        :id="id"
-        :isLocked="techTreeStore.isLocked(id)"
-        :progress="techTreeStore.getProgress(id)"
-        :isSelected="id === techTreeStore.currentlySelectedDiscovery"
-      />
-      <div v-if="techTreeStore.availableDiscoveries.length === 0" class="empty-message">
-        No discoveries available yet
+    <div class="available-section">
+      <h4>Available Discoveries</h4>
+      <div class="available-discoveries">
+        <TechCard
+          v-for="id in techTreeStore.availableDiscoveries"
+          :key="id"
+          :id="id"
+          :isLocked="techTreeStore.isLocked(id)"
+          :progress="techTreeStore.getProgress(id)"
+          :isSelected="id === techTreeStore.currentlySelectedDiscovery"
+        />
+        <div v-if="techTreeStore.availableDiscoveries.length === 0" class="empty-message">
+          No discoveries available yet
+        </div>
       </div>
     </div>
     
-    <h4>Completed Discoveries</h4>
-    <div class="completed-discoveries">
-      <div 
-        v-for="id in techTreeStore.completedDiscoveries" 
-        :key="id"
-        class="completed-item"
-      >
-        {{ findTechById(id)?.name || 'Unknown' }}
-      </div>
-      <div v-if="techTreeStore.completedDiscoveries.length === 0" class="empty-message">
-        No completed discoveries yet
+    <div class="completed-section">
+      <h4>Completed Discoveries</h4>
+      <div class="completed-discoveries">
+        <div 
+          v-for="id in techTreeStore.completedDiscoveries" 
+          :key="id"
+          class="completed-item"
+        >
+          {{ findTechById(id)?.name || 'Unknown' }}
+        </div>
+        <div v-if="techTreeStore.completedDiscoveries.length === 0" class="empty-message">
+          No completed discoveries yet
+        </div>
       </div>
     </div>
   </div>
@@ -45,6 +49,26 @@ const techTreeStore = useTechTreeStore();
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+}
+
+.available-section {
+  flex: 0 0 50%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.completed-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.available-discoveries,
+.completed-discoveries {
+  overflow-y: auto;
+  flex-grow: 1;
 }
 
 h4 {
