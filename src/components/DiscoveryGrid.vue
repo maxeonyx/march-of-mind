@@ -52,7 +52,7 @@ const techTreeStore = useTechTreeStore();
 }
 
 .available-section {
-  flex: 0 0 50%;
+  flex: 1;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
