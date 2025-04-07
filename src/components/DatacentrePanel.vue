@@ -2,10 +2,10 @@
   <div class="datacentre-panel">
     <h2>Datacentre</h2>
     <div class="datacentre-content">
-      <ResearchersPanel />
-      <HardwarePanel />
-      <WorkPanel />
-      <WorkAllocatorPanel />
+      <ResearchersPanel class="grid-item" />
+      <HardwarePanel class="grid-item" />
+      <WorkPanel class="full-width" />
+      <WorkAllocatorPanel class="full-width" />
     </div>
   </div>
 </template>
@@ -33,6 +33,26 @@ h2 {
 .datacentre-content {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-gap: 1rem;
+  grid-template-areas:
+    "researchers hardware"
+    "work work"
+    "allocator allocator";
+  gap: 1rem;
+}
+
+.grid-item:nth-child(1) {
+  grid-area: researchers;
+}
+
+.grid-item:nth-child(2) {
+  grid-area: hardware;
+}
+
+.full-width:nth-child(3) {
+  grid-area: work;
+}
+
+.full-width:nth-child(4) {
+  grid-area: allocator;
 }
 </style>
