@@ -95,4 +95,14 @@ h4 {
   border-radius: 4px;
   margin-bottom: 0.5rem;
 }
+
+/* Make discovery cards distinct from background */
+.available-discoveries > * {
+  background-color: #eef6ff;
+  border: 1px solid #b3d4fc;
+  border-radius: 6px;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
 </style>
