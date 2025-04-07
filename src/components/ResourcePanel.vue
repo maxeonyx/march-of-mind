@@ -30,7 +30,7 @@
         </div>
         <div class="resource-item">
           <span class="resource-label">Work Rate: </span>
-          <span class="resource-value">{{ resourcesStore.workRate }}/tick</span>
+          <span class="resource-value">{{ Math.floor(resourcesStore.workRate) }}/tick</span>
         </div>
       </div>
     </div>
