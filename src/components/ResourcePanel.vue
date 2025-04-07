@@ -9,7 +9,7 @@
           <span class="resource-value">{{ Math.floor(resourcesStore.savingsAmount) }}</span>
         </div>
         <div class="resource-item">
-          <span class="resource-label">Thoughts: </span>
+          <span class="resource-label">Score: </span>
           <span class="resource-value">{{ resourcesStore.thoughtsAmount }}</span>
         </div>
       </div>
