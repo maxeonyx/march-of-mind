@@ -53,9 +53,9 @@ export const useTimeStore = defineStore('time', () => {
     resourcesStore.addThoughts(currentWorkRate * deltaTimeSeconds);
 
     // 3. Apply Work to Selected Tech
-    const proportionProducts = datacentreStore.proportionWorkSpentOnProducts;
-    const workForProducts = currentWorkRate * proportionProducts * deltaTimeSeconds;
-    const workForDiscoveries = currentWorkRate * (1 - proportionProducts) * deltaTimeSeconds;
+    const proportionResearch = datacentreStore.proportionWorkSpentOnResearch;
+    const workForProducts = currentWorkRate * (1 - proportionResearch) * deltaTimeSeconds;
+    const workForDiscoveries = currentWorkRate * proportionResearch * deltaTimeSeconds;
 
     if (techTreeStore.currentlySelectedProduct && workForProducts > 0) {
       techTreeStore.progressWork(techTreeStore.currentlySelectedProduct, workForProducts);
