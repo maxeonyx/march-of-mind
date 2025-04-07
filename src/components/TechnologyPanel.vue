@@ -25,6 +25,9 @@ import DiscoveryGrid from './DiscoveryGrid.vue';
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 1rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 h2 {
