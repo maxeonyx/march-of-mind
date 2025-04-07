@@ -134,3 +134,21 @@
     }
   ]
 }
+
+#TODO: Simplify this tech tree.
+
+We need discovery 1 - this makes discovery 2 available and product 1 available
+
+We need discovery 2 - this makes product 2 available
+
+We need product 1 (makes nothing available)
+
+We need product 2 (also makes nothing available)
+
+We need discovery A (makes discovery B and product A available)
+
+We need discovery B (makes product B available)
+
+We need products A and B (both make nothign available)
+Just give these names "Discovery 1", "Product B" etc
+
