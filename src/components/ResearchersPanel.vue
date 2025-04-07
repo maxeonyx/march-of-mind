@@ -98,4 +98,10 @@ button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
 }
+.additional-work {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  color: #42b983;
+  font-style: italic;
+}
 </style>
