@@ -5,7 +5,7 @@
       "type": "product",
       "name": "Product 1",
       "description": "Placeholder",
-      "workRequired": 1000,
+      "workRequired": 100,
       "incomeGenerated": 500,
       "requiredDiscoveries": ["discovery1"],
       "completionMakesAvailable": []
@@ -47,7 +47,7 @@
       "type": "discovery",
       "name": "Discovery 1",
       "description": "Placeholder",
-      "workRequired": 500,
+      "workRequired": 100,
       "creativity": 10,
       "requiredDiscoveries": [],
       "completionMakesAvailable": ["discovery2", "product1"]

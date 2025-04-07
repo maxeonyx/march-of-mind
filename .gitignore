@@ -28,3 +28,4 @@ pnpm-debug.log*
 *.sw?
 *.ignore*
 CLAUDE.local.md
+.aider*
