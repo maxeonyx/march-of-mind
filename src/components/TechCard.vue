@@ -73,10 +73,6 @@ function handleClick() {
   transition: border-color 0.2s, background-color 0.2s;
 }
 
-.tech-card:hover {
-  border-color: #42b983;
-  background-color: #f9fff9;
-}
 
 .tech-card.selected {
   border-color: #42b983;
