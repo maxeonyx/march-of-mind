@@ -6,7 +6,7 @@
         <h3>Current Values</h3>
         <div class="resource-item">
           <span class="resource-label">Savings: $</span>
-          <span class="resource-value">{{ resourcesStore.savingsAmount }}</span>
+          <span class="resource-value">{{ Math.floor(resourcesStore.savingsAmount) }}</span>
         </div>
         <div class="resource-item">
           <span class="resource-label">Thoughts: </span>
