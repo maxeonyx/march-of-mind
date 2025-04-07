@@ -53,7 +53,7 @@ const techTreeStore = useTechTreeStore();
 }
 
 .available-section {
-  flex: 2; /* Give more space to available section */
+  flex: 1; /* Change from 2 to 1 to match DiscoveryGrid */
   display: flex;
   flex-direction: column;
   overflow-y: auto;
