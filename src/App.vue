@@ -19,10 +19,16 @@
           Stop Game
         </button>
       </div>
-      
-      <ResourcePanel />
-      <DatacentrePanel />
-      <TechnologyPanel />
+
+      <div class="main-content">
+        <div class="left-column">
+          <ResourcePanel />
+          <DatacentrePanel />
+        </div>
+        <div class="right-column">
+          <TechnologyPanel />
+        </div>
+      </div>
       
       <!-- Debug Panel with advanced actions - will be removed later -->
       <DebugPanel />
@@ -111,7 +117,7 @@ html, body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: var(--text-color);
-  max-width: 1200px;
+  max-width: 1600px;
   margin: 0 auto;
   padding: 0 20px;
   text-align: center;
@@ -119,6 +125,25 @@ html, body {
 
 main {
   margin-bottom: 50px;
+}
+
+.main-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .game-controls {
