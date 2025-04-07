@@ -39,6 +39,34 @@ h2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: 1rem;
+  flex-grow: 1;
+}
+
+.products-section,
+.discoveries-section {
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* allow children to shrink */
+}
+
+.discoveries-section {
+  /* Make the discovery grid fill vertical space */
+  flex-grow: 1;
+}
+
+.discoveries-section > *:last-child {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.discoveries-section .discovery-grid {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 h3 {

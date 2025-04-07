@@ -42,6 +42,9 @@ const techTreeStore = useTechTreeStore();
 <style scoped>
 .discovery-grid {
   padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
 }
 
 h4 {
