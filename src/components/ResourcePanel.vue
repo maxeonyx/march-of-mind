@@ -10,7 +10,7 @@
         </div>
         <div class="resource-item">
           <span class="resource-label">Score: </span>
-          <span class="resource-value">{{ resourcesStore.thoughtsAmount }}</span>
+          <span class="resource-value">{{ Math.floor(resourcesStore.thoughtsAmount) }}</span>
         </div>
       </div>
       
