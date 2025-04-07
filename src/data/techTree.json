@@ -3,51 +3,41 @@
     {
       "id": "product1",
       "type": "product",
-      "name": "Basic Data Analysis Tool",
-      "description": "Simple software for analyzing data sets",
+      "name": "Product 1",
+      "description": "Placeholder",
       "workRequired": 1000,
       "incomeGenerated": 500,
-      "requiredDiscoveries": [],
-      "completionMakesAvailable": ["product2"]
+      "requiredDiscoveries": ["discovery1"],
+      "completionMakesAvailable": []
     },
     {
       "id": "product2",
       "type": "product",
-      "name": "Pattern Recognition System",
-      "description": "Software that can identify patterns in data",
+      "name": "Product 2",
+      "description": "Placeholder",
+      "workRequired": 2000,
+      "incomeGenerated": 1000,
+      "requiredDiscoveries": ["discovery2"],
+      "completionMakesAvailable": []
+    },
+    {
+      "id": "productA",
+      "type": "product",
+      "name": "Product A",
+      "description": "Placeholder",
       "workRequired": 3000,
       "incomeGenerated": 1500,
       "requiredDiscoveries": ["discoveryA"],
-      "completionMakesAvailable": ["product3"]
+      "completionMakesAvailable": []
     },
     {
-      "id": "product3",
+      "id": "productB",
       "type": "product",
-      "name": "Predictive Analytics Platform",
-      "description": "Platform for making predictions based on historical data",
-      "workRequired": 8000,
-      "incomeGenerated": 5000,
-      "requiredDiscoveries": ["discoveryB", "discoveryC"],
-      "completionMakesAvailable": ["product4"]
-    },
-    {
-      "id": "product4",
-      "type": "product",
-      "name": "Advanced AI Assistant",
-      "description": "AI system that can assist with complex tasks",
-      "workRequired": 15000,
-      "incomeGenerated": 12000,
-      "requiredDiscoveries": ["discoveryD", "discoveryE"],
-      "completionMakesAvailable": ["product5"]
-    },
-    {
-      "id": "product5",
-      "type": "product",
-      "name": "Autonomous Decision System",
-      "description": "AI that can make decisions without human intervention",
-      "workRequired": 30000,
-      "incomeGenerated": 25000,
-      "requiredDiscoveries": ["discoveryF", "discoveryG"],
+      "name": "Product B",
+      "description": "Placeholder",
+      "workRequired": 4000,
+      "incomeGenerated": 2000,
+      "requiredDiscoveries": ["discoveryB"],
       "completionMakesAvailable": []
     }
   ],
@@ -55,100 +45,43 @@
     {
       "id": "discovery1",
       "type": "discovery",
-      "name": "Basic Machine Learning",
-      "description": "Fundamental concepts of machine learning",
+      "name": "Discovery 1",
+      "description": "Placeholder",
       "workRequired": 500,
       "creativity": 10,
       "requiredDiscoveries": [],
-      "completionMakesAvailable": ["discoveryA"]
+      "completionMakesAvailable": ["discovery2", "product1"]
+    },
+    {
+      "id": "discovery2",
+      "type": "discovery",
+      "name": "Discovery 2",
+      "description": "Placeholder",
+      "workRequired": 1000,
+      "creativity": 20,
+      "requiredDiscoveries": ["discovery1"],
+      "completionMakesAvailable": ["product2"]
     },
     {
       "id": "discoveryA",
       "type": "discovery",
-      "name": "Neural Networks",
-      "description": "Computational models inspired by the human brain",
-      "workRequired": 2000,
+      "name": "Discovery A",
+      "description": "Placeholder",
+      "workRequired": 1500,
       "creativity": 30,
-      "requiredDiscoveries": ["discovery1"],
-      "completionMakesAvailable": ["discoveryB", "discoveryC"]
+      "requiredDiscoveries": [],
+      "completionMakesAvailable": ["discoveryB", "productA"]
     },
     {
       "id": "discoveryB",
       "type": "discovery",
-      "name": "Deep Learning",
-      "description": "Advanced neural networks with multiple layers",
-      "workRequired": 5000,
-      "creativity": 80,
+      "name": "Discovery B",
+      "description": "Placeholder",
+      "workRequired": 2000,
+      "creativity": 40,
       "requiredDiscoveries": ["discoveryA"],
-      "completionMakesAvailable": ["discoveryD", "discoveryE"]
-    },
-    {
-      "id": "discoveryC",
-      "type": "discovery",
-      "name": "Natural Language Processing",
-      "description": "Enabling computers to understand human language",
-      "workRequired": 6000,
-      "creativity": 100,
-      "requiredDiscoveries": ["discoveryA"],
-      "completionMakesAvailable": []
-    },
-    {
-      "id": "discoveryD",
-      "type": "discovery",
-      "name": "Reinforcement Learning",
-      "description": "Learning through interaction with environment",
-      "workRequired": 8000,
-      "creativity": 150,
-      "requiredDiscoveries": ["discoveryB"],
-      "completionMakesAvailable": ["discoveryF"]
-    },
-    {
-      "id": "discoveryE",
-      "type": "discovery",
-      "name": "Computer Vision",
-      "description": "Enabling computers to see and interpret visual information",
-      "workRequired": 10000,
-      "creativity": 180,
-      "requiredDiscoveries": ["discoveryB"],
-      "completionMakesAvailable": ["discoveryF"]
-    },
-    {
-      "id": "discoveryF",
-      "type": "discovery",
-      "name": "Artificial General Intelligence Theory",
-      "description": "Theoretical foundations for general AI",
-      "workRequired": 20000,
-      "creativity": 300,
-      "requiredDiscoveries": ["discoveryD", "discoveryE"],
-      "completionMakesAvailable": ["discoveryG"]
-    },
-    {
-      "id": "discoveryG",
-      "type": "discovery",
-      "name": "Consciousness Modeling",
-      "description": "Models that attempt to replicate consciousness",
-      "workRequired": 25000,
-      "creativity": 350,
-      "requiredDiscoveries": ["discoveryF"],
-      "completionMakesAvailable": []
+      "completionMakesAvailable": ["productB"]
     }
   ]
 }
-
-#TODO: Simplify this tech tree.
-
-We need discovery 1 - this makes discovery 2 available and product 1 available
-
-We need discovery 2 - this makes product 2 available
-
-We need product 1 (makes nothing available)
-
-We need product 2 (also makes nothing available)
-
-We need discovery A (makes discovery B and product A available)
-
-We need discovery B (makes product B available)
-
-We need products A and B (both make nothign available)
-Just give these names "Discovery 1", "Product B" etc
 
