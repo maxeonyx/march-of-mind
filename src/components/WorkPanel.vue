@@ -1,10 +1,10 @@
 <template>
   <div class="work-panel">
     <h3>Work</h3>
-    <div class="work-rate">Work Rate: {{ resourcesStore.workRate }}/tick</div>
-    <div class="work-formula">Work = Creativity * FLOPS</div>
+    <div class="work-rate">Work Rate: {{ resourcesStore.workRate.toFixed(2) }}/tick</div>
+    <div class="work-formula">Work = FLOPS<sup>0.7</sup> × Creativity<sup>0.3</sup></div>
     <div class="work-details">
-      <div>{{ resourcesStore.creativityRate }} × {{ resourcesStore.flopsRate }} = {{ resourcesStore.workRate }}</div>
+      <div>{{ resourcesStore.flopsRate }}<sup>0.7</sup> × {{ resourcesStore.creativityRate }}<sup>0.3</sup> = {{ resourcesStore.workRate.toFixed(2) }}</div>
     </div>
   </div>
 </template>
