@@ -9,6 +9,9 @@
     <div v-else-if="progress" class="progress-bar">
       <div class="progress-fill" :style="{ width: progressPercentage + '%' }"></div>
     </div>
+    <div v-if="progress" class="work-values">
+      {{ progress.workApplied.toFixed(1) }} / {{ progress.workRequired }} work
+    </div>
     <div class="tech-type">{{ tech?.type }}</div>
   </div>
 </template>
@@ -112,5 +115,12 @@ function handleClick() {
   height: 100%;
   background-color: #42b983;
   width: 0%;
+}
+
+.work-values {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 0.25rem;
+  text-align: right;
 }
 </style>
