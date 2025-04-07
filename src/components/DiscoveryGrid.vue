@@ -51,7 +51,6 @@ const techTreeStore = useTechTreeStore();
   overflow-y: auto;
 }
 
-/* Card style similar to HardwarePanel.vue */
 .card {
   background-color: #fff;
   padding: 1rem;
