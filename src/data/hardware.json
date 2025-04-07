@@ -1,0 +1,47 @@
+[
+  {
+    "id": "hardware1",
+    "name": "Basic Computers",
+    "description": "Early computing machines with limited processing power",
+    "flops": 100,
+    "cost": 1000,
+    "tier": 1,
+    "upgradeCost": 5000
+  },
+  {
+    "id": "hardware2",
+    "name": "Advanced Workstations",
+    "description": "More powerful computers with better processing capabilities",
+    "flops": 500,
+    "cost": 5000,
+    "tier": 2,
+    "upgradeCost": 20000
+  },
+  {
+    "id": "hardware3",
+    "name": "Research Cluster",
+    "description": "Multiple computers networked together for parallel processing",
+    "flops": 2000,
+    "cost": 20000,
+    "tier": 3,
+    "upgradeCost": 100000
+  },
+  {
+    "id": "hardware4",
+    "name": "Small Supercomputer",
+    "description": "Specialized high-performance computing system",
+    "flops": 10000,
+    "cost": 100000,
+    "tier": 4,
+    "upgradeCost": 500000
+  },
+  {
+    "id": "hardware5",
+    "name": "AI Research Center",
+    "description": "State-of-the-art facility dedicated to AI research",
+    "flops": 50000,
+    "cost": 500000,
+    "tier": 5,
+    "upgradeCost": null
+  }
+]

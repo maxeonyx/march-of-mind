@@ -2,6 +2,10 @@ import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import App from './App.vue';
 import { useAppStore } from './stores/app';
+import { useResourcesStore } from './stores/resources';
+import { useDatacentreStore } from './stores/datacentre';
+import { useTechTreeStore } from './stores/techTree';
+import { useTimeStore } from './stores/time';
 
 // Create Vue app instance
 const app = createApp(App);
@@ -16,13 +20,30 @@ if (typeof window !== 'undefined' && !window.__APP_STORE_INITIALIZED) {
   
   // Initial store setup
   setTimeout(() => {
-    const store = useAppStore();
+    const appStore = useAppStore();
+    const resourcesStore = useResourcesStore();
+    const datacentreStore = useDatacentreStore();
+    const techTreeStore = useTechTreeStore();
+    const timeStore = useTimeStore();
     
-    // Expose store for tests
-    window.__appStore = store;
+    // Expose stores for tests
+    window.__appStore = appStore;
+    window.__resourcesStore = resourcesStore;
+    window.__datacentreStore = datacentreStore;
+    window.__techTreeStore = techTreeStore;
+    window.__timeStore = timeStore;
+    
     window.__appMethods = {
       // Add basic methods for test compatibility
-      dummyMethod: () => console.log('Test method called')
+      dummyMethod: () => console.log('Test method called'),
+      initializeStores: () => {
+        resourcesStore.initialize();
+        datacentreStore.initialize();
+        techTreeStore.initialize();
+        timeStore.initialize();
+      },
+      startGame: () => timeStore.startGame(),
+      stopGame: () => timeStore.stopGame()
     };
   }, 0);
 }

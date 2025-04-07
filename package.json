@@ -1,6 +1,6 @@
 {
-  "name": "claude-vue-template",
-  "version": "0.1.0",
+  "name": "march-of-mind",
+  "version": "0.7.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,8 +12,8 @@
     "test": "playwright test --reporter=dot"
   },
   "dependencies": {
-    "pinia": "~2.0.14",
-    "vue": "~3.2.47"
+    "pinia": "^3.0.1",
+    "vue": "^3.5.13"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",

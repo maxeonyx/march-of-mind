@@ -1,7 +1,7 @@
 # CLAUDE.md - Project Guidelines
 
 ## Project Overview
-Vue Hello World - A Vue.js starter template with TypeScript, Pinia, Playwright testing, and GitHub Actions CI/CD setup. This project provides a solid foundation for developing new Vue applications.
+March of Mind - A cookie clicker style game where you run a company and balance R&D with products, hardware capital and talent. Built with Vue.js, TypeScript, Pinia, and includes Playwright testing and GitHub Actions CI/CD setup.
 
 ## Current Features
 - Vue 3 with Composition API
@@ -125,3 +125,9 @@ Vue Hello World - A Vue.js starter template with TypeScript, Pinia, Playwright t
 Always update both this file `CLAUDE.md` AND `package.json`.
 
 - 0.1.0 - Initial project setup with Vue 3, TypeScript, Pinia, and testing infrastructure
+- 0.2.0 - Renamed project to March of Mind, updated base path, added simple counter with "unrealistically earn money" button
+- 0.3.0 - Created static data files with hardware and tech tree, implemented staticData store with helper functions, added tests for static data
+- 0.4.0 - Created the four main stores (resources, datacentre, techTree, time) with state and simple getters, implemented all UI components with initial values displayed but no interactions yet
+- 0.5.0 - Implemented cross-store getters (incomeRate, workRate, canAffordToHire, etc.) and simple interactions (firing researchers, adjusting work allocation slider, selecting tech cards)
+- 0.6.0 - Implemented complex actions with cross-store dependencies (hiring researchers, upgrading hardware, unlocking and progressing tech cards), added debug panel to manually test game mechanics
+- 0.7.0 - Implemented game loop with automatic time progression, resource accumulation, and work application; added start/stop game controls

@@ -1,12 +1,38 @@
 <template>
   <div id="app">
-    <header>
-      <img alt="Vue logo" src="./assets/logo.png" class="logo">
-      <h1>Claude Vue Template</h1>
-    </header>
+    <HeaderPanel />
+    
     <main>
-      <p>A Vue.js starter template with TypeScript, Pinia, and GitHub Actions</p>
+      <div class="game-controls">
+        <button 
+          @click="startGame" 
+          :disabled="timeStore.isRunning" 
+          class="start-button"
+        >
+          Start Game
+        </button>
+        <button 
+          @click="stopGame" 
+          :disabled="!timeStore.isRunning" 
+          class="stop-button"
+        >
+          Stop Game
+        </button>
+      </div>
+      
+      <ResourcePanel />
+      <DatacentrePanel />
+      <TechnologyPanel />
+      
+      <!-- Debug Panel with advanced actions - will be removed later -->
+      <DebugPanel />
+      
+      <div class="debug-section">
+        <h3>Debug Controls</h3>
+        <button @click="initializeAllStores">Initialize All Stores</button>
+      </div>
     </main>
+    
     <footer>
       <p>Version {{ version }}</p>
       <p v-if="versionInfo?.buildTime" class="build-time">
@@ -17,11 +43,51 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useVersion } from './composables/useVersion';
+import HeaderPanel from './components/HeaderPanel.vue';
+import ResourcePanel from './components/ResourcePanel.vue';
+import DatacentrePanel from './components/DatacentrePanel.vue';
+import TechnologyPanel from './components/TechnologyPanel.vue';
+import DebugPanel from './components/DebugPanel.vue';
+
+// Import stores for initialization
+import { useResourcesStore } from './stores/resources';
+import { useDatacentreStore } from './stores/datacentre';
+import { useTechTreeStore } from './stores/techTree';
+import { useTimeStore } from './stores/time';
 
 const { version: versionInfo } = useVersion();
 const version = computed(() => versionInfo.value?.version || '0.0.0');
+
+// For debugging initialization
+const resourcesStore = useResourcesStore();
+const datacentreStore = useDatacentreStore();
+const techTreeStore = useTechTreeStore();
+const timeStore = useTimeStore();
+
+function initializeAllStores() {
+  resourcesStore.initialize();
+  datacentreStore.initialize();
+  techTreeStore.initialize();
+  timeStore.initialize();
+  console.log('All stores initialized');
+}
+
+// Game control functions
+function startGame() {
+  timeStore.startGame();
+}
+
+function stopGame() {
+  timeStore.stopGame();
+}
+
+// Start the game when the component is mounted
+onMounted(() => {
+  // Start game automatically
+  timeStore.startGame();
+});
 </script>
 
 <style>
@@ -51,22 +117,45 @@ html, body {
   text-align: center;
 }
 
-header {
-  margin: 60px 0;
-}
-
-.logo {
-  width: 80px;
-  height: 80px;
-}
-
-h1 {
-  font-size: 28px;
-  color: var(--primary-color);
-}
-
 main {
   margin-bottom: 50px;
+}
+
+.game-controls {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.start-button {
+  background-color: var(--primary-color);
+}
+
+.stop-button {
+  background-color: var(--error-color);
+}
+
+.debug-section {
+  background-color: #fff3cd;
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  text-align: left;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #42b983;
+  color: white;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 footer {
@@ -91,15 +180,6 @@ footer .build-time {
 @media (max-width: 768px) {
   #app {
     padding: 0 15px;
-  }
-  
-  h1 {
-    font-size: 24px;
-  }
-  
-  .logo {
-    width: 60px;
-    height: 60px;
   }
 }
 </style>
