@@ -29,7 +29,7 @@ export const useResourcesStore = defineStore('resources', () => {
   });
 
   const workRate = computed(() => {
-    return creativityRate.value * flopsRate.value;
+    return Math.pow(flopsRate.value, 0.7) * Math.pow(creativityRate.value, 0.3);
   });
 
   // --- Actions ---
