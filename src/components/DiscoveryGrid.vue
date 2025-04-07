@@ -51,18 +51,16 @@ const techTreeStore = useTechTreeStore();
   overflow-y: auto;
 }
 
-.card {
-  background-color: #fff;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
 .available-section {
   flex: 0 0 50%;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  background-color: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
 }
 
 .completed-section {
@@ -70,6 +68,10 @@ const techTreeStore = useTechTreeStore();
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  background-color: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .available-discoveries,
