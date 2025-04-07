@@ -2,15 +2,15 @@
   <div class="work-allocator-panel">
     <h3>Work Allocation</h3>
     <div class="allocation-display">
-      <div>Products: {{ Math.round(datacentreStore.proportionWorkSpentOnProducts * 100) }}%</div>
-      <div>Research: {{ Math.round((1 - datacentreStore.proportionWorkSpentOnProducts) * 100) }}%</div>
+      <div>Products: {{ Math.round((1 - datacentreStore.proportionWorkSpentOnResearch) * 100) }}%</div>
+      <div>Research: {{ Math.round(datacentreStore.proportionWorkSpentOnResearch * 100) }}%</div>
     </div>
     <input
       type="range"
       min="0"
       max="1"
       step="0.01"
-      :value="datacentreStore.proportionWorkSpentOnProducts"
+      :value="datacentreStore.proportionWorkSpentOnResearch"
       @input="handleSliderChange"
     />
     <div class="allocation-note">

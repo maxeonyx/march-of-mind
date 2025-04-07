@@ -7,7 +7,7 @@ export const useDatacentreStore = defineStore('datacentre', () => {
   // --- State ---
   const numResearchers = ref(0);
   const currentHardwareId = ref('hardware1'); // Initial hardware ID
-  const proportionWorkSpentOnProducts = ref(0.5); // Initial 50/50 allocation
+  const proportionWorkSpentOnResearch = ref(0.5); // Initial 50/50 allocation
 
   // --- Getters (Computed Properties) ---
   // This getter doesn't depend on other stores
@@ -66,22 +66,22 @@ export const useDatacentreStore = defineStore('datacentre', () => {
 
   function setWorkAllocation(proportion) {
     // Clamp proportion between 0 and 1
-    proportionWorkSpentOnProducts.value = Math.max(0, Math.min(1, proportion));
-    console.log(`Updated work allocation: ${Math.round(proportionWorkSpentOnProducts.value * 100)}% to Products, ${Math.round((1 - proportionWorkSpentOnProducts.value) * 100)}% to Research`);
+    proportionWorkSpentOnResearch.value = Math.max(0, Math.min(1, proportion));
+    console.log(`Updated work allocation: ${Math.round((1 - proportionWorkSpentOnResearch.value) * 100)}% to Products, ${Math.round(proportionWorkSpentOnResearch.value * 100)}% to Research`);
   }
 
   function initialize() {
     console.log("Initializing datacentre store");
     numResearchers.value = 0;
     currentHardwareId.value = 'hardware1';
-    proportionWorkSpentOnProducts.value = 0.5;
+    proportionWorkSpentOnResearch.value = 0.5;
   }
 
   return {
     // State
     numResearchers,
     currentHardwareId,
-    proportionWorkSpentOnProducts,
+    proportionWorkSpentOnResearch,
     // Getters
     currentHardwareObject,
     canAffordToHire,
