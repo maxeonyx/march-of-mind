@@ -47,6 +47,22 @@ h2 {
   display: flex;
   flex-direction: column;
   min-height: 0; /* allow children to shrink */
+  flex-grow: 1; /* Add this to match discoveries-section */
+}
+
+.products-section > *:last-child {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.products-section .product-grid {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .discoveries-section {

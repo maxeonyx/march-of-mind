@@ -49,10 +49,11 @@ const techTreeStore = useTechTreeStore();
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  height: 100%; /* Ensure it takes full height */
 }
 
 .available-section {
-  flex: 1;
+  flex: 2; /* Give more space to available section */
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -61,10 +62,11 @@ const techTreeStore = useTechTreeStore();
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin-bottom: 1rem;
+  min-height: 0; /* Allow it to shrink if needed */
 }
 
 .completed-section {
-  flex: 1;
+  flex: 1; /* Give less space to completed section */
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -72,6 +74,7 @@ const techTreeStore = useTechTreeStore();
   padding: 1rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-height: 0; /* Allow it to shrink if needed */
 }
 
 .available-products,
