@@ -8,6 +8,9 @@
     <div class="affordability" v-else>
       Can afford to hire: No
     </div>
+    <div class="additional-work">
+      Additional work from hiring: +{{ additionalWork.toFixed(2) }}/tick
+    </div>
     <div class="researchers-actions">
       <button 
         @click="datacentreStore.hireResearcher"
@@ -27,8 +30,29 @@
 
 <script setup lang="ts">
 import { useDatacentreStore } from '../stores/datacentre';
+import { useResourcesStore } from '../stores/resources';
+import { computed } from 'vue';
 
 const datacentreStore = useDatacentreStore();
+const resourcesStore = useResourcesStore();
+
+// Calculate the additional work from one more researcher
+const additionalWork = computed(() => {
+  // Current work rate
+  const currentWork = resourcesStore.workRate;
+  
+  // Simulate adding one researcher
+  const currentResearchers = datacentreStore.numResearchers;
+  const newCreativity = currentResearchers + 1;
+  
+  // Calculate new work rate using the same formula from resources.ts
+  // Work = FLOPS^0.7 * Creativity^0.3
+  const flops = resourcesStore.flopsRate;
+  const newWork = Math.pow(flops, 0.7) * Math.pow(newCreativity, 0.3);
+  
+  // Return the difference
+  return newWork - currentWork;
+});
 </script>
 
 <style scoped>
