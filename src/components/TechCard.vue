@@ -12,7 +12,9 @@
     <div v-if="progress" class="work-values">
       {{ progress.workApplied.toFixed(1) }} / {{ progress.workRequired }} work
     </div>
-    <div class="tech-type">{{ tech?.type }}</div>
+    <div v-if="tech?.type === 'product' && tech.incomeGenerated" class="income-info">
+      +{{ tech.incomeGenerated }} income
+    </div>
   </div>
 </template>
 
@@ -129,6 +131,13 @@ function handleClick() {
 .work-values {
   font-size: 0.8rem;
   color: #666;
+  margin-top: 0.25rem;
+  text-align: right;
+}
+
+.income-info {
+  font-size: 0.8rem;
+  color: #333;
   margin-top: 0.25rem;
   text-align: right;
 }
