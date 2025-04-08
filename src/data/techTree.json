@@ -8,7 +8,17 @@
       "workRequired": 100,
       "incomeGenerated": 500,
       "requiredDiscoveries": ["discovery1"],
-      "completionMakesAvailable": []
+      "completionMakesAvailable": [],
+      "quiz": {
+        "question": "Which of the following best describes a minimum viable product (MVP)?",
+        "options": [
+          "A product with the minimum features needed to satisfy early customers",
+          "A product that's not yet ready for market testing",
+          "The final version of a product with all planned features",
+          "A prototype that isn't meant to be shown to customers"
+        ],
+        "correctOptionIndex": 0
+      }
     },
     {
       "id": "product2",
@@ -18,7 +28,17 @@
       "workRequired": 2000,
       "incomeGenerated": 1000,
       "requiredDiscoveries": ["discovery2"],
-      "completionMakesAvailable": []
+      "completionMakesAvailable": [],
+      "quiz": {
+        "question": "What is the primary purpose of product market fit?",
+        "options": [
+          "To maximize short-term profits",
+          "To create a product that satisfies a strong market demand",
+          "To minimize development costs",
+          "To beat competitors to market"
+        ],
+        "correctOptionIndex": 1
+      }
     },
     {
       "id": "productA",
@@ -28,7 +48,17 @@
       "workRequired": 3000,
       "incomeGenerated": 1500,
       "requiredDiscoveries": ["discoveryA"],
-      "completionMakesAvailable": []
+      "completionMakesAvailable": [],
+      "quiz": {
+        "question": "What is a key characteristic of an iterative product development approach?",
+        "options": [
+          "Completing all development in a single phase",
+          "Avoiding customer feedback until launch",
+          "Building and refining in cycles based on feedback",
+          "Focusing only on adding new features"
+        ],
+        "correctOptionIndex": 2
+      }
     },
     {
       "id": "productB",
@@ -38,7 +68,17 @@
       "workRequired": 4000,
       "incomeGenerated": 2000,
       "requiredDiscoveries": ["discoveryB"],
-      "completionMakesAvailable": []
+      "completionMakesAvailable": [],
+      "quiz": {
+        "question": "What does the term 'product-led growth' refer to?",
+        "options": [
+          "Focusing exclusively on marketing a product",
+          "Using the product itself as the primary driver of acquisition and expansion",
+          "Growing primarily through sales teams",
+          "Expanding into new geographic markets"
+        ],
+        "correctOptionIndex": 1
+      }
     }
   ],
   "discoveries": [
@@ -50,7 +90,17 @@
       "workRequired": 100,
       "creativity": 10,
       "requiredDiscoveries": [],
-      "completionMakesAvailable": ["discovery2", "product1"]
+      "completionMakesAvailable": ["discovery2", "product1"],
+      "quiz": {
+        "question": "What is the scientific method?",
+        "options": [
+          "A systematic process involving observation, hypothesis formation, experimentation, and analysis",
+          "A way to prove theories beyond any doubt",
+          "A method used exclusively in chemistry and physics",
+          "A process that only works in controlled laboratory environments"
+        ],
+        "correctOptionIndex": 0
+      }
     },
     {
       "id": "discovery2",
@@ -60,7 +110,17 @@
       "workRequired": 1000,
       "creativity": 20,
       "requiredDiscoveries": ["discovery1"],
-      "completionMakesAvailable": ["product2"]
+      "completionMakesAvailable": ["product2"],
+      "quiz": {
+        "question": "What is the purpose of peer review in scientific research?",
+        "options": [
+          "To prevent any research from being published",
+          "To evaluate research for methodological soundness and validity",
+          "To ensure research supports existing theories only",
+          "To determine which researchers get funded"
+        ],
+        "correctOptionIndex": 1
+      }
     },
     {
       "id": "discoveryA",
@@ -70,7 +130,17 @@
       "workRequired": 1500,
       "creativity": 30,
       "requiredDiscoveries": [],
-      "completionMakesAvailable": ["discoveryB", "productA"]
+      "completionMakesAvailable": ["discoveryB", "productA"],
+      "quiz": {
+        "question": "Which of the following best describes a hypothesis?",
+        "options": [
+          "A proven scientific fact",
+          "An observation made during an experiment",
+          "A testable explanation for an observation",
+          "The final result of scientific research"
+        ],
+        "correctOptionIndex": 2
+      }
     },
     {
       "id": "discoveryB",
@@ -80,7 +150,17 @@
       "workRequired": 2000,
       "creativity": 40,
       "requiredDiscoveries": ["discoveryA"],
-      "completionMakesAvailable": ["productB"]
+      "completionMakesAvailable": ["productB"],
+      "quiz": {
+        "question": "What is the role of data analysis in scientific discovery?",
+        "options": [
+          "To make the research paper longer",
+          "To hide flaws in experimental design",
+          "To interpret results and draw meaningful conclusions",
+          "To ensure the hypothesis is always proven correct"
+        ],
+        "correctOptionIndex": 2
+      }
     }
   ]
 }
