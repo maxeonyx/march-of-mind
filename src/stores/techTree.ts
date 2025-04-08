@@ -101,6 +101,7 @@ export const useTechTreeStore = defineStore('techTree', () => {
       console.log(`Completed: ${tech?.name || id}`);
       unlocked_progress.delete(id); // Remove from progress tracking
       complete.value.add(id);       // Add to completed set
+      available.value.delete(id);   // Remove from available list
 
       // Deselect if it was the currently selected item
       if (tech) {
