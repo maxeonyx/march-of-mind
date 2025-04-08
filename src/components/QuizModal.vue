@@ -77,47 +77,49 @@ function checkAnswer(selectedIndex: number) {
   const correctIndex = quizData.value.correctOptionIndex;
   
   if (selectedIndex === correctIndex) {
-    // Correct answer
+    // Correct answer, proceed immediately
+    if (techId.value) {
+      techTreeStore.unlock(techId.value);
+      
+      // Determine tech type and select it
+      const tech = findTechById(techId.value);
+      if (tech?.type === 'product') {
+        techTreeStore.selectProduct(techId.value);
+      } else if (tech?.type === 'discovery') {
+        techTreeStore.selectDiscovery(techId.value);
+      }
+      
+      // Hide the modal
+      uiStore.hideQuizModal();
+    }
+  } else {
+    // Incorrect answer - show brief feedback and 5 second wait
+    lastIncorrectIndex.value = selectedIndex;
     areAnswersDisabled.value = true;
     countdown.value = 5;
-    
+
     // Clear any existing interval
     if (countdownInterval.value) {
       clearInterval(countdownInterval.value);
     }
-    
+
     // Start the countdown
     countdownInterval.value = setInterval(() => {
       countdown.value--;
-      
+
       if (countdown.value <= 0) {
         // Clear the interval
         if (countdownInterval.value) {
           clearInterval(countdownInterval.value);
           countdownInterval.value = null;
         }
-        
-        // Proceed with unlocking the tech
-        if (techId.value) {
-          techTreeStore.unlock(techId.value);
-          
-          // Determine tech type and select it
-          const tech = findTechById(techId.value);
-          if (tech?.type === 'product') {
-            techTreeStore.selectProduct(techId.value);
-          } else if (tech?.type === 'discovery') {
-            techTreeStore.selectDiscovery(techId.value);
-          }
-          
-          // Hide the modal
-          uiStore.hideQuizModal();
-        }
+
+        // Re-enable answers after countdown
+        areAnswersDisabled.value = false;
+        lastIncorrectIndex.value = null;
       }
     }, 1000);
-  } else {
-    // Incorrect answer - show brief feedback
-    lastIncorrectIndex.value = selectedIndex;
-    
+
     // Reset the feedback after a short delay
     setTimeout(() => {
       lastIncorrectIndex.value = null;
