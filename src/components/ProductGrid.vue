@@ -25,7 +25,13 @@
           :key="id"
           class="completed-item"
         >
-          {{ findTechById(id)?.name || 'Unknown' }}
+          <template v-if="findTechById(id)">
+            {{ findTechById(id).name }}<br>
+            <span class="income-info">+{{ findTechById(id).incomeGenerated }} income</span>
+          </template>
+          <template v-else>
+            Unknown
+          </template>
         </div>
         <div v-if="techTreeStore.completedProducts.length === 0" class="empty-message">
           No completed products yet
@@ -106,5 +112,10 @@ h4 {
   background-color: #eef6ff;
   border: 1px solid #b3d4fc;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.income-info {
+  font-size: 0.75rem;
+  color: #333;
 }
 </style>
