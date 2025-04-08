@@ -18,7 +18,7 @@ export const useTimeStore = defineStore('time', () => {
   const isRunning = ref(false);
   const isPausedManually = ref(false); // For quiz modal or other manual pauses
   const lastTickTimestamp = ref<number | null>(null);
-  let timerId: number | null = null; // To hold the setTimeout ID
+  const timerId = ref<number | null>(null); // To hold the setTimeout ID
 
   // --- Getters ---
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -83,7 +83,7 @@ export const useTimeStore = defineStore('time', () => {
     lastTickTimestamp.value = now;
 
     // Schedule the next tick ~1 second later
-    timerId = setTimeout(tick, 1000);
+    timerId.value = setTimeout(tick, 1000);
   }
 
   function startGame() {
@@ -115,9 +115,9 @@ export const useTimeStore = defineStore('time', () => {
     console.log("Stopping game loop...");
     isRunning.value = false;
     isPausedManually.value = false; // Reset manual pause when stopping
-    if (timerId) {
-      clearTimeout(timerId);
-      timerId = null;
+    if (timerId.value) {
+      clearTimeout(timerId.value);
+      timerId.value = null;
     }
     lastTickTimestamp.value = null; // Clear timestamp when stopped
   }
@@ -163,6 +163,8 @@ export const useTimeStore = defineStore('time', () => {
     currentMonthIndex,
     isRunning,
     isPausedManually,
+    lastTickTimestamp,
+    timerId,
     // Getters
     displayDate,
     // Actions

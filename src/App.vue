@@ -5,19 +5,21 @@
     <main>
       <div class="game-controls">
         <button 
-          @click="startGame" 
-          :disabled="timeStore.isRunning" 
-          class="start-button"
+          @click="resetGame" 
+          class="reset-button"
         >
-          Start Game
+          Reset Game
         </button>
         <button 
-          @click="stopGame" 
-          :disabled="!timeStore.isRunning" 
-          class="stop-button"
+          @click="togglePause" 
+          class="toggle-button"
+          :class="{ 'paused': !timeStore.isRunning || timeStore.isPausedManually }"
         >
-          Stop Game
+          {{ isPaused ? 'Resume Game' : 'Pause Game' }}
         </button>
+        <div class="game-status">
+          The game loop is {{ isPaused ? 'paused' : 'running' }}
+        </div>
       </div>
 
       <div class="main-content">
@@ -85,12 +87,50 @@ function initializeAllStores() {
 }
 
 // Game control functions
-function startGame() {
-  timeStore.startGame();
+function resetGame() {
+  // First pause the game if it's running
+  if (!isPaused.value) {
+    togglePause();
+  }
+  
+  // Reset all stores to initial state
+  resourcesStore.initialize();
+  datacentreStore.initialize();
+  techTreeStore.initialize();
+  timeStore.initialize();
+  
+  // Start the game after reset
+  togglePause();
+  
+  console.log('Game has been reset to initial state');
 }
 
-function stopGame() {
-  timeStore.stopGame();
+const isPaused = computed(() => {
+  return !timeStore.isRunning || timeStore.isPausedManually;
+});
+
+function togglePause() {
+  if (isPaused.value) {
+    // Resume the game
+    if (!timeStore.isRunning) {
+      // If completely stopped, start the game
+      timeStore.startGame();
+    } else if (timeStore.isPausedManually) {
+      // If just paused, resume
+      timeStore.isPausedManually = false;
+      timeStore.lastTickTimestamp = Date.now(); // Reset timestamp to prevent time jump
+      
+      // Restart tick loop if needed
+      if (timeStore.timerId === null) {
+        timeStore.tick();
+      }
+    }
+    console.log('Game resumed');
+  } else {
+    // Pause the game
+    timeStore.isPausedManually = true;
+    console.log('Game paused');
+  }
 }
 
 // Start the game when the component is mounted
@@ -158,12 +198,22 @@ main {
   margin: 1rem 0;
 }
 
-.start-button {
+.reset-button {
+  background-color: var(--error-color);
+}
+
+.toggle-button {
   background-color: var(--primary-color);
 }
 
-.stop-button {
-  background-color: var(--error-color);
+.toggle-button.paused {
+  background-color: #f39c12; /* Orange for paused state */
+}
+
+.game-status {
+  margin-left: 1rem;
+  font-weight: bold;
+  display: inline-block;
 }
 
 .debug-section {
