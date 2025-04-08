@@ -113,22 +113,17 @@ function togglePause() {
   if (isPaused.value) {
     // Resume the game
     if (!timeStore.isRunning) {
-      // If completely stopped, start the game
+      // If completely stopped, start the game (this might be desired after a reset or initial load)
       timeStore.startGame();
-    } else if (timeStore.isPausedManually) {
-      // If just paused, resume
-      timeStore.isPausedManually = false;
-      timeStore.lastTickTimestamp = Date.now(); // Reset timestamp to prevent time jump
-      
-      // Restart tick loop if needed
-      if (timeStore.timerId === null) {
-        timeStore.tick();
-      }
+      console.log('Game started');
+    } else {
+      // If running but paused manually, use the dedicated resume action
+      timeStore.resumeManually();
+      console.log('Game resumed');
     }
-    console.log('Game resumed');
   } else {
-    // Pause the game
-    timeStore.isPausedManually = true;
+    // Pause the game using the dedicated pause action
+    timeStore.pauseManually();
     console.log('Game paused');
   }
 }
