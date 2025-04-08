@@ -1,6 +1,9 @@
 import { ref } from 'vue';
-import hardwareData from '../data/hardware.json' assert { type: 'json' };
-import techTreeData from '../data/techTree.json' assert { type: 'json' };
+// Import JSON data
+// @ts-ignore - Needed for JSON imports
+import hardwareData from '../data/hardware.json';
+// @ts-ignore - Needed for JSON imports
+import techTreeData from '../data/techTree.json';
 
 // Use simple refs for static data accessible across the app
 export const allHardware = ref(hardwareData);

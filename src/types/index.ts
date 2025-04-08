@@ -16,6 +16,45 @@ export interface VersionInfo {
   buildTime: string;
 }
 
+/**
+ * Quiz data structure
+ */
+export interface Quiz {
+  question: string;
+  options: string[];
+  correctOptionIndex: number;
+}
+
+/**
+ * Base tech item interface
+ */
+export interface TechItem {
+  id: string;
+  type: 'product' | 'discovery';
+  name: string;
+  description: string;
+  workRequired: number;
+  requiredDiscoveries: string[];
+  completionMakesAvailable: string[];
+  quiz?: Quiz;
+}
+
+/**
+ * Product interface
+ */
+export interface Product extends TechItem {
+  type: 'product';
+  incomeGenerated: number;
+}
+
+/**
+ * Discovery interface
+ */
+export interface Discovery extends TechItem {
+  type: 'discovery';
+  creativity: number;
+}
+
 // Global window interface extensions for testing compatibility
 declare global {
   interface Window {
@@ -30,7 +69,7 @@ declare global {
     __datacentreStore?: {
       numResearchers: number;
       currentHardwareId: string;
-      proportionWorkSpentOnProducts: number;
+      proportionWorkSpentOnResearch: number;
     };
     __techTreeStore?: {
       currentlySelectedProduct: string | null;
@@ -40,10 +79,19 @@ declare global {
     };
     __timeStore?: {
       isRunning: boolean;
+      isPausedManually: boolean;
       currentYear: number;
       currentMonthIndex: number;
       tick: () => void;
       performTick: (deltaTimeSeconds: number) => void;
+      pauseManually: () => void;
+      resumeManually: () => void;
+    };
+    __uiStore?: {
+      isQuizModalVisible: boolean;
+      quizTechId: string | null;
+      showQuizModal: (techId: string) => void;
+      hideQuizModal: () => void;
     };
     __appMethods?: {
       dummyMethod: () => void;

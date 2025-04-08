@@ -45,6 +45,9 @@
         Built: {{ new Date(versionInfo.buildTime).toLocaleString() }}
       </p>
     </footer>
+
+    <!-- Quiz Modal Component -->
+    <QuizModal />
   </div>
 </template>
 
@@ -56,6 +59,7 @@ import ResourcePanel from './components/ResourcePanel.vue';
 import DatacentrePanel from './components/DatacentrePanel.vue';
 import TechnologyPanel from './components/TechnologyPanel.vue';
 import DebugPanel from './components/DebugPanel.vue';
+import QuizModal from './components/QuizModal.vue';
 
 // Import stores for initialization
 import { useResourcesStore } from './stores/resources';

@@ -20,8 +20,10 @@
 import { computed } from 'vue';
 import { findTechById } from '../stores/staticData';
 import { useTechTreeStore } from '../stores/techTree';
+import { useUiStore } from '../stores/ui';
 
 const techTreeStore = useTechTreeStore();
+const uiStore = useUiStore();
 
 const props = defineProps({
   id: {
@@ -51,8 +53,15 @@ const progressPercentage = computed(() => {
 
 function handleClick() {
   if (props.isLocked) {
-    // Unlock the card if it's locked
-    techTreeStore.unlock(props.id);
+    // Check if this tech has a quiz
+    const techData = findTechById(props.id);
+    if (techData && techData.quiz) {
+      // Show the quiz modal if there's a quiz
+      uiStore.showQuizModal(props.id);
+    } else {
+      // Otherwise unlock directly (fallback for techs without quizzes)
+      techTreeStore.unlock(props.id);
+    }
   } else {
     // Select the card if it's already unlocked
     if (tech.value?.type === 'product') {

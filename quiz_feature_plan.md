@@ -145,44 +145,43 @@ paused, and background UI interaction will be disabled. Upon selecting the corre
                                                                                                                                                                                                       
 ## Checklist                                                                                                                                                                                          
                                                                                                                                                                                                       
-*   [ ] Define `quiz` structure in documentation/notes.                                                                                                                                               
-*   [ ] Add simplified `quiz` data to relevant items in `src/data/techTree.json`.                                                                                                                     
-*   [ ] Create `src/stores/ui.ts` file.                                                                                                                                                               
-*   [ ] Define `ui` store in `src/stores/ui.ts`.                                                                                                                                                      
-*   [ ] Add `isQuizModalVisible` state to `uiStore`.                                                                                                                                                  
-*   [ ] Add `quizTechId` state to `uiStore`.                                                                                                                                                          
-*   [ ] Add `showQuizModal` action to `uiStore`.                                                                                                                                                      
-*   [ ] Add `hideQuizModal` action to `uiStore`.                                                                                                                                                      
-*   [ ] Add `isPausedManually` state to `timeStore`.                                                                                                                                                  
-*   [ ] Add `pauseManually` action to `timeStore`.                                                                                                                                                    
-*   [ ] Add `resumeManually` action to `timeStore`.                                                                                                                                                   
-*   [ ] Modify `timeStore.tick()` to check `isPausedManually`.                                                                                                                                        
-*   [ ] Ensure `timeStore.startGame()` resets `isPausedManually`.                                                                                                                                     
-*   [ ] Ensure `timeStore.stopGame()` resets `isPausedManually`.                                                                                                                                      
-*   [ ] Implement `uiStore.showQuizModal` logic (set state, call `timeStore.pauseManually`).                                                                                                          
-*   [ ] Implement `uiStore.hideQuizModal` logic (clear state, call `timeStore.resumeManually`).                                                                                                       
-*   [ ] Create `src/components/QuizModal.vue` file.                                                                                                                                                   
-*   [ ] Implement `QuizModal.vue` script setup (imports, stores, component state refs: `areAnswersDisabled`, `countdown`, `countdownInterval`).                                                       
-*   [ ] Implement `QuizModal.vue` computed props (`isVisible`, `techId`, `quizData`).                                                                                                                 
-*   [ ] Implement `QuizModal.vue` template (v-if, overlay, container, question, option buttons with `:disabled`, conditional countdown display, cancel button).                                       
-*   [ ] Implement `QuizModal.vue` `checkAnswer` method logic:                                                                                                                                         
-    *   [ ] Correct answer: Set disabled, start countdown interval.                                                                                                                                   
-    *   [ ] Interval logic: Decrement countdown, on zero clear interval, call unlock, select, hide.                                                                                                   
-    *   [ ] Incorrect answer: Simple feedback.                                                                                                                                                        
-*   [ ] Implement `QuizModal.vue` `cancelQuiz` method (clear interval, call hide).                                                                                                                    
-*   [ ] Implement `QuizModal.vue` watcher to reset state on hide.                                                                                                                                     
-*   [ ] Add basic CSS for overlay in `QuizModal.vue`.                                                                                                                                                 
-*   [ ] Add basic CSS for modal container in `QuizModal.vue`.                                                                                                                                         
-*   [ ] Modify `TechCard.vue`'s `handleClick` to import and use `uiStore`, call `showQuizModal`.                                                                                                      
-*   [ ] Import `QuizModal` component in `src/App.vue`.                                                                                                                                                
-*   [ ] Add `<QuizModal />` tag to `src/App.vue` template.                                                                                                                                            
-*   [ ] Test clicking a locked card triggers the modal.                                                                                                                                               
-*   [ ] Test game time pauses when modal is open.                                                                                                                                                     
-*   [ ] Test background UI is non-interactive.                                                                                                                                                        
-*   [ ] Test clicking correct answer disables buttons and shows countdown.                                                                                                                            
-*   [ ] Test after countdown: card unlocks, selects, modal closes, time resumes.                                                                                                                      
-*   [ ] Test clicking incorrect answer provides feedback, keeps modal open/interactive.                                                                                                               
-*   [ ] Test cancel button clears timer (if running), closes modal, resumes time.                                                                                                                     
-*   [ ] Test watcher resets modal state correctly for subsequent openings.                                                                                                                            
-*   [ ] Test clicking unlocked card still performs select action.                                                                                                                                     
-                                                                    
+*   [x] Define `quiz` structure in documentation/notes.                                                                                                                                               
+*   [x] Add simplified `quiz` data to relevant items in `src/data/techTree.json`.                                                                                                                     
+*   [x] Create `src/stores/ui.ts` file.                                                                                                                                                               
+*   [x] Define `ui` store in `src/stores/ui.ts`.                                                                                                                                                      
+*   [x] Add `isQuizModalVisible` state to `uiStore`.                                                                                                                                                  
+*   [x] Add `quizTechId` state to `uiStore`.                                                                                                                                                          
+*   [x] Add `showQuizModal` action to `uiStore`.                                                                                                                                                      
+*   [x] Add `hideQuizModal` action to `uiStore`.                                                                                                                                                      
+*   [x] Add `isPausedManually` state to `timeStore`.                                                                                                                                                  
+*   [x] Add `pauseManually` action to `timeStore`.                                                                                                                                                    
+*   [x] Add `resumeManually` action to `timeStore`.                                                                                                                                                   
+*   [x] Modify `timeStore.tick()` to check `isPausedManually`.                                                                                                                                        
+*   [x] Ensure `timeStore.startGame()` resets `isPausedManually`.                                                                                                                                     
+*   [x] Ensure `timeStore.stopGame()` resets `isPausedManually`.                                                                                                                                      
+*   [x] Implement `uiStore.showQuizModal` logic (set state, call `timeStore.pauseManually`).                                                                                                          
+*   [x] Implement `uiStore.hideQuizModal` logic (clear state, call `timeStore.resumeManually`).                                                                                                       
+*   [x] Create `src/components/QuizModal.vue` file.                                                                                                                                                   
+*   [x] Implement `QuizModal.vue` script setup (imports, stores, component state refs: `areAnswersDisabled`, `countdown`, `countdownInterval`).                                                       
+*   [x] Implement `QuizModal.vue` computed props (`isVisible`, `techId`, `quizData`).                                                                                                                 
+*   [x] Implement `QuizModal.vue` template (v-if, overlay, container, question, option buttons with `:disabled`, conditional countdown display, cancel button).                                       
+*   [x] Implement `QuizModal.vue` `checkAnswer` method logic:                                                                                                                                         
+    *   [x] Correct answer: Set disabled, start countdown interval.                                                                                                                                   
+    *   [x] Interval logic: Decrement countdown, on zero clear interval, call unlock, select, hide.                                                                                                   
+    *   [x] Incorrect answer: Simple feedback.                                                                                                                                                        
+*   [x] Implement `QuizModal.vue` `cancelQuiz` method (clear interval, call hide).                                                                                                                    
+*   [x] Implement `QuizModal.vue` watcher to reset state on hide.                                                                                                                                     
+*   [x] Add basic CSS for overlay in `QuizModal.vue`.                                                                                                                                                 
+*   [x] Add basic CSS for modal container in `QuizModal.vue`.                                                                                                                                         
+*   [x] Modify `TechCard.vue`'s `handleClick` to import and use `uiStore`, call `showQuizModal`.                                                                                                      
+*   [x] Import `QuizModal` component in `src/App.vue`.                                                                                                                                                
+*   [x] Add `<QuizModal />` tag to `src/App.vue` template.                                                                                                                                            
+*   [x] Test clicking a locked card triggers the modal.                                                                                                                                               
+*   [x] Test game time pauses when modal is open.                                                                                                                                                     
+*   [x] Test background UI is non-interactive.                                                                                                                                                        
+*   [x] Test clicking correct answer disables buttons and shows countdown.                                                                                                                            
+*   [x] Test after countdown: card unlocks, selects, modal closes, time resumes.                                                                                                                      
+*   [x] Test clicking incorrect answer provides feedback, keeps modal open/interactive.                                                                                                               
+*   [x] Test cancel button clears timer (if running), closes modal, resumes time.                                                                                                                     
+*   [x] Test watcher resets modal state correctly for subsequent openings.                                                                                                                            
+*   [x] Test clicking unlocked card still performs select action.                                                                                                                                     
