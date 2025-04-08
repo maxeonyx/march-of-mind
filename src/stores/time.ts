@@ -139,7 +139,7 @@ export const useTimeStore = defineStore('time', () => {
     lastTickTimestamp.value = Date.now();
     
     // Restart the tick cycle if it's not already running
-    if (timerId === null) {
+    if (timerId.value === null) {
       tick();
     }
   }
@@ -151,9 +151,9 @@ export const useTimeStore = defineStore('time', () => {
     isRunning.value = false;
     isPausedManually.value = false;
     lastTickTimestamp.value = null;
-    if (timerId) {
-      clearTimeout(timerId);
-      timerId = null;
+    if (timerId.value) {
+      clearTimeout(timerId.value);
+      timerId.value = null;
     }
   }
 
