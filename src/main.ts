@@ -34,16 +34,7 @@ if (typeof window !== 'undefined' && !window.__APP_STORE_INITIALIZED) {
     window.__timeStore = timeStore;
     
     window.__appMethods = {
-      // Add basic methods for test compatibility
       dummyMethod: () => console.log('Test method called'),
-      initializeStores: () => {
-        resourcesStore.initialize();
-        datacentreStore.initialize();
-        techTreeStore.initialize();
-        timeStore.initialize();
-      },
-      startGame: () => timeStore.startGame(),
-      stopGame: () => timeStore.stopGame()
     };
   }, 0);
 }

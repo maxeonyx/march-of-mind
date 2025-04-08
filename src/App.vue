@@ -3,24 +3,6 @@
     <HeaderPanel />
     
     <main>
-      <div class="game-controls">
-        <button 
-          @click="resetGame" 
-          class="reset-button"
-        >
-          Reset Game
-        </button>
-        <button 
-          @click="togglePause" 
-          class="toggle-button"
-          :class="{ 'paused': !timeStore.isRunning || timeStore.isPausedManually }"
-        >
-          {{ isPaused ? 'Resume Game' : 'Pause Game' }}
-        </button>
-        <div class="game-status">
-          The game loop is {{ isPaused ? 'paused' : 'running' }}
-        </div>
-      </div>
 
       <div class="main-content">
         <div class="left-column">
@@ -35,10 +17,6 @@
       <!-- Debug Panel with advanced actions - will be removed later -->
       <DebugPanel />
       
-      <div class="debug-section">
-        <h3>Debug Controls</h3>
-        <button @click="initializeAllStores">Initialize All Stores</button>
-      </div>
     </main>
     
     <footer>
@@ -63,74 +41,14 @@ import TechnologyPanel from './components/TechnologyPanel.vue';
 import DebugPanel from './components/DebugPanel.vue';
 import QuizModal from './components/QuizModal.vue';
 
-// Import stores for initialization
-import { useResourcesStore } from './stores/resources';
-import { useDatacentreStore } from './stores/datacentre';
-import { useTechTreeStore } from './stores/techTree';
 import { useTimeStore } from './stores/time';
 
 const { version: versionInfo } = useVersion();
 const version = computed(() => versionInfo.value?.version || '0.0.0');
 
-// For debugging initialization
-const resourcesStore = useResourcesStore();
-const datacentreStore = useDatacentreStore();
-const techTreeStore = useTechTreeStore();
 const timeStore = useTimeStore();
 
-function initializeAllStores() {
-  resourcesStore.initialize();
-  datacentreStore.initialize();
-  techTreeStore.initialize();
-  timeStore.initialize();
-  console.log('All stores initialized');
-}
-
-// Game control functions
-function resetGame() {
-  // First pause the game if it's running
-  if (!isPaused.value) {
-    togglePause();
-  }
-  
-  // Reset all stores to initial state
-  resourcesStore.initialize();
-  datacentreStore.initialize();
-  techTreeStore.initialize();
-  timeStore.initialize();
-  
-  // Start the game after reset
-  togglePause();
-  
-  console.log('Game has been reset to initial state');
-}
-
-const isPaused = computed(() => {
-  return !timeStore.isRunning || timeStore.isPausedManually;
-});
-
-function togglePause() {
-  if (isPaused.value) {
-    // Resume the game
-    if (!timeStore.isRunning) {
-      // If completely stopped, start the game (this might be desired after a reset or initial load)
-      timeStore.startGame();
-      console.log('Game started');
-    } else {
-      // If running but paused manually, use the dedicated resume action
-      timeStore.resumeManually();
-      console.log('Game resumed');
-    }
-  } else {
-    // Pause the game using the dedicated pause action
-    timeStore.pauseManually();
-    console.log('Game paused');
-  }
-}
-
-// Start the game when the component is mounted
 onMounted(() => {
-  // Start game automatically
   timeStore.startGame();
 });
 </script>
@@ -184,31 +102,6 @@ main {
   flex-direction: column;
   gap: 20px;
   height: 100%;
-}
-
-.game-controls {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin: 1rem 0;
-}
-
-.reset-button {
-  background-color: var(--error-color);
-}
-
-.toggle-button {
-  background-color: var(--primary-color);
-}
-
-.toggle-button.paused {
-  background-color: #f39c12; /* Orange for paused state */
-}
-
-.game-status {
-  margin-left: 1rem;
-  font-weight: bold;
-  display: inline-block;
 }
 
 .debug-section {

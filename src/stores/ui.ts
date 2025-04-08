@@ -12,7 +12,7 @@ export const useUiStore = defineStore('ui', () => {
     const timeStore = useTimeStore();
     quizTechId.value = techId;
     isQuizModalVisible.value = true;
-    timeStore.pauseManually();
+    // timeStore.pauseManually(); // Removed pause
     console.log(`Showing quiz modal for tech ${techId}`);
   }
 
@@ -20,8 +20,8 @@ export const useUiStore = defineStore('ui', () => {
     const timeStore = useTimeStore();
     isQuizModalVisible.value = false;
     quizTechId.value = null;
-    timeStore.resumeManually();
-    console.log('Quiz modal hidden, game resumed');
+    // timeStore.resumeManually(); // Removed resume
+    console.log('Quiz modal hidden');
   }
 
   return {

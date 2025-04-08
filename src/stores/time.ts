@@ -16,7 +16,6 @@ export const useTimeStore = defineStore('time', () => {
   const currentYear = ref(START_YEAR);
   const currentMonthIndex = ref(0); // 0 = January, 1 = February, ... 11 = December
   const isRunning = ref(false);
-  const isPausedManually = ref(false); // For quiz modal or other manual pauses
   const lastTickTimestamp = ref<number | null>(null);
   const timerId = ref<number | null>(null); // To hold the setTimeout ID
 
@@ -27,7 +26,7 @@ export const useTimeStore = defineStore('time', () => {
   // --- Actions ---
   // The core update logic for one tick interval
   function performTick(deltaTimeSeconds: number) {
-    if (!isRunning.value || isPausedManually.value) return;
+    if (!isRunning.value) return;
 
     const resourcesStore = useResourcesStore();
     const datacentreStore = useDatacentreStore();
@@ -68,7 +67,7 @@ export const useTimeStore = defineStore('time', () => {
 
   // Robust tick function using setTimeout
   function tick() {
-    if (!isRunning.value || isPausedManually.value) return; // Stop if game paused/stopped
+    if (!isRunning.value) return; // Stop if game stopped
 
     const now = Date.now();
     // Ensure lastTickTimestamp is set on the very first tick after starting
@@ -89,23 +88,13 @@ export const useTimeStore = defineStore('time', () => {
   function startGame() {
     if (isRunning.value) return; // Already running
     console.log("Starting game loop...");
-    
-    // Initialize all stores
-    const resourcesStore = useResourcesStore();
-    const datacentreStore = useDatacentreStore();
-    const techTreeStore = useTechTreeStore();
-    
-    resourcesStore.initialize();
-    datacentreStore.initialize();
-    techTreeStore.initialize();
-    
+
     // Initialize time
     currentYear.value = START_YEAR;
     currentMonthIndex.value = 0;
     lastTickTimestamp.value = null; // Reset timestamp for accurate first delta
-    isPausedManually.value = false; // Ensure not paused when starting
     isRunning.value = true;
-    
+
     // Start the loop
     tick(); // Start the first tick immediately
   }
@@ -114,7 +103,6 @@ export const useTimeStore = defineStore('time', () => {
     if (!isRunning.value) return;
     console.log("Stopping game loop...");
     isRunning.value = false;
-    isPausedManually.value = false; // Reset manual pause when stopping
     if (timerId.value) {
       clearTimeout(timerId.value);
       timerId.value = null;
@@ -122,34 +110,11 @@ export const useTimeStore = defineStore('time', () => {
     lastTickTimestamp.value = null; // Clear timestamp when stopped
   }
 
-  function pauseManually() {
-    if (!isRunning.value) return;
-    console.log("Game manually paused");
-    isPausedManually.value = true;
-    // We don't clear the timerId here as we want the tick function to keep checking
-    // but performTick won't execute while isPausedManually is true
-  }
-
-  function resumeManually() {
-    if (!isRunning.value) return;
-    console.log("Game manually resumed");
-    isPausedManually.value = false;
-    
-    // Reset the timestamp to prevent a big time jump when resuming
-    lastTickTimestamp.value = Date.now();
-    
-    // Restart the tick cycle if it's not already running
-    if (timerId.value === null) {
-      tick();
-    }
-  }
-
   function initialize() {
     console.log("Initializing time store");
     currentYear.value = START_YEAR;
     currentMonthIndex.value = 0;
     isRunning.value = false;
-    isPausedManually.value = false;
     lastTickTimestamp.value = null;
     if (timerId.value) {
       clearTimeout(timerId.value);
@@ -162,7 +127,6 @@ export const useTimeStore = defineStore('time', () => {
     currentYear,
     currentMonthIndex,
     isRunning,
-    isPausedManually,
     lastTickTimestamp,
     timerId,
     // Getters
@@ -170,8 +134,6 @@ export const useTimeStore = defineStore('time', () => {
     // Actions
     startGame,
     stopGame,
-    pauseManually,
-    resumeManually,
     tick,
     performTick,
     initialize,

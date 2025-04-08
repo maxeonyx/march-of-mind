@@ -79,13 +79,10 @@ declare global {
     };
     __timeStore?: {
       isRunning: boolean;
-      isPausedManually: boolean;
       currentYear: number;
       currentMonthIndex: number;
       tick: () => void;
       performTick: (deltaTimeSeconds: number) => void;
-      pauseManually: () => void;
-      resumeManually: () => void;
     };
     __uiStore?: {
       isQuizModalVisible: boolean;
@@ -95,9 +92,6 @@ declare global {
     };
     __appMethods?: {
       dummyMethod: () => void;
-      initializeStores: () => void;
-      startGame: () => void;
-      stopGame: () => void;
     };
   }
 }
