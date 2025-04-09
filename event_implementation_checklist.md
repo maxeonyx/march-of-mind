@@ -701,34 +701,32 @@ Follow these instructions carefully. Do not deviate without consultation.
       };
     });
     ```
-
 **Step 8: Create Founder Panel Component (Startup Phase)**
 
 1.  Create a new file `src/components/FounderPanel.vue`.
-2.  Add the following code for manual work generation:
+2.  Add the following code. Note the comments explaining the limitation of manual work to discoveries in this phase.
 
     ```vue
     <template>
       <div class="founder-panel panel-card">
         <h3>Founder Actions (Startup Phase)</h3>
-        <p>Manually drive research by clicking the button below.</p>
-
+        <p>Manually drive initial breakthroughs by applying focused effort to discoveries.</p>
         <div v-if="techTreeStore.currentlySelectedDiscovery">
-          <p>Selected Discovery: <strong>{{ selectedDiscoveryName }}</strong></p>
+          <p>Applying effort to: <strong>{{ selectedDiscoveryName }}</strong></p>
           <button @click="doManualResearch" :disabled="!canDoResearch">
-            Do Research (Generates {{ manualWorkPerClick.toFixed(2) }} Work)
+            Focus Effort (Applies {{ manualWorkPerClick.toFixed(2) }} Work)
           </button>
           <p v-if="!canDoResearch" class="error-message">
-            Cannot do research: No discovery selected.
+            Cannot apply effort: No discovery selected.
           </p>
         </div>
         <div v-else>
-          <p class="info-message">Select an available Discovery to begin research.</p>
-          <button disabled>Do Research</button>
+          <p class="info-message">Select an available Discovery to begin.</p>
+          <button disabled>Focus Effort</button>
         </div>
 
         <div class="manual-work-info">
-          Work per click = FLOPS<sup>0.7</sup> * 1<sup>0.3</sup> (Base Creativity per click)
+          Work per Click ≈ FLOPS<sup>0.7</sup> &times; 1<sup>0.3</sup> (Base Effort)
           <br/>
           Current FLOPS: {{ resourcesStore.flopsRate }}
         </div>
@@ -754,11 +752,12 @@ Follow these instructions carefully. Do not deviate without consultation.
 
     // Calculate how much work one manual click generates
     const manualWorkPerClick = computed(() => {
-      // Use current FLOPS rate, but assume a fixed "creativity input" of 1 per click
+      // Design Decision: In 'startup', manual effort applies directly to discoveries.
+      // We use current FLOPS, but assume a fixed "creativity input" of 1 per click.
       const flops = resourcesStore.flopsRate;
-      const baseCreativity = 1; // Each click represents one unit of focused effort/creativity
-      // Formula: FLOPS^0.7 * Creativity^0.3
-      return Math.pow(flops, 0.7) * Math.pow(baseCreativity, 0.3);
+      const baseCreativityPerClick = 1; // Represents one unit of focused effort/creativity input.
+      // Formula: Work = FLOPS^0.7 * Creativity^0.3
+      return Math.pow(flops, 0.7) * Math.pow(baseCreativityPerClick, 0.3);
     });
 
     function doManualResearch() {
@@ -852,39 +851,56 @@ Follow these instructions carefully. Do not deviate without consultation.
 2.  Import `usePhaseStore`.
 3.  Import the new `FounderPanel` component.
 4.  Use `v-if` directives to show `FounderPanel` in the 'startup' phase and `ResearchersPanel` + `WorkAllocatorPanel` in the 'lab' phase.
+5.  **Layout Handling:** Choose *one* of the following CSS approaches for handling the layout changes between phases:
+
+    * **Option A (Simpler - Recommended): Using Conditional CSS Classes**
+        * Add a computed property for the phase class.
+        * Bind this class to the `.datacentre-content` div.
+        * Define CSS rules targeting `.startup-layout` and `.lab-layout`.
+    * **Option B (More Complex - Advanced): Using Direct Grid Area Manipulation**
+        * Relies more heavily on the structure within the `<template>` and specific CSS grid area names/rules, potentially using `:has()` if browser support is sufficient/acceptable.
+
+6.  Apply the chosen layout approach (Option A shown below is recommended):
 
     ```vue
     <template>
       <div class="datacentre-panel">
         <h2>Datacentre</h2>
-        <div class="datacentre-content">
+        <div class="datacentre-content" :class="layoutClass">
+
           <template v-if="phaseStore.currentPhase === 'startup'">
-             <FounderPanel class="full-width-startup" />
-             <HardwarePanel class="grid-item-hardware-startup" />
-             <WorkPanel class="full-width-startup" />
+             <FounderPanel class="grid-founder" />
+             <HardwarePanel class="grid-hardware" />
+             <WorkPanel class="grid-work" />
              </template>
 
           <template v-else-if="phaseStore.currentPhase === 'lab'">
-             <ResearchersPanel class="grid-item" />
-             <HardwarePanel class="grid-item" />
-             <WorkPanel class="full-width" />
-             <WorkAllocatorPanel class="full-width" />
+             <ResearchersPanel class="grid-researchers" />
+             <HardwarePanel class="grid-hardware" />
+             <WorkPanel class="grid-work" />
+             <WorkAllocatorPanel class="grid-allocator" />
           </template>
           </div>
       </div>
     </template>
 
     <script setup lang="ts">
+    import { computed } from 'vue'; // Import computed
     import { usePhaseStore } from '../stores/phase'; // Import Phase Store
 
     // Import all possible panels
-    import FounderPanel from './FounderPanel.vue'; // Import new panel
+    import FounderPanel from './FounderPanel.vue';
     import ResearchersPanel from './ResearchersPanel.vue';
     import HardwarePanel from './HardwarePanel.vue';
     import WorkPanel from './WorkPanel.vue';
     import WorkAllocatorPanel from './WorkAllocatorPanel.vue';
 
-    const phaseStore = usePhaseStore(); // Get phase store instance
+    const phaseStore = usePhaseStore();
+
+    // Computed property for layout class (Used with Option A CSS)
+    const layoutClass = computed(() => {
+      return `${phaseStore.currentPhase}-layout`; // e.g., 'startup-layout' or 'lab-layout'
+    });
     </script>
 
     <style scoped>
@@ -898,96 +914,101 @@ Follow these instructions carefully. Do not deviate without consultation.
     h2 {
       margin-top: 0;
       color: #2c3e50;
-      text-align: center; /* Center title */
+      text-align: center;
     }
 
     .datacentre-content {
       display: grid;
       gap: 1rem;
-      /* Default grid for 'lab' phase */
+    }
+
+    /* --- Option A CSS: Using Conditional Layout Classes --- */
+
+    /* Default Layout (Lab Phase) */
+    .datacentre-content.lab-layout {
       grid-template-columns: 1fr 1fr;
       grid-template-areas:
         "researchers hardware"
         "work work"
         "allocator allocator";
     }
+    .lab-layout .grid-researchers { grid-area: researchers; }
+    .lab-layout .grid-hardware { grid-area: hardware; }
+    .lab-layout .grid-work { grid-area: work; }
+    .lab-layout .grid-allocator { grid-area: allocator; }
 
-    /* Grid item placement for 'lab' phase (default) */
-    .grid-item:nth-child(1) { grid-area: researchers; }
-    .grid-item:nth-child(2) { grid-area: hardware; }
-    .full-width:nth-child(3) { grid-area: work; }
-    .full-width:nth-child(4) { grid-area: allocator; }
-
-    /* --- STARTUP PHASE STYLING --- */
-    /* Adjust grid layout for startup phase if needed */
-    .datacentre-content:has(.full-width-startup) { /* Use :has() if browser support allows, or add a class based on phase */
-       grid-template-columns: 1fr; /* Single column for startup */
+    /* Startup Phase Layout */
+    .datacentre-content.startup-layout {
+       grid-template-columns: 1fr; /* Single column */
        grid-template-areas:
          "founder"
          "hardware"
-         "work"; /* Adjust areas */
-       /* Alternatively, apply styles directly in the template using :class binding */
+         "work";
     }
+    .startup-layout .grid-founder { grid-area: founder; }
+    .startup-layout .grid-hardware { grid-area: hardware; }
+    .startup-layout .grid-work { grid-area: work; }
 
-    .full-width-startup:nth-child(1) { grid-area: founder; }
-    .grid-item-hardware-startup { grid-area: hardware; } /* Hardware might need specific placement */
-    .full-width-startup:nth-child(3) { grid-area: work; }
+    /* --- End Option A CSS --- */
 
-    /* Ensure panels take appropriate space */
-    .full-width-startup,
-    .grid-item-hardware-startup {
-       width: 100%;
-    }
+    /* --- Option B CSS: Direct Grid Area (More Complex/Potentially Brittle) --- */
+    /* This approach would skip the :class binding and define grid areas */
+    /* directly on the components, possibly needing more complex selectors */
+    /* or relying on element order. Example (Illustrative, less recommended): */
+    /*
+    .datacentre-content { ... basic grid setup ... }
+    .grid-item:nth-child(1) { grid-area: researchers; } // Might map to FounderPanel in startup
+    .grid-item:nth-child(2) { grid-area: hardware; }
+    .full-width:nth-child(3) { grid-area: work; }
+    .full-width:nth-child(4) { grid-area: allocator; } // Hidden via v-if
+     // Would likely need adjustments based on conditional rendering order.
+    */
+    /* --- End Option B CSS --- */
 
     </style>
     ```
-    *Self-Correction:* The CSS grid adjustments for the startup phase might be complex. A simpler approach for the junior dev might be to use `v-if` on the `.datacentre-content` container itself or use `:class` bindings based on the phase to switch between CSS grid layouts defined in the `<style>` block. Using `:has()` is modern but might lack full support. Let's simplify the CSS instructions or suggest using conditional classes. For now, the provided CSS attempts a basic structure. The junior developer might need to refine this based on visual requirements.
 
 **Step 10: Testing**
 
-Perform the following tests manually:
+Perform the following tests manually, verifying UI elements, console logs, and game state changes (e.g., using browser dev tools to inspect `window.__phaseStore.currentPhase` or `window.__timeStore.isPaused`).
 
-1.  **Startup Phase:**
-    * Verify the "Founder Panel" is displayed in the Datacentre section.
-    * Verify the "Researchers Panel" and "Work Allocator Panel" are hidden.
-    * Verify that selecting a discovery enables the "Do Research" button.
-    * Click "Do Research" multiple times. Verify work is applied to the selected discovery's progress bar in the `TechnologyPanel`. Check the console for logs.
-    * Verify that the game time progresses, but *no automatic work* is applied via the tick (progress should only happen on manual clicks). Check Savings increase if base income exists.
-2.  **First Product Completion:**
-    * Unlock and select the first *product* (e.g., "Product 1" requires "Discovery 1").
-    * Manually click "Do Research" until "Discovery 1" is completed. This should make "Product 1" available.
-    * Unlock "Product 1" (via Quiz or direct unlock if no quiz).
-    * Select "Product 1".
-    * **CRITICAL**: How is work applied to products in the startup phase? The instructions currently only mention applying work to *discoveries*. **Decision:** Modify `FounderPanel`'s `doManualResearch` to apply work to *either* the selected discovery OR the selected product. If both are somehow selected (which shouldn't happen with the current selection logic), prioritize one (e.g., discovery). Or, add a separate button/logic. *Simplest*: Assume startup phase focuses *only* on discoveries. Product work requires the Lab phase. Let's stick to that for simplicity. The user must complete the required *discovery* manually, then the first product completion *event* triggers the transition. Revisit if product work *must* be manual in startup. *Assuming discovery-only manual work*.
-    * Complete "Discovery 1" manually. Unlock "Product 1" (Quiz). Select "Product 1". **Correction:** Product work *cannot* be done manually in this simplified startup phase. The player must complete the *discovery* manually, then the transition to the lab phase happens when the *first product is completed automatically* by the standard game loop *after* transitioning. This avoids manual product work logic. **Revised Test Flow:**
-        * Complete "Discovery 1" manually via `FounderPanel`.
-        * "Product 1" becomes available. Unlock it (via Quiz).
-        * "Discovery 2" becomes available. Unlock and select it.
-        * Manually complete "Discovery 2".
-        * "Product 2" becomes available. Unlock it (via Quiz).
-        * Now, wait. Since automatic work isn't happening in 'startup', nothing progresses. This seems like a flaw in the plan.
-        * **RETHINK:** The trigger is "first product completion". How can a product complete if only discoveries get manual work and automatic work is off?
-        * **NEW PLAN:** The transition must happen upon completing the *first DISCOVERY* that *unlocks* a product. Or, perhaps the very first unlock action? Let's make the trigger: **Completing the first Discovery that has a Product in its `completionMakesAvailable` list.**
-        * **Revised Step 7:** Modify `techTreeStore.completeWork`. Check if `tech.type === 'discovery'` AND `!hasCompletedFirstProductUnlockingDiscovery.value` (new flag) AND `tech.completionMakesAvailable.some(id => findTechById(id)?.type === 'product')`. If true, set the flag, show popup, transition phase.
-        * **Revised Test Flow:**
-            * Start game. Phase is 'startup'. Founder Panel visible.
-            * Select "Discovery 1". Click "Do Research" until complete.
-            * **Upon completion of "Discovery 1"**: Check if the event triggers (console log), popup appears, game pauses.
-            * Close the popup. Verify game resumes.
-            * Verify the phase changes to 'lab' (check `window.__phaseStore.currentPhase` or UI changes).
-            * Verify "Founder Panel" is replaced by "Researchers Panel" and "Work Allocator Panel".
-            * Verify work is now applied *automatically* via the game tick to selected items (product or discovery). Hire a researcher and assign work via the allocator to see progress.
-3.  **Lab Phase:**
-    * Verify the "Researchers Panel" and "Work Allocator Panel" are displayed.
-    * Verify the "Founder Panel" is hidden.
-    * Hire a researcher.
-    * Select an available product or discovery.
-    * Adjust the work allocator.
-    * Verify work is applied automatically over time according to the allocation.
-    * Verify completing subsequent products does *not* trigger the phase transition popup again.
-4.  **Pause/Resume:**
-    * Open the Quiz modal for any tech item. Verify the game date stops advancing. Close the quiz modal. Verify the game date resumes advancing.
-    * Trigger the phase transition popup. Verify the game date stops advancing. Close the popup. Verify the game date resumes advancing.
+1.  **Initial State & Startup Phase Mechanics:**
+    * [ ] Verify the game starts in the `'startup'` phase.
+    * [ ] Verify the `FounderPanel` is visible in the `DatacentrePanel`.
+    * [ ] Verify `ResearchersPanel` and `WorkAllocatorPanel` are hidden.
+    * [ ] Verify selecting an available Discovery enables the "Focus Effort" button in `FounderPanel`.
+    * [ ] Verify clicking "Focus Effort" applies work *only* to the selected Discovery's progress bar (check UI and console logs).
+    * [ ] Verify game time advances (`HeaderPanel` date changes).
+    * [ ] Verify *no automatic work* is applied via the game tick (tech progress *only* occurs via manual clicks).
+    * [ ] Verify Savings increase if there's base income, but Thoughts likely won't increase much (as automatic `workRate` should be near 0 unless researchers are somehow present).
+
+2.  **Event Trigger & Phase Transition:**
+    * [ ] Manually complete the *first Discovery that unlocks a Product* (e.g., "Discovery 1" which unlocks "Product 1") using the "Focus Effort" button.
+    * [ ] **On completion of that specific Discovery:**
+        * [ ] Verify a console log indicates the event trigger ("EVENT: First product completed!" or similar, based on the revised trigger name).
+        * [ ] Verify the informational popup appears ("Milestone Achieved!").
+        * [ ] Verify the game time stops advancing (game is paused). Check `window.__timeStore.isPaused` is true.
+    * [ ] **Close the Popup:**
+        * [ ] Verify the popup closes.
+        * [ ] Verify the game time *resumes* advancing. Check `window.__timeStore.isPaused` is false.
+        * [ ] Verify the game phase has transitioned to `'lab'`. Check `window.__phaseStore.currentPhase`.
+
+3.  **Lab Phase Mechanics:**
+    * [ ] Verify `FounderPanel` is now hidden.
+    * [ ] Verify `ResearchersPanel` and `WorkAllocatorPanel` are now visible.
+    * [ ] Hire a researcher using the `ResearchersPanel`.
+    * [ ] Select an available product or discovery.
+    * [ ] Adjust the `WorkAllocatorPanel` slider.
+    * [ ] Verify work is now applied *automatically* over time via the game tick, according to the allocation, causing progress bars to fill.
+    * [ ] Complete another discovery or product. Verify the phase transition popup *does not* appear again.
+
+4.  **Pause/Resume Functionality:**
+    * [ ] Open the Quiz modal for any tech item. Verify game time pauses. Close the modal. Verify game time resumes.
+    * *Re-verify (if possible by resetting state)* Trigger the phase transition popup again. Verify game time pauses. Close the popup. Verify game time resumes.
+
+5.  **Store State & Initialization:**
+    * [ ] Use browser dev tools to inspect the exposed window variables (`window.__phaseStore`, `window.__timeStore`, `window.__techTreeStore`) to confirm state changes during testing.
+    * [ ] Test any "Initialize" or "Reset" functionality if available (like in `DebugPanel`) to ensure the `hasCompletedFirstProductUnlockingDiscovery` flag and `currentPhase` reset correctly.
 
 ## Implementation Checklist
 
@@ -1005,9 +1026,9 @@ Perform the following tests manually:
 - [ ] Added `hasCompletedFirstProductUnlockingDiscovery` state flag to `src/stores/techTree.ts`.
 - [ ] Modified `completeWork` action in `src/stores/techTree.ts` to detect the completion of the first discovery unlocking a product, trigger `uiStore.showPopup`, and call `phaseStore.setPhase('lab')`.
 - [ ] Reset `hasCompletedFirstProductUnlockingDiscovery` flag in `techTreeStore.initialize`.
-- [ ] Created `src/components/FounderPanel.vue` with a "Do Research" button applying manual work to the selected *discovery*.
+- [ ] Created `src/components/FounderPanel.vue` with a "Focus Effort" button applying manual work to the selected *discovery*, including explanatory comments.
 - [ ] Imported `usePhaseStore` and `FounderPanel` into `src/components/DatacentrePanel.vue`.
-- [ ] Implemented conditional rendering in `DatacentrePanel.vue` using `v-if` based on `phaseStore.currentPhase` to show `FounderPanel` ('startup') or `ResearchersPanel`/`WorkAllocatorPanel` ('lab').
-- [ ] Performed manual testing as outlined in the "Testing" section, verifying startup mechanics, event trigger, popup, pause/resume, phase transition, and lab mechanics.
+- [ ] Implemented conditional rendering in `DatacentrePanel.vue` using `v-if` based on `phaseStore.currentPhase` to show `FounderPanel` ('startup') or `ResearchersPanel`/`WorkAllocatorPanel` ('lab'), applying a chosen CSS layout strategy.
+- [ ] Performed manual testing following the **revised structure and steps outlined in the updated Step 10**, verifying startup mechanics, event trigger, popup, pause/resume, phase transition, and lab mechanics.
 - [ ] Ensured all new code includes appropriate TypeScript types and comments for clarity.
 - [ ] Ensured all modified stores correctly expose necessary states/actions for Playwright tests via the `window.__storeName` pattern.
