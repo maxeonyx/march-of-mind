@@ -1,4 +1,26 @@
-Implementation Instructions: Event System and Phase TransitionsThis document provides step-by-step instructions for implementing an event system with phase transitions in the "March of Mind" game. Please follow these instructions carefully to ensure a robust and maintainable implementation.1. File Creation and ModificationHere's a list of files that need to be created or modified:Create: src/stores/events.tsCreate: src/stores/phases.tsModify: src/stores/techTree.tsModify: src/App.vueModify: src/components/DatacentrePanel.vueModify: src/components/TechCard.vueModify: src/stores/resources.tsModify: src/components/DebugPanel.vue (Optional, for debugging)2. src/stores/events.ts (Create)This file will manage the event system.import { defineStore } from 'pinia';
+# Implementation Instructions: Event System and Phase Transitions
+
+This document provides step-by-step instructions for implementing an event system with phase transitions in the "March of Mind" game. Please follow these instructions carefully to ensure a robust and maintainable implementation.
+
+## 1. File Creation and Modification
+
+Here's a list of files that need to be created or modified:
+
+* Create: src/stores/events.ts
+* Create: src/stores/phases.ts
+* Modify: src/stores/techTree.ts
+* Modify: src/App.vue
+* Modify: src/components/DatacentrePanel.vue
+* Modify: src/components/TechCard.vue
+* Modify: src/stores/resources.ts
+* Modify: src/components/DebugPanel.vue (Optional, for debugging)
+
+## 2. src/stores/events.ts (Create)
+
+This file will manage the event system.
+
+```typescript
+import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 
 export const useEventsStore = defineStore('events', () => {
@@ -26,7 +48,14 @@ export const useEventsStore = defineStore('events', () => {
         resetEvents,
     };
 });
-3. src/stores/phases.ts (Create)This file will manage the game phases.import { defineStore } from 'pinia';
+```
+
+## 3. src/stores/phases.ts (Create)
+
+This file will manage the game phases.
+
+```typescript
+import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
 export const usePhasesStore = defineStore('phases', () => {
@@ -42,7 +71,14 @@ export const usePhasesStore = defineStore('phases', () => {
         setPhase,
     };
 });
-4. src/stores/techTree.ts (Modify)Modify this file to trigger the event on the first product completion and provide a way to check if a product is the first one.// ... existing imports ...
+```
+
+## 4. src/stores/techTree.ts (Modify)
+
+Modify this file to trigger the event on the first product completion and provide a way to check if a product is the first one.
+
+```typescript
+// ... existing imports ...
 import { useEventsStore } from './stores/events';
 
 export const useTechTreeStore = defineStore('techTree', () => {
@@ -81,7 +117,14 @@ export const useTechTreeStore = defineStore('techTree', () => {
         initialize,
     };
 });
-5. src/App.vue (Modify)Import and use the new stores.// ... existing imports ...
+```
+
+## 5. src/App.vue (Modify)
+
+Import and use the new stores.
+
+```typescript
+// ... existing imports ...
 import { useEventsStore } from './stores/events';
 import { usePhasesStore } from './stores/phases';
 
@@ -109,7 +152,9 @@ function closePopup() {
 }
 
 // ... existing template ...
+```
 
+```html
 <template>
     // ... existing template ...
 
@@ -135,7 +180,14 @@ function closePopup() {
     z-index: 1000;
 }
 </style>
-6. src/components/DatacentrePanel.vue (Modify)Conditionally render the correct panel based on the current phase.// ... existing imports ...
+```
+
+## 6. src/components/DatacentrePanel.vue (Modify)
+
+Conditionally render the correct panel based on the current phase.
+
+```typescript
+// ... existing imports ...
 import { usePhasesStore } from '../stores/phases';
 import ResearchersPanel from './ResearchersPanel.vue';
 import HardwarePanel from './HardwarePanel.vue';
@@ -146,7 +198,9 @@ import FounderPanel from './FounderPanel.vue'; // Import the new FounderPanel
 const phasesStore = usePhasesStore();
 
 // ... existing template ...
+```
 
+```html
 <template>
     <div class="datacentre-panel">
         <h2>Datacentre</h2>
@@ -163,7 +217,14 @@ const phasesStore = usePhasesStore();
 </template>
 
 // ... existing style ...
-7. src/components/FounderPanel.vue (Create)This component will be specific to the startup phase.<template>
+```
+
+## 7. src/components/FounderPanel.vue (Create)
+
+This component will be specific to the startup phase.
+
+```html
+<template>
     <div class="founder-panel">
         <h3>Founder Panel</h3>
         <button @click="doResearch">Do Research</button>
@@ -222,7 +283,14 @@ button {
     margin-bottom: 0.5rem;
 }
 </style>
-8. src/components/TechCard.vue (Modify)Adjust the logic for handling clicks in the startup phase.// ... existing imports ...
+```
+
+## 8. src/components/TechCard.vue (Modify)
+
+Adjust the logic for handling clicks in the startup phase.
+
+```typescript
+// ... existing imports ...
 import { usePhasesStore } from '../stores/phases';
 
 const phasesStore = usePhasesStore();
@@ -257,7 +325,14 @@ function handleClick() {
 }
 
 // ... existing template ...
-9. src/stores/resources.ts (Modify)Remove the work calculation from the store, as it's now handled in the FounderPanel for the startup phase.// ... existing imports ...
+```
+
+## 9. src/stores/resources.ts (Modify)
+
+Remove the work calculation from the store, as it's now handled in the FounderPanel for the startup phase.
+
+```typescript
+// ... existing imports ...
 import { usePhasesStore } from '../stores/phases';
 
 export const useResourcesStore = defineStore('resources', () => {
@@ -280,7 +355,14 @@ export const useResourcesStore = defineStore('resources', () => {
         workRate,
     };
 });
-10. src/components/DebugPanel.vue (Modify - Optional)Add phase control for easier testing.// ... existing imports ...
+```
+
+## 10. src/components/DebugPanel.vue (Modify - Optional)
+
+Add phase control for easier testing.
+
+```typescript
+// ... existing imports ...
 import { usePhasesStore } from '../stores/phases';
 
 const phasesStore = usePhasesStore();
@@ -291,7 +373,9 @@ function setPhase() {
 }
 
 // ... existing template ...
+```
 
+```html
 <template>
     // ... existing template ...
 
@@ -308,4 +392,49 @@ function setPhase() {
 
     // ... existing template ...
 </template>
-11. Testing GuidanceInitial State:Verify the game starts in the "startup" phase.Verify the FounderPanel is displayed in the DatacentrePanel.Manual Research:Click the "Do Research" button in the FounderPanel.Verify that work is applied to the selected discovery or the first product.First Product Completion:Continue clicking the "Do Research" button until the first product is completed.Verify the "first_product_completed" event is triggered (check the console).Verify the popup appears with the correct message.Verify the game is paused while the popup is shown.Phase Transition:Click the "OK" button to dismiss the popup.Verify the game transitions to the "lab" phase.Verify the FounderPanel is replaced by the ResearchersPanel, HardwarePanel, WorkPanel, and WorkAllocatorPanel in the DatacentrePanel.Verify the game resumes.Lab Phase Mechanics:Verify that work is now generated automatically per tick.Verify that hiring researchers and upgrading hardware function correctly.Persistence (Optional):If persistence is implemented, verify that the phase and triggered events are saved and loaded correctly.Implementation Checklist[ ] Create src/stores/events.ts[ ] Create src/stores/phases.ts[ ] Modify src/stores/techTree.ts to trigger the "first_product_completed" event and check for the first product.[ ] Modify src/App.vue to handle the event and phase transition.[ ] Modify src/components/DatacentrePanel.vue to conditionally render panels based on the phase.[ ] Create src/components/FounderPanel.vue for the startup phase.[ ] Modify src/components/TechCard.vue to handle click logic for the startup phase.[ ] Modify src/stores/resources.ts to adjust work rate calculation based on the phase.[ ] Modify src/components/DebugPanel.vue (Optional) for phase control.[ ] Thoroughly test all functionalities as outlined in the testing guidance.[ ] Verify code adheres to coding standards (TypeScript, comments, etc.).[ ] Review and refactor code for clarity and efficiency.[ ] Complete documentation for the event and phase systems.
+```
+
+## 11. Testing Guidance
+
+### Initial State:
+- Verify the game starts in the "startup" phase.
+- Verify the FounderPanel is displayed in the DatacentrePanel.
+
+### Manual Research:
+- Click the "Do Research" button in the FounderPanel.
+- Verify that work is applied to the selected discovery or the first product.
+
+### First Product Completion:
+- Continue clicking the "Do Research" button until the first product is completed.
+- Verify the "first_product_completed" event is triggered (check the console).
+- Verify the popup appears with the correct message.
+- Verify the game is paused while the popup is shown.
+
+### Phase Transition:
+- Click the "OK" button to dismiss the popup.
+- Verify the game transitions to the "lab" phase.
+- Verify the FounderPanel is replaced by the ResearchersPanel, HardwarePanel, WorkPanel, and WorkAllocatorPanel in the DatacentrePanel.
+- Verify the game resumes.
+
+### Lab Phase Mechanics:
+- Verify that work is now generated automatically per tick.
+- Verify that hiring researchers and upgrading hardware function correctly.
+
+### Persistence (Optional):
+- If persistence is implemented, verify that the phase and triggered events are saved and loaded correctly.
+
+## Implementation Checklist
+
+- [ ] Create src/stores/events.ts
+- [ ] Create src/stores/phases.ts
+- [ ] Modify src/stores/techTree.ts to trigger the "first_product_completed" event and check for the first product.
+- [ ] Modify src/App.vue to handle the event and phase transition.
+- [ ] Modify src/components/DatacentrePanel.vue to conditionally render panels based on the phase.
+- [ ] Create src/components/FounderPanel.vue for the startup phase.
+- [ ] Modify src/components/TechCard.vue to handle click logic for the startup phase.
+- [ ] Modify src/stores/resources.ts to adjust work rate calculation based on the phase.
+- [ ] Modify src/components/DebugPanel.vue (Optional) for phase control.
+- [ ] Thoroughly test all functionalities as outlined in the testing guidance.
+- [ ] Verify code adheres to coding standards (TypeScript, comments, etc.).
+- [ ] Review and refactor code for clarity and efficiency.
+- [ ] Complete documentation for the event and phase systems.
