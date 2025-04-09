@@ -131,3 +131,4 @@ Always update both this file `CLAUDE.md` AND `package.json`.
 - 0.5.0 - Implemented cross-store getters (incomeRate, workRate, canAffordToHire, etc.) and simple interactions (firing researchers, adjusting work allocation slider, selecting tech cards)
 - 0.6.0 - Implemented complex actions with cross-store dependencies (hiring researchers, upgrading hardware, unlocking and progressing tech cards), added debug panel to manually test game mechanics
 - 0.7.0 - Implemented game loop with automatic time progression, resource accumulation, and work application; added start/stop game controls
+- 0.8.0 - Implemented event and phase system with startup/lab phases, pause/resume functionality, InfoPopup component, and conditional DatacentrePanel rendering; added FounderPanel for manual work in startup phase

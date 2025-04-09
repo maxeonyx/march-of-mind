@@ -17,6 +17,11 @@ export interface VersionInfo {
 }
 
 /**
+ * Represents the major phases of the game.
+ */
+export type GamePhase = 'startup' | 'lab'; // Add more phases later as needed
+
+/**
  * Quiz data structure
  */
 export interface Quiz {
@@ -83,12 +88,23 @@ declare global {
       currentMonthIndex: number;
       tick: () => void;
       performTick: (deltaTimeSeconds: number) => void;
+      pauseGame: () => void;
+      resumeGame: () => void;
     };
     __uiStore?: {
       isQuizModalVisible: boolean;
       quizTechId: string | null;
       showQuizModal: (techId: string) => void;
       hideQuizModal: () => void;
+      isPopupVisible: boolean;
+      popupTitle: string | null;
+      popupMessage: string | null;
+      showPopup: (title: string, message: string) => void;
+      hidePopup: () => void;
+    };
+    __phaseStore?: {
+      currentPhase: GamePhase;
+      setPhase: (phase: GamePhase) => void;
     };
     __appMethods?: {
       dummyMethod: () => void;

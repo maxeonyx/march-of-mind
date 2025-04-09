@@ -26,8 +26,9 @@
       </p>
     </footer>
 
-    <!-- Quiz Modal Component -->
+    <!-- Modal Components -->
     <QuizModal />
+    <InfoPopup />
   </div>
 </template>
 
@@ -40,6 +41,7 @@ import DatacentrePanel from './components/DatacentrePanel.vue';
 import TechnologyPanel from './components/TechnologyPanel.vue';
 import DebugPanel from './components/DebugPanel.vue';
 import QuizModal from './components/QuizModal.vue';
+import InfoPopup from './components/InfoPopup.vue';
 
 import { useTimeStore } from './stores/time';
 
