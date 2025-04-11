@@ -12,6 +12,7 @@
     "test": "playwright test --reporter=dot"
   },
   "dependencies": {
+    "chart.js": "^4.4.8",
     "pinia": "~2.0.14",
     "vue": "~3.2.47"
   },
